@@ -1,0 +1,21 @@
+{
+  "name": "react-museum",
+  "description": "Sample React components",
+  "main": "bundle.js",
+  "scripts": {
+    "build:js": "jsx ./src ./build",
+    "build:jsx": "jsx --extension jsx ./src ./build",
+    "bundle": "browserify ./build/index.js -o ./bundle.js",
+    "build": "npm run build:js && npm run build:jsx && npm run bundle",
+    "watch": "./node_modules/watch/cli.js 'npm run build' ./src",
+    "clean": "rm -rf ./build && rm ./bundle.js"
+  },
+  "dependencies": {
+    "react": "^0.13.3",
+    "react-router": "^0.13.3",
+    "react-tap-event-plugin": "^0.1.7"
+  },
+  "devDependencies": {
+    "watch": "^0.16.0"
+  }
+}
