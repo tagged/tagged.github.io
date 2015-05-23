@@ -19,10 +19,6 @@ var Ripple = React.createClass({
         borderRadius: '50%',
         backgroundColor: Color.blue500,
         opacity: 0
-        //transform:  this.props.visible ? 'scale(1)' : 'scale(0)',        
-        //Note: transition not working on Chrome mobile
-        //transition: this.props.visible ? 'transform 200ms ease-out 0' :
-        //            'opacity 400ms ease-out 0, transform 0 ease-out 400ms'
       }
     };
   },
