@@ -1,10 +1,11 @@
 var React = require('react/addons');
+React.initializeTouchEvents(true);
+
 var Color = require('./res/color');
 var Dimension = require('./res/dimension');
 var SvgIconCheckbox = require('./SvgIconCheckbox');
 var SvgIconCheckboxOutline = require('./SvgIconCheckboxOutline');
-
-
+var Ripple = require('./Ripple');
 
 var Checkbox = React.createClass({
 
@@ -21,11 +22,12 @@ var Checkbox = React.createClass({
         boxSizing: 'border-box',
         height: Dimension.touchTarget,
         width: Dimension.touchTarget,
-        padding: (Dimension.touchTarget - Dimension.icon) / 2,
         cursor: 'pointer'
       },
       check: {
         position: 'absolute',
+        top:  (Dimension.touchTarget - Dimension.icon) / 2,
+        left: (Dimension.touchTarget - Dimension.icon) / 2,
         fill: Color.blue500,
         opacity:    this.props.checked ? 1 : 0,
         transform:  this.props.checked ? 'scale(1)' : 'scale(0)',
@@ -33,7 +35,9 @@ var Checkbox = React.createClass({
                     'opacity 200ms ease-out 0, transform 0 ease-out 200ms'
       },
       box: {
-        position: 'absolute'
+        position: 'absolute',
+        top:  (Dimension.touchTarget - Dimension.icon) / 2,
+        left: (Dimension.touchTarget - Dimension.icon) / 2
       }
     };
   },
@@ -41,11 +45,25 @@ var Checkbox = React.createClass({
   render: function() {
     var style = this.getStyle();
     return (
-      <div style={style.checkbox} onClick={this.props.handleClick}>
+      <div style={style.checkbox}
+           onClick={this.props.handleClick}
+           //onMouseDown={this.showRipple}
+           //onMouseUp={this.hideRipple}
+           onTouchStart={this.showRipple}
+           onTouchEnd={this.hideRipple}>
           <SvgIconCheckboxOutline style={style.box}/>
           <SvgIconCheckbox style={style.check}/>
+          <Ripple ref="ripple"/>
       </div>
     );
+  },
+
+  showRipple: function() {
+    this.refs.ripple.showRipple();
+  },
+
+  hideRipple: function() {
+    this.refs.ripple.hideRipple();
   }
 
 });

@@ -1,4 +1,6 @@
 var React = require('react/addons');
+var injectTapEventPlugin = require("react-tap-event-plugin");
+//injectTapEventPlugin();
 
 var Router = require('react-router');
 var DefaultRoute = Router.DefaultRoute;
