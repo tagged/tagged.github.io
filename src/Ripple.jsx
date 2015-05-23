@@ -5,12 +5,6 @@ var Velocity = require('../velocity/velocity.js');
 
 var Ripple = React.createClass({
 
-  getInitialState: function(){
-    return {
-      currentlyRippling: false
-    };
-  },
-
   getStyle: function() {
     return {
       ripple: {
@@ -31,9 +25,6 @@ var Ripple = React.createClass({
   },
 
   showRipple: function() {
-
-    if (!this.state.currentlyRippling) {
-      this.setState({currentlyRippling: true});
       var rippleElement = this.refs.ripple.getDOMNode();
 
       Velocity({
@@ -45,15 +36,13 @@ var Ripple = React.createClass({
         },
         options: {duration: 200}
       });
-
-    }
   },
 
   hideRipple: function() {
     var rippleElement = this.refs.ripple.getDOMNode();
     var RippleComponent = this;
 
-    // Animations in Velocity are queued
+    // Animations in Velocity are queued per element
     Velocity({
       elements: rippleElement,
       properties: {opacity: 0},
@@ -64,11 +53,12 @@ var Ripple = React.createClass({
       properties: {scaleX: 0, scaleY: 0},
       options: {
         complete: function() {
-          RippleComponent.setState({currentlyRippling: false});
+          // Clear animation queue on ripple element
+          // to prevent delayed ripples when user taps quickly
+          Velocity(rippleElement, "stop", true);
         }
       }
     });
-
   }
 
 });
