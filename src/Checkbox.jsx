@@ -1,22 +1,24 @@
 var React = require('react/addons');
-React.initializeTouchEvents(true);
+ReactTransitionGroup = React.addons.TransitionGroup;
 
-var Color = require('./res/color');
 var Dimension = require('./res/dimension');
 var SvgIconCheckbox = require('./SvgIconCheckbox');
 var SvgIconCheckboxOutline = require('./SvgIconCheckboxOutline');
-var Ripple = require('./Ripple');
+var Ripples = require('./Ripples');
+
+var Velocity = require('../velocity/velocity.js');
 
 var Checkbox = React.createClass({
 
   propTypes: {
-    checked: React.PropTypes.bool,
-    handleClick: React.PropTypes.func
+    isChecked: React.PropTypes.bool,
+    handleClick: React.PropTypes.func,
+    color: React.PropTypes.string
   },
 
   getStyle: function() {
     return {
-      checkbox: {
+      component: {
         position: 'relative',
         display: 'inline-block',
         boxSizing: 'border-box',
@@ -24,20 +26,10 @@ var Checkbox = React.createClass({
         width: Dimension.touchTarget,
         cursor: 'pointer'
       },
-      check: {
+      icon: {
         position: 'absolute',
         top:  (Dimension.touchTarget - Dimension.icon) / 2,
         left: (Dimension.touchTarget - Dimension.icon) / 2,
-        fill: Color.blue500,
-        opacity:    this.props.checked ? 1 : 0,
-        transform:  this.props.checked ? 'scale(1)' : 'scale(0)',
-        transition: this.props.checked ? 'all 200ms ease-out 0' : 
-                    'opacity 200ms ease-out 0, transform 0 ease-out 200ms'
-      },
-      box: {
-        position: 'absolute',
-        top:  (Dimension.touchTarget - Dimension.icon) / 2,
-        left: (Dimension.touchTarget - Dimension.icon) / 2
       }
     };
   },
@@ -45,25 +37,21 @@ var Checkbox = React.createClass({
   render: function() {
     var style = this.getStyle();
     return (
-      <div style={style.checkbox}
-           onClick={this.props.handleClick}
-           //onMouseDown={this.showRipple}
-           //onMouseUp={this.hideRipple}
-           onTouchStart={this.showRipple}
-           onTouchEnd={this.hideRipple}>
-          <SvgIconCheckboxOutline style={style.box}/>
-          <SvgIconCheckbox style={style.check}/>
-          <Ripple ref="ripple"/>
+      <div style={style.component}
+           onClick={this.handleClick}>
+          <SvgIconCheckboxOutline style={style.icon}/>
+          <SvgIconCheckbox ref="checkbox" 
+                           color={this.props.color} 
+                           isChecked={this.props.isChecked} 
+                           style={style.icon}/>
       </div>
     );
+//<Ripples color={this.props.color}/>
   },
 
-  showRipple: function() {
-    this.refs.ripple.showRipple();
-  },
-
-  hideRipple: function() {
-    this.refs.ripple.hideRipple();
+  handleClick: function() {
+    this.refs.checkbox.stopAnimation();    
+    this.props.handleCheck();
   }
 
 });

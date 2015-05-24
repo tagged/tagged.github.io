@@ -17,6 +17,7 @@ var SvgIconSearch = require('./SvgIconSearch');
 var SvgIconCloudQueue = require('./SvgIconCloudQueue');
 var Checkbox = require('./Checkbox');
 
+var Color = require('./res/color');
 
 
 var Search = React.createClass({
@@ -50,7 +51,10 @@ var Cloud = React.createClass({
     return(
       <Paper style={paperStyle}>
           <h1>Cloud</h1>
-          <Checkbox checked={this.state.checkbox} handleClick={this.clickedCheckbox}/>
+          <Checkbox isChecked={this.state.checkbox} 
+                    handleCheck={this.clickedCheckbox}
+                    color={Color.blue500}/>
+
       </Paper>
     );
   }
