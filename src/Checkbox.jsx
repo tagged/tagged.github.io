@@ -1,5 +1,4 @@
 var React = require('react/addons');
-ReactTransitionGroup = React.addons.TransitionGroup;
 
 var Dimension = require('./res/dimension');
 var SvgIconCheckbox = require('./SvgIconCheckbox');
