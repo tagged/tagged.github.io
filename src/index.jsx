@@ -16,6 +16,7 @@ var SvgIcon = require('./SvgIcon');
 var SvgIconSearch = require('./SvgIconSearch');
 var SvgIconCloudQueue = require('./SvgIconCloudQueue');
 var Checkbox = require('./Checkbox');
+var Collapsible = require('./Collapsible');
 
 var Color = require('./res/color');
 
@@ -48,12 +49,26 @@ var Cloud = React.createClass({
 
   render: function() {
     var paperStyle = {height:'20px', marginTop:'50px'};
+    var headContent = (
+      <h1>Collapsible header</h1>
+    );
+    var bodyContent = (
+      <div>
+          <div>Collapsible body line 1</div>
+          <div>Collapsible body line 2</div>
+          <div>Collapsible body line 3</div>
+      </div>
+    );
+
     return(
       <Paper style={paperStyle}>
           <h1>Cloud</h1>
           <Checkbox isChecked={this.state.checkbox} 
                     handleCheck={this.clickedCheckbox}
                     color={Color.blue500}/>
+          <Collapsible head={headContent}
+                       body={bodyContent}
+                       isOpen={false}/>
 
       </Paper>
     );

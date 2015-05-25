@@ -1,16 +1,13 @@
 var React = require('react/addons');
-
 var Dimension = require('./res/dimension');
 var SvgIconCheckbox = require('./SvgIconCheckbox');
 var SvgIconCheckboxOutline = require('./SvgIconCheckboxOutline');
 var Ripples = require('./Ripples');
 
-var Velocity = require('../velocity/velocity.js');
-
 var Checkbox = React.createClass({
 
   propTypes: {
-    isChecked: React.PropTypes.bool,
+    isChecked: React.PropTypes.bool.isRequired,
     handleClick: React.PropTypes.func,
     color: React.PropTypes.string
   },
@@ -37,20 +34,14 @@ var Checkbox = React.createClass({
     var style = this.getStyle();
     return (
       <div style={style.component}
-           onClick={this.handleClick}>
+           onClick={this.props.handleCheck}>
           <SvgIconCheckboxOutline style={style.icon}/>
-          <SvgIconCheckbox ref="checkbox" 
-                           color={this.props.color} 
-                           isChecked={this.props.isChecked} 
+          <SvgIconCheckbox isChecked={this.props.isChecked}
+                           fill={this.props.color} 
                            style={style.icon}/>
       </div>
     );
 //<Ripples color={this.props.color}/>
-  },
-
-  handleClick: function() {
-    this.refs.checkbox.stopAnimation();    
-    this.props.handleCheck();
   }
 
 });
