@@ -15,6 +15,7 @@ var AppBarAction = require('./AppBarAction');
 var SvgIcon = require('./SvgIcon');
 var SvgIconSearch = require('./SvgIconSearch');
 var SvgIconCloudQueue = require('./SvgIconCloudQueue');
+var SvgIconExpand = require('./SvgIconExpand');
 var Checkbox = require('./Checkbox');
 var Collapsible = require('./Collapsible');
 
@@ -35,7 +36,8 @@ var Search = React.createClass({
 var Cloud = React.createClass({
   getInitialState: function() {
     return {
-      checkbox: false
+      checkbox: false,
+      isOpen: false
     };
   },
 
@@ -47,10 +49,22 @@ var Cloud = React.createClass({
     });
   },
 
+  toggledCollapsible: function() {
+    this.setState({
+      isOpen: !this.state.isOpen
+    }, function() {
+      console.log('toggled collapsible');
+    });
+  },
+
   render: function() {
     var paperStyle = {height:'20px', marginTop:'50px'};
     var headContent = (
-      <h1>Collapsible header</h1>
+      <div>
+          <span>Title</span>
+          <SvgIconExpand isExpanded={this.state.isOpen}/>
+      </div>
+
     );
     var bodyContent = (
       <div>
@@ -68,7 +82,8 @@ var Cloud = React.createClass({
                     color={Color.blue500}/>
           <Collapsible head={headContent}
                        body={bodyContent}
-                       isOpen={false}/>
+                       isOpen={this.state.isOpen}
+                       handleToggle={this.toggledCollapsible}/>
 
       </Paper>
     );
