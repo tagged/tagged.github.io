@@ -84,8 +84,8 @@ var SvgIconCheckbox = React.createClass({
         scale: nextProps.isChecked ? 1 : 0
       },
       options: {
-        duration: 200, 
-        easing: "ease-out"
+        duration: 400,
+        easing: nextProps.isChecked ? "easeOutCubic" : "easeInCubic"
       }
     });
   }
