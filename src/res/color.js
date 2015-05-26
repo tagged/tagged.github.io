@@ -5,6 +5,10 @@ module.exports = {
   blackSecondary: 'rgba(0,0,0,0.54)',
   blackHint: 'rgba(0,0,0,0.26)',
   blackDivider: 'rgba(0,0,0,0.12)',
+  blackPrimaryOpacity: 0.87,
+  blackSecondaryOpacity: 0.54,
+  blackHintOpacity: 0.26,
+  blackDividerOpacity: 0.12,
 
   white: '#ffffff',
   whitePrimary: '#ffffff',
