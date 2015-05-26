@@ -1,7 +1,8 @@
 var React = require('react/addons');
+var Color = require('./res/color');
 var Dimension = require('./res/dimension');
-var SvgIconCheckbox = require('./SvgIconCheckbox');
-var SvgIconCheckboxOutline = require('./SvgIconCheckboxOutline');
+var MaterialIconCheckbox = require('./MaterialIconCheckbox');
+var MaterialIconCheckboxOutline = require('./MaterialIconCheckboxOutline');
 var Ripples = require('./Ripples');
 
 var Checkbox = React.createClass({
@@ -35,13 +36,14 @@ var Checkbox = React.createClass({
     return (
       <div style={style.component}
            onClick={this.props.handleCheck}>
-          <SvgIconCheckboxOutline style={style.icon}/>
-          <SvgIconCheckbox isChecked={this.props.isChecked}
-                           fill={this.props.color} 
-                           style={style.icon}/>
+          <MaterialIconCheckboxOutline fill={Color.black}
+                                       fillOpacity={Color.blackSecondaryOpacity}
+                                       style={style.icon}/>
+          <MaterialIconCheckbox isChecked={this.props.isChecked}
+                                fill={this.props.color}
+                                style={style.icon}/>
       </div>
     );
-//<Ripples color={this.props.color}/>
   }
 
 });
