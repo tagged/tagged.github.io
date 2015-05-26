@@ -3,12 +3,15 @@
   "description": "Sample React components",
   "main": "bundle.js",
   "scripts": {
+    "bundle:vendor": "browserify --require react --require react/addons --require ./velocity/velocity.js > ./vendor.js",
     "build:js": "jsx ./src ./build",
     "build:jsx": "jsx --harmony --extension jsx ./src ./build",
-    "bundle": "browserify ./build/index.js -o ./bundle.js",
-    "build": "npm run build:js && npm run build:jsx && npm run bundle && echo 'Done'",
-    "watch": "./node_modules/watch/cli.js 'npm run build' ./src",
-    "clean": "rm -rf ./build && rm ./bundle.js"
+    "bundle:app": "browserify --external react --external react/addons --external ./velocity/velocity.js ./build/index.js > ./app.js",
+    "build:app": "npm run build:js && npm run build:jsx && npm run bundle:app && echo 'Done'",
+    "build": "npm run bundle:vendor && npm run build:app",
+    "watch:app": "./node_modules/watch/cli.js 'npm run build:app' ./src",
+    "watch": "npm run bundle:vendor && npm run watch:app",
+    "clean": "rm -rf ./build && rm -f ./app.js && rm -f ./vendor.js"
   },
   "dependencies": {
     "react": "^0.13.3",

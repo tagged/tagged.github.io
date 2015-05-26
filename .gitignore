@@ -3,4 +3,5 @@ node_modules
 velocity
 
 reset.css
-bundle.js
+app.js
+vendor.js
