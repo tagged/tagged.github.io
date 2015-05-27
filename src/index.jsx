@@ -22,6 +22,8 @@ var Dimension = require('./res/dimension');
 
 var getGlobalStyle = function() {
   return {
+    color: Color.blackPrimary,
+    fontFamily: 'Roboto, sans-serif',
     WebkitTapHighlightColor: 'rgba(0,0,0,0)'
   };
 }
