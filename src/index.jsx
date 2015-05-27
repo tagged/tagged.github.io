@@ -1,5 +1,5 @@
 var React = require('react/addons');
-var injectTapEventPlugin = require("react-tap-event-plugin");
+//var injectTapEventPlugin = require("react-tap-event-plugin");
 //injectTapEventPlugin();
 
 var Router = require('react-router');
@@ -12,14 +12,19 @@ var Paper = require('./Paper');
 var AppBar = require('./AppBar');
 var AppBarActions = require('./AppBarActions');
 var AppBarAction = require('./AppBarAction');
-var SvgIcon = require('./SvgIcon');
-var SvgIconSearch = require('./SvgIconSearch');
-var SvgIconCloudQueue = require('./SvgIconCloudQueue');
-var SvgIconExpand = require('./SvgIconExpand');
-var Checkbox = require('./Checkbox');
-var Collapsible = require('./Collapsible');
-
+var MaterialIcon = require('./MaterialIcon');
+var MaterialIconSearch = require('./MaterialIconSearch');
+var MaterialIconCloudQueue = require('./MaterialIconCloudQueue');
+var FileTile = require('./FileTile');
 var Color = require('./res/color');
+var Dimension = require('./res/dimension');
+
+
+var getGlobalStyle = function() {
+  return {
+    WebkitTapHighlightColor: 'rgba(0,0,0,0)'
+  };
+}
 
 
 var Search = React.createClass({
@@ -34,58 +39,83 @@ var Search = React.createClass({
 });
 
 var Cloud = React.createClass({
+  // Sample files; will generalize later
   getInitialState: function() {
+    var files = [{
+      name: "Getting Started With a Really really Really really Really really Long Title",
+      metadata: {
+        "path": "Dropbox/Samples",
+        "modified": "Modified 2015 Feb 28",
+        "size": "25 KB",
+        "type": "PDF"
+      },
+      tags: ["TAG ","TAG ","TAG "],
+      isOpen: false,
+      isChecked: false
+    }, {
+      name: "Second file",
+      metadata: {
+        "path": "Dropbox/Samples",
+        "modified": "Modified 2014 Aug 12",
+        "size": "2 KB",
+        "type": "DOCX"
+      },
+      tags: ["TAG ","TAG ","TAG ","TAG ","TAG ",],
+      isOpen: false,
+      isChecked: false     
+    }];
+    
     return {
-      checkbox: false,
-      isOpen: false
+      files: files
     };
   },
 
-  clickedCheckbox: function() {
-    this.setState({
-      checkbox: !this.state.checkbox
-    }, function() {
-      console.log('clicked checkbox');
-    });
+  clickedCheckbox: function(fileName) {
+    this.toggle(fileName, 'isChecked', 'clicked checkbox');
   },
 
-  toggledCollapsible: function() {
+  toggledCollapsible: function(fileName) {
+    this.toggle(fileName, 'isOpen', 'toggled collapsible');
+  },
+
+  toggle: function(fileName, fileProperty, message) {
+    //Toggle a boolean file property
+
+    var newFiles = this.state.files.map(function(file) {
+      if (fileName !== file.name) {
+        return file;
+      } else {
+        var fileCopy = file;
+        fileCopy[fileProperty] = !file[fileProperty];
+        return fileCopy;
+      }
+    });
+
     this.setState({
-      isOpen: !this.state.isOpen
+      files: newFiles
     }, function() {
-      console.log('toggled collapsible');
+      console.log(message);
     });
   },
 
   render: function() {
-    var paperStyle = {height:'20px', marginTop:'50px'};
-    var headContent = (
-      <div>
-          <span>Title</span>
-          <SvgIconExpand isExpanded={this.state.isOpen}/>
-      </div>
-
-    );
-    var bodyContent = (
-      <div>
-          <div>Collapsible body line 1</div>
-          <div>Collapsible body line 2</div>
-          <div>Collapsible body line 3</div>
-      </div>
-    );
+    var fileTiles = this.state.files.map(function(file) {
+      return (
+        <FileTile filename={file.name}
+                  metadata={file.metadata}
+                  tags={file.tags}
+                  isChecked={file.isChecked}
+                  isOpen={file.isOpen}
+                  handleCheck={this.clickedCheckbox.bind(this, file.name)}
+                  handleToggle={this.toggledCollapsible.bind(this, file.name)}
+                  key={file.name}/>
+      );
+    }, this);
 
     return(
-      <Paper style={paperStyle}>
-          <h1>Cloud</h1>
-          <Checkbox isChecked={this.state.checkbox} 
-                    handleCheck={this.clickedCheckbox}
-                    color={Color.blue500}/>
-          <Collapsible head={headContent}
-                       body={bodyContent}
-                       isOpen={this.state.isOpen}
-                       handleToggle={this.toggledCollapsible}/>
-
-      </Paper>
+      <div style={{paddingTop: Dimension.space}}>
+          {fileTiles}
+      </div>
     );
   }
 });
@@ -96,17 +126,19 @@ var Main = React.createClass({
 
   render: function() {
     return (
-      <div>
+      <div  style={getGlobalStyle()}>
           <AppBar>
               <AppBarActions> 
                   <Link to="search"><AppBarAction>
-                      <SvgIconSearch 
-                          style={{}}
+                      <MaterialIconSearch fill={Color.black}
+                                          fillOpacity={Color.blackSecondaryOpacity}
+                                          style={{}}
                       />
                   </AppBarAction></Link>
                   <Link to="app"><AppBarAction>
-                      <SvgIconCloudQueue
-                          style={{}}
+                      <MaterialIconCloudQueue fill={Color.black}
+                                              fillOpacity={Color.blackSecondaryOpacity}
+                                              style={{}}
                       />
                   </AppBarAction></Link>
               </AppBarActions>

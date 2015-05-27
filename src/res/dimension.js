@@ -1,5 +1,6 @@
 module.exports = {
 
+  quantum: 4,
   space: 8,
 
   touchTarget: 48,
@@ -14,8 +15,7 @@ module.exports = {
   icon: 24,
 
   heightListItemSingle: 48,
-  heightListItemDouble: 72,
-  heightListItemTriple: 88,
+  heightListItemDouble: 56,
 
   heightAppBarMobile: 56,
   heightAppBarTablet: 64,
