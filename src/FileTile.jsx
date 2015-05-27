@@ -2,6 +2,7 @@ var React = require('react/addons');
 var Checkbox = require('./Checkbox');
 var Collapsible = require('./Collapsible');
 var MaterialIconExpand = require('./MaterialIconExpand');
+var ImageIcon = require('./ImageIcon');
 var Color = require('./res/color');
 var Dimension = require('./res/dimension');
 
@@ -45,6 +46,10 @@ var FileTile = React.createClass({
         lineHeight: 1,
         fontSize: '14px',
         fontWeight: 300
+      },
+      icon: {
+        float: 'right',
+        marginLeft: Dimension.quantum
       }
     };
   },
@@ -85,6 +90,15 @@ var FileTile = React.createClass({
       </div>
     );
 
+    var fileLink = (
+      <a href={this.props.metadata.link}
+         target="_blank"
+         onClick={function(e){e.stopPropagation();}}>
+          <ImageIcon cloud={this.props.metadata.cloud}
+                     style={style.icon}/>
+      </a>
+    );
+
     return (
       <div style={style.component}>
           <Checkbox isChecked={this.props.isChecked} 
@@ -94,7 +108,8 @@ var FileTile = React.createClass({
           <Collapsible head={headContent}
                        body={bodyContent}
                        isOpen={this.props.isOpen}
-                       handleToggle={this.props.handleToggle}/>
+                       handleToggle={this.props.handleToggle}
+                       icon={fileLink}/>
       </div>
     );
   }

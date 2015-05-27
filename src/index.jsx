@@ -44,10 +44,12 @@ var Cloud = React.createClass({
     var files = [{
       name: "Getting Started With a Really really Really really Really really Long Title",
       metadata: {
-        "path": "Dropbox/Samples",
-        "modified": "Modified 2015 Feb 28",
-        "size": "25 KB",
-        "type": "PDF"
+        path: "Dropbox/Samples",
+        modified: "Modified 2015 Feb 28",
+        size: "25 KB",
+        type: "PDF",
+        cloud: "dropbox",
+        link: "//www.dropbox.com/home"
       },
       tags: ["TAG ","TAG ","TAG "],
       isOpen: false,
@@ -55,10 +57,12 @@ var Cloud = React.createClass({
     }, {
       name: "Second file",
       metadata: {
-        "path": "Dropbox/Samples",
-        "modified": "Modified 2014 Aug 12",
-        "size": "2 KB",
-        "type": "DOCX"
+        path: "Dropbox/Samples",
+        modified: "Modified 2014 Aug 12",
+        size: "2 KB",
+        type: "DOCX",
+        cloud: "google",
+        link: "//drive.google.com"
       },
       tags: ["TAG ","TAG ","TAG ","TAG ","TAG ",],
       isOpen: false,

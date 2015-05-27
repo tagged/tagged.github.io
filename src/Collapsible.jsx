@@ -9,7 +9,8 @@ var Collapsible = React.createClass({
     head: React.PropTypes.element.isRequired,
     body: React.PropTypes.element.isRequired,
     isOpen: React.PropTypes.bool.isRequired,
-    handleToggle: React.PropTypes.func.isRequired
+    handleToggle: React.PropTypes.func.isRequired,
+    icon: React.PropTypes.element
   },
 
   getStyle: function() {
@@ -31,6 +32,7 @@ var Collapsible = React.createClass({
           <div ref="head"
                onClick={this.props.handleToggle}
                style={style.head}>
+              {this.props.icon}
               {this.props.head}
           </div>
           <div ref="body" 
