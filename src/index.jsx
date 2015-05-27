@@ -16,6 +16,7 @@ var MaterialIcon = require('./MaterialIcon');
 var MaterialIconSearch = require('./MaterialIconSearch');
 var MaterialIconCloudQueue = require('./MaterialIconCloudQueue');
 var FileTile = require('./FileTile');
+var Tag = require('./Tag');
 var Color = require('./res/color');
 var Dimension = require('./res/dimension');
 
@@ -107,19 +108,27 @@ var Cloud = React.createClass({
   render: function() {
     var fileTiles = this.state.files.map(function(file) {
       return (
-        <FileTile filename={file.name}
-                  metadata={file.metadata}
-                  tags={file.tags}
-                  isChecked={file.isChecked}
-                  isOpen={file.isOpen}
-                  handleCheck={this.clickedCheckbox.bind(this, file.name)}
-                  handleToggle={this.toggledCollapsible.bind(this, file.name)}
-                  key={file.name}/>
+            <FileTile filename={file.name}
+                      metadata={file.metadata}
+                      tags={file.tags}
+                      isChecked={file.isChecked}
+                      isOpen={file.isOpen}
+                      handleCheck={this.clickedCheckbox.bind(this, file.name)}
+                      handleToggle={this.toggledCollapsible.bind(this, file.name)}
+                      key={file.name}/>
       );
     }, this);
 
     return(
-      <div style={{paddingTop: Dimension.space}}>
+      <div>
+          <div style={{paddingTop: Dimension.space}}></div>
+          <Tag text={"pork"} 
+               isDisabled={true}
+               handleClick={function(){}}/>
+          <Tag text={"caravan"} 
+               isDisabled={false}
+               handleClick={function(){}}/>
+          <div style={{paddingTop: Dimension.space}}></div>
           {fileTiles}
       </div>
     );
