@@ -32,12 +32,13 @@ var FileTile = React.createClass({
       },
       filename: {
         boxSizing: 'border-box',
-        paddingTop: Dimension.space,
-        height: '28px',
-        lineHeight: 1,
+        paddingTop: Dimension.quantum, //Dimension.space,
+        paddingBottom: this.props.isOpen ? Dimension.quantum : 0,
+        height: this.props.isOpen ? 'auto' : '28px',
+        lineHeight: 1.2, //1
         fontSize: '16px',
         fontWeight: 400,
-        whiteSpace: 'nowrap',
+        whiteSpace: this.props.isOpen ? 'normal' : 'nowrap',
         textOverflow: 'ellipsis',
         overflow: 'hidden'
       },
