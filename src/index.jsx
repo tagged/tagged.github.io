@@ -57,7 +57,7 @@ var Cloud = React.createClass({
     }, {
       name: "Second file",
       metadata: {
-        path: "Dropbox/Samples",
+        path: ["GoogleDrive","Samples","SmallDocuments","folder","subfolder","InnerFolder","CoreFolder"].join(String.fromCharCode(8203) + "/"),
         modified: "Modified 2014 Aug 12",
         size: "2 KB",
         type: "DOCX",

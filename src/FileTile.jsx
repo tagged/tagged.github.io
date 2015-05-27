@@ -32,10 +32,9 @@ var FileTile = React.createClass({
       },
       filename: {
         boxSizing: 'border-box',
-        paddingTop: Dimension.quantum, //Dimension.space,
-        paddingBottom: this.props.isOpen ? Dimension.quantum : 0,
-        height: this.props.isOpen ? 'auto' : '28px',
-        lineHeight: 1.2, //1
+        paddingTop: Dimension.quantum,
+        paddingBottom: Dimension.quantum,
+        lineHeight: '20px',
         fontSize: '16px',
         fontWeight: 400,
         whiteSpace: this.props.isOpen ? 'normal' : 'nowrap',
@@ -43,10 +42,14 @@ var FileTile = React.createClass({
         overflow: 'hidden'
       },
       subheader: {
-        height: '20px',
-        lineHeight: 1,
+        boxSizing: 'border-box',
+        paddingBottom: Dimension.quantum,
+        lineHeight: '16px',
         fontSize: '14px',
-        fontWeight: 300
+        fontWeight: 300,
+        whiteSpace: this.props.isOpen ? 'normal' : 'nowrap',
+        textOverflow: 'ellipsis',
+        overflow: 'hidden'
       },
       icon: {
         float: 'right',
@@ -57,6 +60,10 @@ var FileTile = React.createClass({
 
   render: function() {
     var style = this.getStyle();
+
+    var filename = (
+      <div style={style.filename}>{this.props.filename}</div>
+    );
 
     var metadata;
     if (this.props.isOpen) {
@@ -79,7 +86,7 @@ var FileTile = React.createClass({
 
     var headContent = (
       <div>
-          <div style={style.filename}>{this.props.filename}</div>
+          {filename}
           {metadata}
           {tagCount}
       </div>
