@@ -15,12 +15,15 @@ var Tag = React.createClass({
     return {
       component: {
         display: 'inline-block',
-        height: '32px',
-        lineHeight: '32px',
+        fontSize: 16,
+        lineHeight: 1.25,
+        paddingTop: Dimension.space,
+        paddingBottom: Dimension.space,
         paddingLeft: Dimension.space,
         paddingRight: Dimension.space,
         marginRight: Dimension.space,
-        borderRadius: '2px',
+        marginBottom: Dimension.space,
+        borderRadius: Dimension.borderRadius,
         backgroundColor: this.props.isDisabled ? Color.blackDivider : Color.blue100,
         cursor: this.props.isDisabled ? 'auto' : 'pointer'        
       }

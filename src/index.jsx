@@ -54,7 +54,7 @@ var Cloud = React.createClass({
         cloud: "dropbox",
         link: "//www.dropbox.com/home"
       },
-      tags: ["TAG ","TAG ","TAG "],
+      tags: ["pork","pork shoulder","honey","five spice","food.ingredients.sauces.oyster-sauce.lee-kum-kee.large-bbbottle","red bean paste"],
       isOpen: false,
       isChecked: false
     }, {
@@ -67,7 +67,7 @@ var Cloud = React.createClass({
         cloud: "google",
         link: "//drive.google.com"
       },
-      tags: ["TAG ","TAG ","TAG ","TAG ","TAG ",],
+      tags: ["TAG"],
       isOpen: false,
       isChecked: false     
     }];
