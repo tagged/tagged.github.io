@@ -1,6 +1,7 @@
 var React = require('react/addons');
 var Color = require('./res/color');
 var Dimension = require('./res/dimension');
+var Typography = require('./res/typography');
 //var Velocity = require('../velocity/velocity.js');
 
 var Tag = React.createClass({
@@ -12,13 +13,15 @@ var Tag = React.createClass({
   },
 
   getStyle: function() {
+    var verticalPadding = (Dimension.heightTag - Typography.lineHeight * Typography.fontSize) / 2;
+
     return {
       component: {
         display: 'inline-block',
-        fontSize: 16,
-        lineHeight: 1.25,
-        paddingTop: Dimension.space,
-        paddingBottom: Dimension.space,
+        fontSize: Typography.fontSize,
+        lineHeight: Typography.lineHeight,
+        paddingTop: verticalPadding,
+        paddingBottom: verticalPadding,
         paddingLeft: Dimension.space,
         paddingRight: Dimension.space,
         marginRight: Dimension.space,

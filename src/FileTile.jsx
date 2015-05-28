@@ -3,8 +3,10 @@ var Checkbox = require('./Checkbox');
 var Collapsible = require('./Collapsible');
 var MaterialIconExpand = require('./MaterialIconExpand');
 var ImageIcon = require('./ImageIcon');
+var Tag = require('./Tag');
 var Color = require('./res/color');
 var Dimension = require('./res/dimension');
+var Typography = require('./res/typography');
 
 var FileTile = React.createClass({
 
@@ -16,7 +18,6 @@ var FileTile = React.createClass({
     isOpen: React.PropTypes.bool.isRequired,
     handleCheck: React.PropTypes.func.isRequired,
     handleToggle: React.PropTypes.func.isRequired
-    
   },
 
   getStyle: function() {
@@ -34,9 +35,9 @@ var FileTile = React.createClass({
         boxSizing: 'border-box',
         paddingTop: Dimension.quantum,
         paddingBottom: Dimension.quantum,
-        lineHeight: '20px',
-        fontSize: '16px',
-        fontWeight: 400,
+        lineHeight: Typography.lineHeight,
+        fontSize: Typography.fontSize,
+        fontWeight: Typography.fontWeightRegular,
         whiteSpace: this.props.isOpen ? 'normal' : 'nowrap',
         textOverflow: 'ellipsis',
         overflow: 'hidden'
@@ -44,9 +45,9 @@ var FileTile = React.createClass({
       subheader: {
         boxSizing: 'border-box',
         paddingBottom: Dimension.quantum,
-        lineHeight: '16px',
-        fontSize: '14px',
-        fontWeight: 300,
+        lineHeight: Typography.lineHeightSmall,
+        fontSize: Typography.fontSizeSmall,
+        fontWeight: Typography.fontWeightThin,
         whiteSpace: this.props.isOpen ? 'normal' : 'nowrap',
         textOverflow: 'ellipsis',
         overflow: 'hidden'
@@ -92,9 +93,18 @@ var FileTile = React.createClass({
       </div>
     );
     
+    var tags = this.props.tags.map(function(tag) {
+      return (
+        <Tag text={tag}
+             isDisabled={false}
+             handleClick={function(){}}
+             key={tag}/>
+      );
+    });
+
     var bodyContent = (
       <div>
-          {this.props.tags}
+          {tags}
       </div>
     );
 
