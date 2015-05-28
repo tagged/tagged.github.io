@@ -17,6 +17,7 @@ var MaterialIconSearch = require('./MaterialIconSearch');
 var MaterialIconCloudQueue = require('./MaterialIconCloudQueue');
 var FileTile = require('./FileTile');
 var Tag = require('./Tag');
+var TagInput = require('./TagInput');
 var Color = require('./res/color');
 var Dimension = require('./res/dimension');
 
@@ -128,6 +129,7 @@ var Cloud = React.createClass({
           <Tag text={"caravan"} 
                isDisabled={false}
                handleClick={function(){}}/>
+          <TagInput placeholder="Search files"/>
           <div style={{paddingTop: Dimension.space}}></div>
           {fileTiles}
       </div>
