@@ -8,6 +8,7 @@ module.exports = {
   lineHeight: 20 / 16,
 
   fontWeightThin: 300,
-  fontWeightRegular: 400
+  fontWeightRegular: 400,
+  fontWeightMedium: 500
 
 }

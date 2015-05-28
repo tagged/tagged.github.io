@@ -10,7 +10,7 @@ module.exports = {
   marginContentMobile: 72,
   marginContentTablet: 80,
 
-  heightSubtitle: 48,
+  heightSubheader: 48,
   heightTag: 32,
 
   heightListItemSingle: 48,
