@@ -10,17 +10,20 @@ var TagInput = React.createClass({
   //Grows with user input
 
   propTypes: {
+    value: React.PropTypes.string,
+    isFocused: React.PropTypes.bool,
+    handleFocus: React.PropTypes.func.isRequired,
+    handleBlur: React.PropTypes.func.isRequired,
+    handleChange: React.PropTypes.func.isRequired,
+
     placeholder: React.PropTypes.string,  //input placeholder text
-    maxWidth: React.PropTypes.number      //input max width; excludes padding and borders
+    //max width of input; excludes padding and borders
+    maxWidth: React.PropTypes.oneOfType([
+      React.PropTypes.number,
+      React.PropTypes.string
+    ])
   },
 
-  getInitialState: function() {
-    return {
-      value: "",
-      isFocused: false
-    };
-  },
-  
   getStyle: function() {
     var verticalPadding = (Dimension.heightTag - Typography.lineHeight * Typography.fontSize) / 2;
     
@@ -39,7 +42,7 @@ var TagInput = React.createClass({
         outline: 0,
         borderWidth: Dimension.borderWidth,
         borderStyle: 'solid',
-        borderColor: this.state.isFocused ? Color.blue500 : Color.blackSecondary,
+        borderColor: this.props.isFocused ? Color.blue500 : Color.blackSecondary,
         borderRadius: Dimension.borderRadius,
         paddingLeft: Dimension.space,
         paddingRight: Dimension.space,
@@ -64,16 +67,16 @@ var TagInput = React.createClass({
     var style = this.getStyle();
 
     // Make spaces count towards computed regulator width
-    var nbspValue = this.state.value.replace(/ /g, String.fromCharCode(160));
+    var nbspValue = this.props.value.replace(/ /g, String.fromCharCode(160));
 
     return (
       <div style={style.component}>
           <input ref="input"
                  type="text"
                  value={nbspValue}
-                 onChange={this.handleChange}
-                 onFocus={this.handleFocus}
-                 onBlur={this.handleBlur}
+                 onFocus={this.props.handleFocus}
+                 onBlur={this.props.handleBlur}
+                 onChange={this.props.handleChange}
                  placeholder={this.props.placeholder}
                  style={style.input}/>
           <div ref="regulator"
@@ -102,7 +105,7 @@ var TagInput = React.createClass({
     var input = this.refs.input.getDOMNode();
     
     var inputWidth;
-    if (this.state.value === "") {
+    if (this.props.value === "") {
       var placeholder = this.refs.placeholder.getDOMNode();
       var placeholderWidth = window.getComputedStyle(placeholder).width;
       inputWidth = placeholderWidth;
@@ -113,18 +116,6 @@ var TagInput = React.createClass({
     }
 
     input.style.width = inputWidth;
-  },
-
-  handleChange: function(event) {
-    this.setState({value: event.target.value});
-  },
-
-  handleFocus: function() {
-    this.setState({isFocused: true});
-  },
-
-  handleBlur: function() {
-    this.setState({isFocused: false});
   }
   
 });

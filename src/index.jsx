@@ -16,10 +16,16 @@ var MaterialIcon = require('./MaterialIcon');
 var MaterialIconSearch = require('./MaterialIconSearch');
 var MaterialIconCloudQueue = require('./MaterialIconCloudQueue');
 var FileTile = require('./FileTile');
-var Tag = require('./Tag');
-var TagInput = require('./TagInput');
+var TagSearch = require('./TagSearch');
+
 var Color = require('./res/color');
 var Dimension = require('./res/dimension');
+
+var _Files = require('./res/_files');
+var _Tags = require('./res/_tags');
+
+
+
 
 
 var getGlobalStyle = function() {
@@ -31,58 +37,111 @@ var getGlobalStyle = function() {
 }
 
 
-var Search = React.createClass({
+
+
+
+var Cloud = React.createClass({
   render: function() {
     var paperStyle = {height:'56px', margin:'0 20px'}
     return(
       <Paper style={paperStyle}>
-          <h1>Search</h1>
+          <h1>Cloud</h1>
       </Paper>
     );
   }
 });
 
-var Cloud = React.createClass({
-  // Sample files; will generalize later
+
+
+
+
+var Search = React.createClass({
+  
   getInitialState: function() {
-    var files = [{
-      name: "Getting Started With a Really really Really really Really really Long Title",
-      metadata: {
-        path: "Dropbox/Samples",
-        modified: "Modified 2015 Feb 28",
-        size: "25 KB",
-        type: "PDF",
-        cloud: "dropbox",
-        link: "//www.dropbox.com/home"
-      },
-      tags: ["pork","pork shoulder","honey","five spice","food.ingredients.sauces.oyster-sauce.lee-kum-kee.large-bbbottle","red bean paste"],
-      isOpen: false,
-      isChecked: false
-    }, {
-      name: "Second file",
-      metadata: {
-        path: ["GoogleDrive","Samples","SmallDocuments","folder","subfolder","InnerFolder","CoreFolder"].join(String.fromCharCode(8203) + "/"),
-        modified: "Modified 2014 Aug 12",
-        size: "2 KB",
-        type: "DOCX",
-        cloud: "google",
-        link: "//drive.google.com"
-      },
-      tags: ["TAG"],
-      isOpen: false,
-      isChecked: false     
-    }];
-    
     return {
-      files: files
+      files: _Files,
+      searchTags: [],
+      searchValue: "",
+      isFocused: false
     };
   },
 
-  clickedCheckbox: function(fileName) {
+  handleFocus: function() {
+    this.setState({isFocused: true});
+  },
+
+  handleBlur: function() {
+    this.setState({isFocused: false});
+  },
+
+  handleChange: function(event) {
+    this.setState({searchValue: event.target.value});
+  },
+
+  getTagSearchProps: function() {
+    return {
+      searchTags: this.state.searchTags,
+      addSearchTag: this.addSearchTag,
+      deleteSearchTag: this.deleteSearchTag,
+      searchValue: this.state.searchValue,
+      isFocused: this.state.isFocused,
+      handleFocus: this.handleFocus,
+      handleBlur: this.handleBlur,
+      handleChange: this.handleChange
+    };
+  },
+
+  getFileTileProps: function(file) {
+    return {
+      filename: file.name,
+      metadata: file.metadata,
+      tags: file.tags,
+      isChecked: file.isChecked,
+      isOpen: file.isOpen,
+      handleCheck: this.selectFile.bind(this, file.name),
+      handleToggle: this.toggleFile.bind(this, file.name),
+      key: file.name
+    };
+  },
+
+  render: function() {
+    
+    var fileTiles = this.state.files.map(function(file) {
+      return (
+            <FileTile {...this.getFileTileProps(file)}/>
+      );
+    }, this);
+
+    return(
+      <div onClick={this.handleClick}>
+          <TagSearch ref="search" {...this.getTagSearchProps()}/>
+          {fileTiles}
+      </div>
+    );
+  },
+    
+  addSearchTag: function(tag) {
+    //Add tag to search tags, and clear search input
+    this.setState({
+      searchTags: this.state.searchTags.concat([tag]),
+      searchValue: ""
+    });
+  },
+
+  deleteSearchTag: function(tag) {
+    var newSearchTags = this.state.searchTags.filter(function(searchTag) {
+      return searchTag !== tag;
+    });
+    this.setState({
+      searchTags: newSearchTags
+    });
+  },
+
+  selectFile: function(fileName) {
     this.toggle(fileName, 'isChecked', 'clicked checkbox');
   },
 
-  toggledCollapsible: function(fileName) {
+  toggleFile: function(fileName) {
     this.toggle(fileName, 'isOpen', 'toggled collapsible');
   },
 
@@ -104,37 +163,8 @@ var Cloud = React.createClass({
     }, function() {
       console.log(message);
     });
-  },
-
-  render: function() {
-    var fileTiles = this.state.files.map(function(file) {
-      return (
-            <FileTile filename={file.name}
-                      metadata={file.metadata}
-                      tags={file.tags}
-                      isChecked={file.isChecked}
-                      isOpen={file.isOpen}
-                      handleCheck={this.clickedCheckbox.bind(this, file.name)}
-                      handleToggle={this.toggledCollapsible.bind(this, file.name)}
-                      key={file.name}/>
-      );
-    }, this);
-
-    return(
-      <div>
-          <div style={{paddingTop: Dimension.space}}></div>
-          <Tag text={"pork"} 
-               isDisabled={true}
-               handleClick={function(){}}/>
-          <Tag text={"caravan"} 
-               isDisabled={false}
-               handleClick={function(){}}/>
-          <TagInput placeholder="Search files"/>
-          <div style={{paddingTop: Dimension.space}}></div>
-          {fileTiles}
-      </div>
-    );
   }
+
 });
 
 
@@ -146,13 +176,13 @@ var Main = React.createClass({
       <div  style={getGlobalStyle()}>
           <AppBar>
               <AppBarActions> 
-                  <Link to="search"><AppBarAction>
+                  <Link to="app"><AppBarAction>
                       <MaterialIconSearch fill={Color.black}
                                           fillOpacity={Color.blackSecondaryOpacity}
                                           style={{}}
                       />
                   </AppBarAction></Link>
-                  <Link to="app"><AppBarAction>
+                  <Link to="cloud"><AppBarAction>
                       <MaterialIconCloudQueue fill={Color.black}
                                               fillOpacity={Color.blackSecondaryOpacity}
                                               style={{}}
@@ -172,8 +202,8 @@ var Main = React.createClass({
 
 var routes = (
   <Route name="app" path="/" handler={Main}>
-      <Route name="search" handler={Search}/>
-      <DefaultRoute handler={Cloud}/>
+      <Route name="cloud" handler={Cloud}/>
+      <DefaultRoute handler={Search}/>
   </Route>
 );
 
