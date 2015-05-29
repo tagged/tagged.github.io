@@ -37,10 +37,14 @@ var Tag = React.createClass({
     var style = this.getStyle();
     return (
       <div style={style.component}
-           onClick={this.handleClick}>
+           onMouseDown={this.handleClick}>
           {this.props.text}
       </div>
     );
+  },
+
+  handleClick: function() {
+    this.props.handleClick(this.props.text);
   }
 
 });
