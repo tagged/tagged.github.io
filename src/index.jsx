@@ -119,17 +119,6 @@ var App = React.createClass({
     this.setState({files: newFiles});
   },
 
-  findFileIndex: function(fileId) {
-    //Find the index of the file with the specified id
-    var fileIndex;
-    this.state.files.forEach(function(file, index) {
-      if (file.id === fileId) {
-        fileIndex = index;
-      }
-    });
-    return fileIndex || -1;
-  },
-
   handleFocus: function() {
     this.setState({isFocused: true});
   },
