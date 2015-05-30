@@ -15,16 +15,15 @@ var AppBarAction = require('./AppBarAction');
 var MaterialIcon = require('./MaterialIcon');
 var MaterialIconSearch = require('./MaterialIconSearch');
 var MaterialIconCloudQueue = require('./MaterialIconCloudQueue');
+
+var Search = require('./Search');
+var Tag = require('./Tag');
+var TagInput = require('./TagInput');
+var Subheader = require('./Subheader');
 var FileTile = require('./FileTile');
-var TagSearch = require('./TagSearch');
 
 var Color = require('./res/color');
-var Dimension = require('./res/dimension');
-
-var _Files = require('./res/_files');
-var _Tags = require('./res/_tags');
-
-
+var _Database = require('./res/_database');
 
 
 
@@ -35,6 +34,206 @@ var getGlobalStyle = function() {
     WebkitTapHighlightColor: 'rgba(0,0,0,0)'
   };
 }
+
+
+
+var App = React.createClass({
+
+  getInitialState: function() {
+    return {
+      files: [], //{id, name, metadata, tags, isOpen, isSelected}
+      searchTags: [],
+      searchValue: "",
+      isFocused: false
+    };
+  },
+
+  addSearchTag: function(tag) {
+    //Add tag to search tags, and clear search input
+    var newSearchTags = this.state.searchTags.concat([tag]);
+    var newFiles = this.updateFiles(newSearchTags);
+    this.setState({
+      files: newFiles,
+      searchTags: newSearchTags,
+      searchValue: ""
+    });
+  },
+
+  deleteSearchTag: function(tagIndex) {
+    var newSearchTags = React.addons.update(this.state.searchTags, {
+      $splice: [[tagIndex, 1]]
+    });
+    var newFiles = this.updateFiles(newSearchTags);
+    this.setState({
+      files: newFiles,
+      searchTags: newSearchTags
+    });
+  },
+
+  updateFiles: function(searchTags) {
+    //Calculate files from search tags
+    var files = _Database.getFiles(searchTags);
+    var newFiles = [];
+    for (var i=0; i < files.length; i++) {
+      var file = files[i];
+      newFiles.push({
+        id: file.id,
+        name: file.name,
+        metadata: file.metadata,
+        tags: file.tags,
+        isOpen: false,
+        isSelected: false
+      });
+    }
+    return newFiles;
+  },
+    
+  selectFile: function(fileIndex) {
+    var newFile = React.addons.update(this.state.files[fileIndex], {
+      isSelected: {$set: !this.state.files[fileIndex].isSelected}
+    });
+    
+    var newFiles = React.addons.update(this.state.files, {
+      $splice: [[fileIndex, 1, newFile]]
+    });
+    
+    this.setState({files: newFiles}, function() {
+      console.log('select');
+    });
+  },
+
+  toggleFile: function(fileIndex) {
+    var newFile = React.addons.update(this.state.files[fileIndex], {
+      isOpen: {$set: !this.state.files[fileIndex].isOpen}
+    });
+    
+    var newFiles = React.addons.update(this.state.files, {
+      $splice: [[fileIndex, 1, newFile]]
+    });
+    
+    this.setState({files: newFiles}, function() {
+      console.log('open');
+    });
+  },
+
+  findFileIndex: function(fileId) {
+    //Find the index of the file with the specified id
+    var fileIndex;
+    this.state.files.forEach(function(file, index) {
+      if (file.id === fileId) {
+        fileIndex = index;
+      }
+    });
+    return fileIndex || -1;
+  },
+
+  handleFocus: function() {
+    this.setState({isFocused: true});
+  },
+
+  handleBlur: function() {
+    this.setState({isFocused: false});
+  },
+
+  handleChange: function(event) {
+    this.setState({searchValue: event.target.value});
+  },
+
+  getFileTileProps: function(file, fileIndex) {
+    
+    var tagNodes = file.tags.map(function(tag) {
+      //Disable tag if it's already a search tag
+      var isDisabled = this.state.searchTags.indexOf(tag) >= 0;
+      return (
+        <Tag text={tag}
+             isDisabled={isDisabled}
+             handleClick={this.addSearchTag.bind(this, tag)}
+             key={tag}/>
+      );
+    }, this);
+    
+    return {
+      file: file,
+      tagNodes: tagNodes,
+      handleSelect: this.selectFile.bind(this, fileIndex),
+      handleToggle: this.toggleFile.bind(this, fileIndex),
+      key: file.id
+    };
+
+  },
+
+  getTagInputProps: function() {
+    return {
+      value: this.state.searchValue,
+      isFocused: this.state.isFocused,
+      handleFocus: this.handleFocus,
+      handleBlur: this.handleBlur,
+      handleChange: this.handleChange,
+      placeholder: "Search files by tag",
+      maxWidth: 'none'
+    };
+  },
+  
+  getSearchProps: function() {
+
+    var fileNodes = this.state.files.map(function(file, index) {
+      return (
+        <FileTile {...this.getFileTileProps(file, index)}/>
+      );
+    }, this);
+
+    var searchTagNodes = this.state.searchTags.map(function(tag, tagIndex) {
+      return (
+        <Tag text={tag}
+             isDisabled={false}
+             handleClick={this.deleteSearchTag.bind(this, tagIndex)}
+             key={tag}/>
+      );
+    }, this);
+
+    var searchInputNode = <TagInput {...this.getTagInputProps()}/>;
+    
+    var suggestedTags = _Database.makeSuggestion(
+      this.state.searchValue, 
+      this.state.searchTags
+    );
+    
+    var suggestionTitle = _Database.labelSuggestion(
+      this.state.searchValue, 
+      this.state.searchTags, 
+      suggestedTags
+    );
+
+    var suggestedTagNodes = suggestedTags.map(function(tag) {
+      //Disable tag if it's already a search tag
+      var isDisabled = this.state.searchTags.indexOf(tag) >= 0;//always false?
+      return (
+        <Tag text={tag}
+             isDisabled={isDisabled}
+             handleClick={this.addSearchTag.bind(this, tag)}
+             key={tag}/>
+      );
+    }, this);
+
+    var suggestionTitleNode = <Subheader text={suggestionTitle}/>;
+
+    return {
+      fileNodes: fileNodes,
+      searchTagNodes: searchTagNodes,
+      searchInputNode: searchInputNode,
+      suggestedTagNodes: this.state.isFocused ? suggestedTagNodes : null,
+      suggestionTitleNode: this.state.isFocused ? suggestionTitleNode : null,
+    };
+  },
+
+  render: function() {
+    return (
+      <Search {...this.getSearchProps()}/>
+    );
+  }
+
+});
+
 
 
 
@@ -53,119 +252,6 @@ var Cloud = React.createClass({
 
 
 
-
-
-var Search = React.createClass({
-  
-  getInitialState: function() {
-    return {
-      files: _Files,
-      searchTags: [],
-      searchValue: "",
-      isFocused: false
-    };
-  },
-
-  handleFocus: function() {
-    this.setState({isFocused: true});
-  },
-
-  handleBlur: function() {
-    this.setState({isFocused: false});
-  },
-
-  handleChange: function(event) {
-    this.setState({searchValue: event.target.value});
-  },
-
-  getTagSearchProps: function() {
-    return {
-      searchTags: this.state.searchTags,
-      addSearchTag: this.addSearchTag,
-      deleteSearchTag: this.deleteSearchTag,
-      searchValue: this.state.searchValue,
-      isFocused: this.state.isFocused,
-      handleFocus: this.handleFocus,
-      handleBlur: this.handleBlur,
-      handleChange: this.handleChange
-    };
-  },
-
-  getFileTileProps: function(file) {
-    return {
-      filename: file.name,
-      metadata: file.metadata,
-      tags: file.tags,
-      isChecked: file.isChecked,
-      isOpen: file.isOpen,
-      handleCheck: this.selectFile.bind(this, file.name),
-      handleToggle: this.toggleFile.bind(this, file.name),
-      key: file.name
-    };
-  },
-
-  render: function() {
-    
-    var fileTiles = this.state.files.map(function(file) {
-      return (
-            <FileTile {...this.getFileTileProps(file)}/>
-      );
-    }, this);
-
-    return(
-      <div onClick={this.handleClick}>
-          <TagSearch ref="search" {...this.getTagSearchProps()}/>
-          {fileTiles}
-      </div>
-    );
-  },
-    
-  addSearchTag: function(tag) {
-    //Add tag to search tags, and clear search input
-    this.setState({
-      searchTags: this.state.searchTags.concat([tag]),
-      searchValue: ""
-    });
-  },
-
-  deleteSearchTag: function(tag) {
-    var newSearchTags = this.state.searchTags.filter(function(searchTag) {
-      return searchTag !== tag;
-    });
-    this.setState({
-      searchTags: newSearchTags
-    });
-  },
-
-  selectFile: function(fileName) {
-    this.toggle(fileName, 'isChecked', 'clicked checkbox');
-  },
-
-  toggleFile: function(fileName) {
-    this.toggle(fileName, 'isOpen', 'toggled collapsible');
-  },
-
-  toggle: function(fileName, fileProperty, message) {
-    //Toggle a boolean file property
-
-    var newFiles = this.state.files.map(function(file) {
-      if (fileName !== file.name) {
-        return file;
-      } else {
-        var fileCopy = file;
-        fileCopy[fileProperty] = !file[fileProperty];
-        return fileCopy;
-      }
-    });
-
-    this.setState({
-      files: newFiles
-    }, function() {
-      console.log(message);
-    });
-  }
-
-});
 
 
 
@@ -203,7 +289,7 @@ var Main = React.createClass({
 var routes = (
   <Route name="app" path="/" handler={Main}>
       <Route name="cloud" handler={Cloud}/>
-      <DefaultRoute handler={Search}/>
+      <DefaultRoute handler={App}/>
   </Route>
 );
 

@@ -3,20 +3,18 @@ var Checkbox = require('./Checkbox');
 var Collapsible = require('./Collapsible');
 var MaterialIconExpand = require('./MaterialIconExpand');
 var ImageIcon = require('./ImageIcon');
-var Tag = require('./Tag');
 var Color = require('./res/color');
 var Dimension = require('./res/dimension');
 var Typography = require('./res/typography');
+var Util = require('./util/util');
+
 
 var FileTile = React.createClass({
 
   propTypes: {
-    filename: React.PropTypes.string.isRequired,
-    metadata: React.PropTypes.object.isRequired,
-    tags: React.PropTypes.array.isRequired,
-    isChecked: React.PropTypes.bool.isRequired,
-    isOpen: React.PropTypes.bool.isRequired,
-    handleCheck: React.PropTypes.func.isRequired,
+    file: React.PropTypes.object.isRequired,
+    tagNodes: React.PropTypes.array.isRequired,
+    handleSelect: React.PropTypes.func.isRequired,
     handleToggle: React.PropTypes.func.isRequired
   },
 
@@ -38,7 +36,7 @@ var FileTile = React.createClass({
         lineHeight: Typography.lineHeight,
         fontSize: Typography.fontSize,
         fontWeight: Typography.fontWeightRegular,
-        whiteSpace: this.props.isOpen ? 'normal' : 'nowrap',
+        whiteSpace: this.props.file.isOpen ? 'normal' : 'nowrap',
         textOverflow: 'ellipsis',
         overflow: 'hidden'
       },
@@ -48,7 +46,7 @@ var FileTile = React.createClass({
         lineHeight: Typography.lineHeightSmall,
         fontSize: Typography.fontSizeSmall,
         fontWeight: Typography.fontWeightThin,
-        whiteSpace: this.props.isOpen ? 'normal' : 'nowrap',
+        whiteSpace: this.props.file.isOpen ? 'normal' : 'nowrap',
         textOverflow: 'ellipsis',
         overflow: 'hidden'
       },
@@ -63,25 +61,25 @@ var FileTile = React.createClass({
     var style = this.getStyle();
 
     var filename = (
-      <div style={style.filename}>{this.props.filename}</div>
+      <div style={style.filename}>{this.props.file.name}</div>
     );
 
     var metadata;
     if (this.props.isOpen) {
       metadata = (
         <div>
-            <div style={style.subheader}>{this.props.metadata.path}</div>
-            <div style={style.subheader}>{this.props.metadata.modified}</div>
-            <div style={style.subheader}>{this.props.metadata.size}</div>
-            <div style={style.subheader}>{this.props.metadata.type}</div>
+            <div style={style.subheader}>{Util.makePath(this.props.file.metadata.path)}</div>
+            <div style={style.subheader}>{this.props.file.metadata.modified}</div>
+            <div style={style.subheader}>{this.props.file.metadata.size}</div>
+            <div style={style.subheader}>{this.props.file.metadata.type}</div>
         </div>
       );
     }
-
+    
     var tagCount = (
       <div style={style.subheader}>
-          {this.props.tags.length +
-           (this.props.tags.length === 1 ? " tag" : " tags")}
+          {this.props.tagNodes.length +
+           (this.props.tagNodes.length === 1 ? " tag" : " tags")}
       </div>
     );
 
@@ -93,39 +91,30 @@ var FileTile = React.createClass({
       </div>
     );
     
-    var tags = this.props.tags.map(function(tag) {
-      return (
-        <Tag text={tag}
-             isDisabled={false}
-             handleClick={function(){}}
-             key={tag}/>
-      );
-    });
-
     var bodyContent = (
       <div>
-          {tags}
+          {this.props.tagNodes}
       </div>
     );
 
     var fileLink = (
-      <a href={this.props.metadata.link}
+      <a href={this.props.file.metadata.link}
          target="_blank"
          onClick={function(e){e.stopPropagation();}}>
-          <ImageIcon cloud={this.props.metadata.cloud}
+          <ImageIcon cloud={this.props.file.metadata.cloud}
                      style={style.icon}/>
       </a>
     );
 
     return (
       <div style={style.component}>
-          <Checkbox isChecked={this.props.isChecked} 
-                    handleCheck={this.props.handleCheck}
+          <Checkbox isChecked={this.props.file.isSelected} 
+                    handleCheck={this.props.handleSelect}
                     color={Color.blue500}
                     style={style.checkbox}/>
           <Collapsible head={headContent}
                        body={bodyContent}
-                       isOpen={this.props.isOpen}
+                       isOpen={this.props.file.isOpen}
                        handleToggle={this.props.handleToggle}
                        icon={fileLink}/>
       </div>
