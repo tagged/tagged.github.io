@@ -1,2 +1,0 @@
-//Sample tags
-module.exports = ["pork", "pork shoulder", "honey", "five spice", "red bean paste", "gochujang", "gochugaru", "spicy", "vinegar", "ribs", "shoyu", "food.ingredients.sauces.oyster-sauce.lee-kum-kee.large-bbbottle"];
