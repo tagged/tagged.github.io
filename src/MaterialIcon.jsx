@@ -54,7 +54,7 @@ var MaterialIcon = React.createClass({
     var iconPath = this.refs.iconPath.getDOMNode();
     var animations = this.props.animations;
 
-    Velocity(iconPath, "stop", true);
+    Velocity(iconPath, "finish");
 
     for (var i = 0; i < animations.length; i++) {
       var animation = animations[i];
