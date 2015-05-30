@@ -12,7 +12,7 @@ module.exports = {
     return _Files;
   },
   
-  getFiles: function(tags) {
+  computeFiles: function(tags) {
     //Get files with all specified tags
 
     var newFiles = [];
