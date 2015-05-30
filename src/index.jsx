@@ -16,11 +16,10 @@ var MaterialIcon = require('./MaterialIcon');
 var MaterialIconSearch = require('./MaterialIconSearch');
 var MaterialIconCloudQueue = require('./MaterialIconCloudQueue');
 
-var Search = require('./Search');
 var Tag = require('./Tag');
 var TagInput = require('./TagInput');
 var Subheader = require('./Subheader');
-var FileTile = require('./FileTile');
+var Files = require('./Files');
 
 var Color = require('./res/color');
 var Dimension = require('./res/dimension');
@@ -81,7 +80,13 @@ var App = React.createClass({
       newFiles.push({
         id: file.id,
         name: file.name,
-        metadata: file.metadata,
+        path: file.path,
+        modified: file.modified,
+        size: file.size,
+        modified: file.modified,
+        type: file.type,
+        cloud: file.cloud,
+        link: file.link,
         tags: file.tags,
         isOpen: false,
         isSelected: false
@@ -90,7 +95,7 @@ var App = React.createClass({
     return newFiles;
   },
     
-  selectFile: function(fileIndex) {
+  handleFileSelect: function(fileIndex) {
     var newFile = React.addons.update(this.state.files[fileIndex], {
       isSelected: {$set: !this.state.files[fileIndex].isSelected}
     });
@@ -99,12 +104,10 @@ var App = React.createClass({
       $splice: [[fileIndex, 1, newFile]]
     });
     
-    this.setState({files: newFiles}, function() {
-      console.log('select');
-    });
+    this.setState({files: newFiles});
   },
 
-  toggleFile: function(fileIndex) {
+  handleFileToggle: function(fileIndex) {
     var newFile = React.addons.update(this.state.files[fileIndex], {
       isOpen: {$set: !this.state.files[fileIndex].isOpen}
     });
@@ -113,9 +116,7 @@ var App = React.createClass({
       $splice: [[fileIndex, 1, newFile]]
     });
     
-    this.setState({files: newFiles}, function() {
-      console.log('open');
-    });
+    this.setState({files: newFiles});
   },
 
   findFileIndex: function(fileId) {
@@ -141,28 +142,7 @@ var App = React.createClass({
     this.setState({searchValue: event.target.value});
   },
 
-  getFileTileProps: function(file, fileIndex) {
-    
-    var tagNodes = file.tags.map(function(tag) {
-      //Disable tag if it's already a search tag
-      var isDisabled = this.state.searchTags.indexOf(tag) >= 0;
-      return (
-        <Tag text={tag}
-             isDisabled={isDisabled}
-             handleClick={this.addSearchTag.bind(this, tag)}
-             key={tag}/>
-      );
-    }, this);
-    
-    return {
-      file: file,
-      tagNodes: tagNodes,
-      handleSelect: this.selectFile.bind(this, fileIndex),
-      handleToggle: this.toggleFile.bind(this, fileIndex),
-      key: file.id
-    };
-
-  },
+  
 
   getTagInputProps: function() {
     return {
@@ -178,17 +158,11 @@ var App = React.createClass({
   
   getSearchProps: function() {
 
-    var fileNodes = this.state.files.map(function(file, index) {
-      return (
-        <FileTile {...this.getFileTileProps(file, index)}/>
-      );
-    }, this);
-
     var searchTagNodes = this.state.searchTags.map(function(tag, tagIndex) {
       return (
         <Tag text={tag}
              isDisabled={false}
-             handleClick={this.deleteSearchTag.bind(this, tagIndex)}
+             onClick={this.deleteSearchTag.bind(this, tagIndex)}
              key={tag}/>
       );
     }, this);
@@ -212,7 +186,7 @@ var App = React.createClass({
       return (
         <Tag text={tag}
              isDisabled={isDisabled}
-             handleClick={this.addSearchTag.bind(this, tag)}
+             onClick={this.addSearchTag.bind(this, tag)}
              key={tag}/>
       );
     }, this);
@@ -220,11 +194,20 @@ var App = React.createClass({
     var suggestionTitleNode = <Subheader text={suggestionTitle}/>;
 
     return {
-      fileNodes: fileNodes,
       searchTagNodes: searchTagNodes,
       searchInputNode: searchInputNode,
       suggestedTagNodes: this.state.isFocused ? suggestedTagNodes : null,
       suggestionTitleNode: this.state.isFocused ? suggestionTitleNode : null,
+    };
+  },
+
+  getFilesProps: function() {
+    return {
+      files: this.state.files,
+      onFileSelect: this.handleFileSelect,
+      onFileToggle: this.handleFileToggle,
+      disabledTags: this.state.searchTags,
+      onTagClick: this.addSearchTag,
     };
   },
 
@@ -267,7 +250,7 @@ var App = React.createClass({
               </div>
           </div>
 
-          {props.fileNodes}
+          <Files {...this.getFilesProps()}/>
 
       </div>
     );

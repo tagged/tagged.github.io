@@ -1,21 +1,32 @@
 var React = require('react/addons');
 var Checkbox = require('./Checkbox');
 var Collapsible = require('./Collapsible');
-var MaterialIconExpand = require('./MaterialIconExpand');
+var Tag = require('./Tag');
 var ImageIcon = require('./ImageIcon');
+
 var Color = require('./res/color');
 var Dimension = require('./res/dimension');
 var Typography = require('./res/typography');
 var Util = require('./util/util');
 
 
-var FileTile = React.createClass({
+var File = React.createClass({
 
   propTypes: {
-    file: React.PropTypes.object.isRequired,
-    tagNodes: React.PropTypes.array.isRequired,
-    handleSelect: React.PropTypes.func.isRequired,
-    handleToggle: React.PropTypes.func.isRequired
+    name: React.PropTypes.string,
+    path: React.PropTypes.string,
+    modified: React.PropTypes.string,
+    size: React.PropTypes.string,
+    type: React.PropTypes.string,
+    cloud: React.PropTypes.string,
+    link: React.PropTypes.string,
+    tags: React.PropTypes.array,
+    disabledTags: React.PropTypes.array,
+    onTagClick: React.PropTypes.func,
+    isSelected: React.PropTypes.bool,
+    isOpen: React.PropTypes.bool,
+    onFileSelect: React.PropTypes.func,
+    onFileToggle: React.PropTypes.func,
   },
 
   getStyle: function() {
@@ -36,7 +47,7 @@ var FileTile = React.createClass({
         lineHeight: Typography.lineHeight,
         fontSize: Typography.fontSize,
         fontWeight: Typography.fontWeightRegular,
-        whiteSpace: this.props.file.isOpen ? 'normal' : 'nowrap',
+        whiteSpace: this.props.isOpen ? 'normal' : 'nowrap',
         textOverflow: 'ellipsis',
         overflow: 'hidden'
       },
@@ -46,7 +57,7 @@ var FileTile = React.createClass({
         lineHeight: Typography.lineHeightSmall,
         fontSize: Typography.fontSizeSmall,
         fontWeight: Typography.fontWeightThin,
-        whiteSpace: this.props.file.isOpen ? 'normal' : 'nowrap',
+        whiteSpace: this.props.isOpen ? 'normal' : 'nowrap',
         textOverflow: 'ellipsis',
         overflow: 'hidden'
       },
@@ -62,25 +73,25 @@ var FileTile = React.createClass({
     var style = Util.prefix(this.getStyle());
 
     var filename = (
-      <div style={style.filename}>{this.props.file.name}</div>
+      <div style={style.filename}>{this.props.name}</div>
     );
 
     var metadata;
     if (this.props.isOpen) {
       metadata = (
         <div>
-            <div style={style.subheader}>{Util.makePath(this.props.file.metadata.path)}</div>
-            <div style={style.subheader}>{this.props.file.metadata.modified}</div>
-            <div style={style.subheader}>{this.props.file.metadata.size}</div>
-            <div style={style.subheader}>{this.props.file.metadata.type}</div>
+            <div style={style.subheader}>{this.props.path}</div>
+            <div style={style.subheader}>{this.props.modified}</div>
+            <div style={style.subheader}>{this.props.size}</div>
+            <div style={style.subheader}>{this.props.type}</div>
         </div>
       );
     }
     
+    var plural = this.props.tags.length !== 1;
     var tagCount = (
       <div style={style.subheader}>
-          {this.props.tagNodes.length +
-           (this.props.tagNodes.length === 1 ? " tag" : " tags")}
+          {this.props.tags.length + (plural ? " tags" : " tag")}
       </div>
     );
 
@@ -92,31 +103,46 @@ var FileTile = React.createClass({
       </div>
     );
     
+    var tagNodes = this.props.tags.map(function(tag) {
+      var isDisabled = this.props.disabledTags.indexOf(tag) >= 0;
+
+      var onTagClick = function() {
+        this.props.onTagClick(tag);
+      }.bind(this);
+
+      return (
+        <Tag text={tag}
+             isDisabled={isDisabled}
+             onClick={onTagClick}
+             key={tag}/>
+      );
+    }, this);
+
     var bodyContent = (
       <div>
-          {this.props.tagNodes}
+          {tagNodes}
       </div>
     );
 
     var fileLink = (
-      <a href={this.props.file.metadata.link}
+      <a href={this.props.link}
          target="_blank"
          onClick={function(e){e.stopPropagation();}}>
-          <ImageIcon cloud={this.props.file.metadata.cloud}
+          <ImageIcon cloud={this.props.cloud}
                      style={style.icon}/>
       </a>
     );
 
     return (
       <div style={style.component}>
-          <Checkbox isChecked={this.props.file.isSelected} 
-                    handleCheck={this.props.handleSelect}
+          <Checkbox isChecked={this.props.isSelected} 
+                    handleCheck={this.props.onFileSelect}
                     color={Color.blue500}
                     style={style.checkbox}/>
           <Collapsible head={headContent}
                        body={bodyContent}
-                       isOpen={this.props.file.isOpen}
-                       handleToggle={this.props.handleToggle}
+                       isOpen={this.props.isOpen}
+                       handleToggle={this.props.onFileToggle}
                        icon={fileLink}/>
       </div>
     );
@@ -124,4 +150,4 @@ var FileTile = React.createClass({
 
 });
 
-module.exports = FileTile;
+module.exports = File;
