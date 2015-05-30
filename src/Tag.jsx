@@ -44,7 +44,9 @@ var Tag = React.createClass({
   },
 
   handleClick: function() {
-    this.props.handleClick(this.props.text);
+    if (!this.props.isDisabled) {
+      this.props.handleClick();
+    }
   }
 
 });
