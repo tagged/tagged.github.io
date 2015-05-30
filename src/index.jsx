@@ -23,6 +23,8 @@ var Subheader = require('./Subheader');
 var FileTile = require('./FileTile');
 
 var Color = require('./res/color');
+var Dimension = require('./res/dimension');
+
 var _Database = require('./res/_database');
 
 
@@ -226,9 +228,48 @@ var App = React.createClass({
     };
   },
 
+  getStyle: function() {
+    return {
+      search: {
+        paddingTop: 3 * Dimension.space,
+        paddingBottom: Dimension.space
+      },
+      editor: {
+        paddingLeft: Dimension.marginMobile,
+        paddingRight: Dimension.marginMobile,
+      },
+      suggestions: {
+        paddingLeft: Dimension.marginMobile,
+        paddingRight: Dimension.marginMobile,
+        paddingTop: Dimension.space
+      }
+    };
+  },
+
   render: function() {
+    var style = this.getStyle();
+    
+    var props = this.getSearchProps();
+
     return (
-      <Search {...this.getSearchProps()}/>
+      <div>
+
+          <div style={style.search}>
+              <div style={style.editor}>
+                  {props.searchTagNodes}
+                  {props.searchInputNode}
+              </div>
+              <div>
+                  {props.suggestionTitleNode}
+                  <div style={style.suggestions}>
+                      {props.suggestedTagNodes}
+                  </div>
+              </div>
+          </div>
+
+          {props.fileNodes}
+
+      </div>
     );
   }
 
