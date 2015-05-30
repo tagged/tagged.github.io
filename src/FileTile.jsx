@@ -52,13 +52,14 @@ var FileTile = React.createClass({
       },
       icon: {
         float: 'right',
-        marginLeft: Dimension.quantum
+        marginLeft: Dimension.quantum,
+        userSelect: 'none'
       }
     };
   },
 
   render: function() {
-    var style = this.getStyle();
+    var style = Util.prefix(this.getStyle());
 
     var filename = (
       <div style={style.filename}>{this.props.file.name}</div>
