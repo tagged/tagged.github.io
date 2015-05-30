@@ -61,6 +61,9 @@ var File = React.createClass({
         textOverflow: 'ellipsis',
         overflow: 'hidden'
       },
+      tagNodes: {
+        paddingTop: Dimension.quantum
+      },
       icon: {
         float: 'right',
         marginLeft: Dimension.quantum,
@@ -119,7 +122,7 @@ var File = React.createClass({
     }, this);
 
     var bodyContent = (
-      <div>
+      <div style={style.tagNodes}>
           {tagNodes}
       </div>
     );
