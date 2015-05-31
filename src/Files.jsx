@@ -5,21 +5,21 @@ var Util = require('./util/util');
 var Files = React.createClass({
   
   propTypes: {
-    files: React.PropTypes.array,
+    searchFiles: React.PropTypes.object,
     onFileSelect: React.PropTypes.func,
     onFileToggle: React.PropTypes.func,
     disabledTags: React.PropTypes.array,
     onTagClick: React.PropTypes.func
   },
 
-  getFileProps: function(file, fileIndex) {
-    
+  getFileProps: function(file) {
+
     var onFileSelect = function() {
-      this.props.onFileSelect(fileIndex);
+      this.props.onFileSelect(file.id);
     }.bind(this);
 
     var onFileToggle = function() {
-      this.props.onFileToggle(fileIndex);
+      this.props.onFileToggle(file.id);
     }.bind(this);
 
     return {
@@ -43,10 +43,12 @@ var Files = React.createClass({
   },
   
   render: function() {
-    var fileNodes = this.props.files.map(function(file, fileIndex) {
-      return (
-        <File {...this.getFileProps(file, fileIndex)}/>
-      );
+    //Sort files
+    //Any order for now
+
+    var fileNodes = [];
+    this.props.searchFiles.forEach(function(file) {
+      fileNodes.push(<File {...this.getFileProps(file)}/>);
     }, this);
 
     return (

@@ -26,6 +26,8 @@ var Dimension = require('./res/dimension');
 
 var _Database = require('./res/_database');
 
+var Immutable = require('immutable');
+
 
 
 var getGlobalStyle = function() {
@@ -42,21 +44,21 @@ var App = React.createClass({
 
   getInitialState: function() {
     return {
-      files: [], //{id, name, metadata, tags, isOpen, isSelected}
       searchTags: [],
       searchValue: "",
-      isFocused: false
+      searchIsFocused: false,
+      searchFiles: Immutable.Map(),  //depends on searchTags
     };
   },
 
   addSearchTag: function(tag) {
     //Add tag to search tags, and clear search input
     var newSearchTags = this.state.searchTags.concat([tag]);
-    var newFiles = this.updateFiles(newSearchTags);
+    var newSearchFiles = this.updateSearchFiles(newSearchTags);
     this.setState({
-      files: newFiles,
       searchTags: newSearchTags,
-      searchValue: ""
+      searchValue: "",
+      searchFiles: newSearchFiles,
     });
   },
 
@@ -64,79 +66,61 @@ var App = React.createClass({
     var newSearchTags = React.addons.update(this.state.searchTags, {
       $splice: [[tagIndex, 1]]
     });
-    var newFiles = this.updateFiles(newSearchTags);
+    var newSearchFiles = this.updateSearchFiles(newSearchTags);
     this.setState({
-      files: newFiles,
-      searchTags: newSearchTags
+      searchTags: newSearchTags,
+      searchFiles: newSearchFiles,
     });
   },
 
-  updateFiles: function(searchTags) {
-    //Calculate files from search tags
+  updateSearchFiles: function(searchTags) {
+    //Search tags determine files
+    //Return type is Immutable.Map
     var files = _Database.getFiles(searchTags);
-    var newFiles = [];
-    for (var i=0; i < files.length; i++) {
-      var file = files[i];
-      newFiles.push({
-        id: file.id,
-        name: file.name,
-        path: file.path,
-        modified: file.modified,
-        size: file.size,
-        modified: file.modified,
-        type: file.type,
-        cloud: file.cloud,
-        link: file.link,
-        tags: file.tags,
-        isOpen: false,
-        isSelected: false
-      });
-    }
-    return newFiles;
+
+    //Preserve previous UI state of file (isOpen, isSelected)
+    var syncedFiles = files.map(function(file, fileId) {
+      var currentFile = this.state.searchFiles.get(fileId);
+      file.isSelected = currentFile !== undefined ? currentFile.isSelected : false;
+      file.isOpen = currentFile !== undefined ? currentFile.isOpen : false;
+      return file;
+    }, this);
+
+    return syncedFiles;
   },
     
-  handleFileSelect: function(fileIndex) {
-    var newFile = React.addons.update(this.state.files[fileIndex], {
-      isSelected: {$set: !this.state.files[fileIndex].isSelected}
+  handleFileSelect: function(fileId) {
+    var newFiles = this.state.searchFiles.update(fileId, function(file) {
+      file.isSelected = !file.isSelected;
+      return file;
     });
-    
-    var newFiles = React.addons.update(this.state.files, {
-      $splice: [[fileIndex, 1, newFile]]
-    });
-    
-    this.setState({files: newFiles});
+    this.setState({searchFiles: newFiles});
   },
 
-  handleFileToggle: function(fileIndex) {
-    var newFile = React.addons.update(this.state.files[fileIndex], {
-      isOpen: {$set: !this.state.files[fileIndex].isOpen}
+  handleFileToggle: function(fileId) {
+    var newFiles = this.state.searchFiles.update(fileId, function(file) {
+      file.isOpen = !file.isOpen;
+      return file;
     });
-    
-    var newFiles = React.addons.update(this.state.files, {
-      $splice: [[fileIndex, 1, newFile]]
-    });
-    
-    this.setState({files: newFiles});
+    this.setState({searchFiles: newFiles});
   },
 
   handleFocus: function() {
-    this.setState({isFocused: true});
+    this.setState({searchIsFocused: true});
   },
 
   handleBlur: function() {
-    this.setState({isFocused: false});
+    this.setState({searchIsFocused: false});
   },
 
   handleChange: function(event) {
     this.setState({searchValue: event.target.value});
   },
 
-  
-
   getTagInputProps: function() {
     return {
       value: this.state.searchValue,
-      isFocused: this.state.isFocused,
+      isFocused: this.state.searchIsFocused,
       handleFocus: this.handleFocus,
       handleBlur: this.handleBlur,
       handleChange: this.handleChange,
@@ -185,14 +169,14 @@ var App = React.createClass({
     return {
       searchTagNodes: searchTagNodes,
       searchInputNode: searchInputNode,
-      suggestedTagNodes: this.state.isFocused ? suggestedTagNodes : null,
-      suggestionTitleNode: this.state.isFocused ? suggestionTitleNode : null,
+      suggestedTagNodes: this.state.searchIsFocused ? suggestedTagNodes : null,
+      suggestionTitleNode: this.state.searchIsFocused ? suggestionTitleNode : null,
     };
   },
 
   getFilesProps: function() {
     return {
-      files: this.state.files,
+      searchFiles: this.state.searchFiles,
       onFileSelect: this.handleFileSelect,
       onFileToggle: this.handleFileToggle,
       disabledTags: this.state.searchTags,
