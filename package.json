@@ -3,10 +3,10 @@
   "description": "Sample React components",
   "main": "bundle.js",
   "scripts": {
-    "bundle:vendor": "browserify --require react --require react/addons --require ./velocity/velocity.js > ./vendor.js",
+    "bundle:vendor": "browserify --require react --require react/addons --require ./velocity/velocity.js --require immutable > ./vendor.js",
     "build:js": "jsx ./src ./build",
     "build:jsx": "jsx --harmony --extension jsx ./src ./build",
-    "bundle:app": "browserify --external react --external react/addons --external ./velocity/velocity.js ./build/index.js > ./app.js",
+    "bundle:app": "browserify --external react --external react/addons --external ./velocity/velocity.js ./build/index.js --external immutable > ./app.js",
     "build:app": "npm run build:js && npm run build:jsx && npm run bundle:app && echo 'Done'",
     "build": "npm run bundle:vendor && npm run build:app",
     "watch:app": "./node_modules/watch/cli.js 'npm run build:app' ./src",
