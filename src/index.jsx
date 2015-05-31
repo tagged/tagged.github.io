@@ -17,6 +17,7 @@ var MaterialIconSearch = require('./MaterialIconSearch');
 var MaterialIconCloudQueue = require('./MaterialIconCloudQueue');
 
 var Search = require('./Search');
+var ActionBar = require('./ActionBar');
 
 var Color = require('./res/color');
 var _Database = require('./res/_database');
@@ -177,7 +178,7 @@ var Main = React.createClass({
 
   render: function() {
     return (
-      <div  style={getGlobalStyle()}>
+      <div style={getGlobalStyle()}>
           <AppBar>
               <AppBarActions> 
                   <Link to="app"><AppBarAction>
@@ -194,6 +195,24 @@ var Main = React.createClass({
                   </AppBarAction></Link>
               </AppBarActions>
           </AppBar>
+          <ActionBar style={{backgroundColor: 'limegreen', height: 56}}>
+              <div action="Blackify" style={{backgroundColor: 'black', width:48, height: 48}}/>
+              <div action="Grayify" style={{backgroundColor: 'gray', width:48, height: 48}}/>
+              <div action="Indigoify" style={{backgroundColor: 'indigo', width:48, height: 48}}/>
+              <div action="Purplify" style={{backgroundColor: 'purple', width:48, height: 48}}/>
+              <div action="Yellowify" style={{backgroundColor: 'yellow', width:48, height: 48}}/>
+              <div action="Orangify" style={{backgroundColor: 'orange', width:48, height: 48}}/>
+              <div action="Redify" style={{backgroundColor: 'red', width:48, height: 48}}/>
+              <div action="Pinkify" style={{backgroundColor: 'pink', width:48, height: 48}}/>
+              <div action="Blackify" style={{backgroundColor: 'black', width:48, height: 48}}/>
+              <div action="Grayify" style={{backgroundColor: 'gray', width:48, height: 48}}/>
+              <div action="Indigoify" style={{backgroundColor: 'indigo', width:48, height: 48}}/>
+              <div action="Purplify" style={{backgroundColor: 'purple', width:48, height: 48}}/>
+              <div action="Yellowify" style={{backgroundColor: 'yellow', width:48, height: 48}}/>
+              <div action="Orangify" style={{backgroundColor: 'orange', width:48, height: 48}}/>
+              <div action="Redify" style={{backgroundColor: 'red', width:48, height: 48}}/>
+              <div action="Pinkify" style={{backgroundColor: 'pink', width:48, height: 48}}/>
+          </ActionBar>
 
 
           <RouteHandler/>
