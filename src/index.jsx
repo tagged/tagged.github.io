@@ -16,16 +16,10 @@ var MaterialIcon = require('./MaterialIcon');
 var MaterialIconSearch = require('./MaterialIconSearch');
 var MaterialIconCloudQueue = require('./MaterialIconCloudQueue');
 
-var Tag = require('./Tag');
-var TagInput = require('./TagInput');
-var Subheader = require('./Subheader');
-var Files = require('./Files');
+var Search = require('./Search');
 
 var Color = require('./res/color');
-var Dimension = require('./res/dimension');
-
 var _Database = require('./res/_database');
-
 var Immutable = require('immutable');
 
 
@@ -47,7 +41,7 @@ var App = React.createClass({
       searchTags: [],
       searchValue: "",
       searchIsFocused: false,
-      searchFiles: Immutable.Map(),  //depends on searchTags
+      searchFiles: Immutable.Map(),
     };
   },
 
@@ -89,6 +83,18 @@ var App = React.createClass({
     return syncedFiles;
   },
     
+  handleFocus: function() {
+    this.setState({searchIsFocused: true});
+  },
+
+  handleBlur: function() {
+    this.setState({searchIsFocused: false});
+  },
+
+  handleChange: function(event) {
+    this.setState({searchValue: event.target.value});
+  },
+
   handleFileSelect: function(fileId) {
     var newFiles = this.state.searchFiles.update(fileId, function(file) {
       file.isSelected = !file.isSelected;
@@ -105,127 +111,42 @@ var App = React.createClass({
     this.setState({searchFiles: newFiles});
   },
 
-  handleFocus: function() {
-    this.setState({searchIsFocused: true});
-  },
-
-  handleBlur: function() {
-    this.setState({searchIsFocused: false});
-  },
-
-  handleChange: function(event) {
-    this.setState({searchValue: event.target.value});
-  },
-
-  getTagInputProps: function() {
-    return {
-      value: this.state.searchValue,
-      isFocused: this.state.searchIsFocused,
-      handleFocus: this.handleFocus,
-      handleBlur: this.handleBlur,
-      handleChange: this.handleChange,
-      placeholder: "Search files by tag",
-      maxWidth: 'none'
-    };
-  },
-  
   getSearchProps: function() {
-
-    var searchTagNodes = this.state.searchTags.map(function(tag, tagIndex) {
-      return (
-        <Tag text={tag}
-             isDisabled={false}
-             onClick={this.deleteSearchTag.bind(this, tagIndex)}
-             key={tag}/>
-      );
-    }, this);
-
-    var searchInputNode = <TagInput {...this.getTagInputProps()}/>;
-    
     var suggestedTags = _Database.makeSuggestion(
       this.state.searchValue, 
       this.state.searchTags
     );
-    
+
     var suggestionTitle = _Database.labelSuggestion(
       this.state.searchValue, 
       this.state.searchTags, 
       suggestedTags
     );
 
-    var suggestedTagNodes = suggestedTags.map(function(tag) {
-      //Disable tag if it's already a search tag
-      var isDisabled = this.state.searchTags.indexOf(tag) >= 0;//always false?
-      return (
-        <Tag text={tag}
-             isDisabled={isDisabled}
-             onClick={this.addSearchTag.bind(this, tag)}
-             key={tag}/>
-      );
-    }, this);
-
-    var suggestionTitleNode = <Subheader text={suggestionTitle}/>;
-
     return {
-      searchTagNodes: searchTagNodes,
-      searchInputNode: searchInputNode,
-      suggestedTagNodes: this.state.searchIsFocused ? suggestedTagNodes : null,
-      suggestionTitleNode: this.state.searchIsFocused ? suggestionTitleNode : null,
-    };
-  },
-
-  getFilesProps: function() {
-    return {
+      searchTags: this.state.searchTags,
+      searchValue: this.state.searchValue,
+      searchIsFocused: this.state.searchIsFocused,
       searchFiles: this.state.searchFiles,
+
+      suggestedTags: suggestedTags,
+      suggestionTitle: suggestionTitle,
+      
+      onSearchTagAdd: this.addSearchTag,
+      onSearchTagDelete: this.deleteSearchTag,
+
+      onFocus: this.handleFocus,
+      onBlur: this.handleBlur,
+      onChange: this.handleChange,
+      
       onFileSelect: this.handleFileSelect,
       onFileToggle: this.handleFileToggle,
-      disabledTags: this.state.searchTags,
-      onTagClick: this.addSearchTag,
     };
   },
-
-  getStyle: function() {
-    return {
-      search: {
-        paddingTop: 3 * Dimension.space,
-        paddingBottom: Dimension.space
-      },
-      editor: {
-        paddingLeft: Dimension.marginMobile,
-        paddingRight: Dimension.marginMobile,
-      },
-      suggestions: {
-        paddingLeft: Dimension.marginMobile,
-        paddingRight: Dimension.marginMobile,
-        paddingTop: Dimension.space
-      }
-    };
-  },
-
+  
   render: function() {
-    var style = this.getStyle();
-    
-    var props = this.getSearchProps();
-
     return (
-      <div>
-
-          <div style={style.search}>
-              <div style={style.editor}>
-                  {props.searchTagNodes}
-                  {props.searchInputNode}
-              </div>
-              <div>
-                  {props.suggestionTitleNode}
-                  <div style={style.suggestions}>
-                      {props.suggestedTagNodes}
-                  </div>
-              </div>
-          </div>
-
-          <Files {...this.getFilesProps()}/>
-
-      </div>
+      <Search {...this.getSearchProps()}/>
     );
   }
 
