@@ -85,7 +85,7 @@ var Search = React.createClass({
     }, this);
 
     return (
-      <div onMouseDown={function(e){e.preventDefault()}}>
+      <div>
           <Subheader text={this.props.suggestionTitle}/>
           <div style={style.suggestions}>
               {suggestedTagNodes}

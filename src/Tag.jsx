@@ -36,13 +36,14 @@ var Tag = React.createClass({
     var style = this.getStyle();
     return (
       <div style={style.component}
-           onMouseDown={this.handleClick}>
+           onMouseDown={this.handleMouseDown}>
           {this.props.text}
       </div>
     );
   },
 
-  handleClick: function() {
+  handleMouseDown: function(event) {
+    event.preventDefault();
     if (!this.props.isDisabled) {
       this.props.onClick();
     }
