@@ -45,7 +45,7 @@ var Search = React.createClass({
     return this.props.searchTags.map(function(tag, tagIndex) {
 
       var onTagClick = function() {
-        this.props.onSearchTagDelete(tag);
+        this.props.onSearchTagDelete(tagIndex);
       }.bind(this);
       
       return (
