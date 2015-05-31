@@ -2,11 +2,13 @@ var React = require('react/addons');
 var Color = require('./res/color');
 var Dimension = require('./res/dimension');
 var Typography = require('./res/typography');
+var Util = require('./util/util');
 
 var Subheader = React.createClass({
   
   propTypes: {
-    text: React.PropTypes.string.isRequired
+    text: React.PropTypes.string,
+    style: React.PropTypes.object
   },
 
   getStyle: function() {
@@ -19,9 +21,7 @@ var Subheader = React.createClass({
         fontSize: Typography.fontSizeSmall,
         lineHeight: Typography.lineHeightSmall,
         paddingTop: verticalPadding,
-        paddingBottom: verticalPadding,
-        paddingLeft: Dimension.marginMobile,
-        paddingRight: Dimension.marginMobile
+        paddingBottom: verticalPadding
       }
     };
   },
@@ -29,7 +29,7 @@ var Subheader = React.createClass({
   render: function() {
     var style = this.getStyle();
     return (
-      <div style={style.component}>
+      <div style={Util.merge(style.component, this.props.style)}>
           {this.props.text}
       </div>
     );
