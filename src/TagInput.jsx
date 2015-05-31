@@ -106,11 +106,11 @@ var TagInput = React.createClass({
     
     var inputWidth;
     if (this.props.value === "") {
-      var placeholder = this.refs.placeholder.getDOMNode();
+      var placeholder = React.findDOMNode(this.refs.placeholder);
       var placeholderWidth = window.getComputedStyle(placeholder).width;
       inputWidth = placeholderWidth;
     } else {
-      var regulator = this.refs.regulator.getDOMNode();
+      var regulator = React.findDOMNode(this.refs.regulator);
       var regulatorWidth = window.getComputedStyle(regulator).width;
       inputWidth = regulatorWidth;
     }
