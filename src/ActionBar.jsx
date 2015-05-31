@@ -13,6 +13,10 @@ function findDOMNodeWidth(ref) {
 }
 
 
+//Children of ActionBar should provide a prop called `action`
+//The value of `action` is the action's display name in the overflow menu.
+
+
 var ActionBar = React.createClass({
 
   propTypes: {
