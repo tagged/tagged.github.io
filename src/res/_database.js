@@ -1,45 +1,40 @@
 var Set = require('collections/set');
 var SortedSet = require('collections/sorted-set');
 
+var Immutable = require('immutable');
+
 //Treat files as read-only
 var _Files = require('./_files');
+var _files = Immutable.Map(_Files);
 
 module.exports = {
 
   //Eventually move to database logic
 
-  getAllFiles: function() {
-    return _Files;
-  },
-  
-  computeFiles: function(tags) {
+  getFiles: function(tags) {
     //Get files with all specified tags
+    //Return Immutable Map
 
-    var newFiles = [];
-    
     if (tags.length === 0) {
-      return newFiles;
+      return Immutable.Map();
     }
     
     var tagSet = Set(tags);
-    var files = this.getAllFiles();
-    for (var i = 0; i < files.length; i++) {
-      var file = files[i];
-      if (tagSet.intersection(Set(file.tags)).length === tagSet.length) {
-        //If file contains all tags, merge it into result
-        newFiles.push(file);
-      }
-    }
+    
+    var _newFiles = _files.filter(function(file, fileId) {
+      //Keep only files that contain all tags
+      return tagSet.intersection(Set(file.tags)).length === tagSet.length;
+    });
 
-    return newFiles;
+    return _newFiles;
   },
 
   getTags: function() {
     //Calculate tags from files
     var tags = SortedSet();
-    for (var i = 0; i < _Files.length; i++) {
-      tags = tags.union(_Files[i].tags);
-    }
+    _files.forEach(function(file) {
+      tags = tags.union(file.tags);
+    });
     return tags.toArray();
   },
   
@@ -62,11 +57,12 @@ module.exports = {
 
     } else {
 
-      //Tags on files containing all search tags AND start with search value (empty string starts every string)
+      //Tags on files containing all search tags AND start with search value 
+      //(empty string starts every string)
       suggestedTags = SortedSet();
       searchTagSet = Set(searchTags);
-      for (var i = 0; i < _Files.length; i++) {
-        var fileTags = Set(_Files[i].tags);
+      _files.forEach(function(file) {
+        var fileTags = Set(file.tags);
         if (searchTagSet.intersection(fileTags).length === searchTagSet.length) { 
           //If file contains all search tags,
           //get all file tags that start with search value
@@ -78,7 +74,7 @@ module.exports = {
           //Merge into suggested tags
           suggestedTags = suggestedTags.union(matchingFileTags);
         }
-      }
+      });
       suggestedTags = suggestedTags.toArray();
 
     }
