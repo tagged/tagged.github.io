@@ -40,9 +40,10 @@ var Search = React.createClass({
     };
   },
   
-  getSearchNodes: function() {
+  getSearchTagNodes: function() {
 
-    var searchTagNodes = this.props.searchTags.map(function(tag, tagIndex) {
+    return this.props.searchTags.map(function(tag, tagIndex) {
+
       var onTagClick = function() {
         this.props.onSearchTagDelete(tag);
       }.bind(this);
@@ -53,11 +54,20 @@ var Search = React.createClass({
              onClick={onTagClick}
              key={tag}/>
       );
-    }, this);
 
-    var searchInputNode = <TagInput {...this.getTagInputProps()}/>;
+    }, this);
+ 
+  },
+
+  getSuggestionsNode: function(style) {
     
+    if (!this.props.searchIsFocused && this.props.searchTags.length > 0) {
+      //If no search tags, even if not focused, show suggestions
+      return null;
+    }
+
     var suggestedTagNodes = this.props.suggestedTags.map(function(tag) {
+
       //Disable tag if it's already a search tag -- should always be false
       var isDisabled = this.props.searchTags.indexOf(tag) >= 0;
 
@@ -71,16 +81,18 @@ var Search = React.createClass({
              onClick={onTagClick}
              key={tag}/>
       );
+
     }, this);
 
-    var suggestionTitleNode = <Subheader text={this.props.suggestionTitle}/>;
+    return (
+      <div>
+          <Subheader text={this.props.suggestionTitle}/>
+          <div style={style.suggestions}>
+              {suggestedTagNodes}
+          </div>
+      </div>
+    );
 
-    return {
-      searchTagNodes: searchTagNodes,
-      searchInputNode: searchInputNode,
-      suggestedTagNodes: this.props.searchIsFocused ? suggestedTagNodes : null,
-      suggestionTitleNode: this.props.searchIsFocused ? suggestionTitleNode : null,
-    };
   },
 
   getFilesProps: function() {
@@ -113,21 +125,15 @@ var Search = React.createClass({
 
   render: function() {
     var style = this.getStyle();
-    var nodes = this.getSearchNodes();
     return (
       <div>
 
           <div style={style.search}>
               <div style={style.editor}>
-                  {nodes.searchTagNodes}
-                  {nodes.searchInputNode}
+                  {this.getSearchTagNodes()}
+                  <TagInput {...this.getTagInputProps()}/>
               </div>
-              <div>
-                  {nodes.suggestionTitleNode}
-                  <div style={style.suggestions}>
-                      {nodes.suggestedTagNodes}
-                  </div>
-              </div>
+              {this.getSuggestionsNode(style)}
           </div>
 
           <Files {...this.getFilesProps()}/>
