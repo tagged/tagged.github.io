@@ -109,15 +109,11 @@ var Search = React.createClass({
     return {
       search: {
         paddingTop: 3 * Dimension.space,
-        paddingBottom: Dimension.space
-      },
-      editor: {
+        paddingBottom: Dimension.space,
         paddingLeft: Dimension.marginMobile,
         paddingRight: Dimension.marginMobile,
       },
       suggestions: {
-        paddingLeft: Dimension.marginMobile,
-        paddingRight: Dimension.marginMobile,
         paddingTop: Dimension.space
       }
     };
@@ -127,17 +123,12 @@ var Search = React.createClass({
     var style = this.getStyle();
     return (
       <div>
-
           <div style={style.search}>
-              <div style={style.editor}>
-                  {this.getSearchTagNodes()}
-                  <TagInput {...this.getTagInputProps()}/>
-              </div>
+              {this.getSearchTagNodes()}
+              <TagInput {...this.getTagInputProps()}/>
               {this.getSuggestionsNode(style)}
           </div>
-
           <Files {...this.getFilesProps()}/>
-
       </div>
     );
   }
