@@ -96,7 +96,7 @@ var Search = React.createClass({
                         maxWidth="none"/>
               {suggestions}
           </div>
-          <Files searchFiles={this.props.searchFiles}
+          <Files files={this.props.searchFiles}
                  onFileSelect={this.props.onFileSelect}
                  onFileToggle={this.props.onFileToggle}
                  disabledTags={this.props.searchTags}

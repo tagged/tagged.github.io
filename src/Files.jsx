@@ -5,7 +5,7 @@ var Util = require('./util/util');
 var Files = React.createClass({
   
   propTypes: {
-    searchFiles: React.PropTypes.object,
+    files: React.PropTypes.object,
     onFileSelect: React.PropTypes.func,
     onFileToggle: React.PropTypes.func,
     disabledTags: React.PropTypes.array,
@@ -47,7 +47,7 @@ var Files = React.createClass({
     //Any order for now
 
     var fileNodes = [];
-    this.props.searchFiles.forEach(function(file) {
+    this.props.files.forEach(function(file) {
       fileNodes.push(<File {...this.getFileProps(file)}/>);
     }, this);
 
