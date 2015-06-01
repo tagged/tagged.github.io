@@ -1,3 +1,5 @@
+var Immutable = require('immutable');
+
 var properties = {
   'userSelect': true,
   'transform': true,
@@ -12,11 +14,9 @@ var properties = {
 module.exports = {
 
   merge: function(object1, object2) {
-    //Merge object2 into object1
-    for (var key in object2) {
-      object1[key] = object2[key];
-    }
-    return object1;
+    var immutableObj1 = Immutable.fromJS(object1);
+    var immutableObj2 = Immutable.fromJS(object2);
+    return immutableObj1.mergeDeep(immutableObj2).toJS();
   },
 
   makePath: function(pathArray) {
