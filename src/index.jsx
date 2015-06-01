@@ -177,6 +177,13 @@ var Cloud = React.createClass({
 var Main = React.createClass({
 
   render: function() {
+    var actionBarStyle = {
+      actionBar: {
+        position: 'fixed', bottom: 0, left:0, right: 0, zIndex: 99, 
+        backgroundColor: 'limegreen', height: 56, paddingRight: 4
+      },
+      menu: {bottom: 4, top:'auto'},
+    };
     return (
       <div style={getGlobalStyle()}>
           <AppBar>
@@ -195,7 +202,7 @@ var Main = React.createClass({
                   </AppBarAction></Link>
               </AppBarActions>
           </AppBar>
-          <ActionBar style={{backgroundColor: 'limegreen', height: 56}}>
+          <ActionBar style={actionBarStyle}>
               <div action="Blackify" style={{backgroundColor: 'black', width:48, height: 48}}/>
               <div action="Grayify" style={{backgroundColor: 'gray', width:48, height: 48}}/>
               <div action="Indigoify" style={{backgroundColor: 'indigo', width:48, height: 48}}/>

@@ -28,10 +28,19 @@ var ActionBar = React.createClass({
     }
   },
 
+  //Invariant: isMenuShowing can be true only if actionsVisible < React.Children.count
+  getInitialState: function() {
+    return {
+      actionsVisible: React.Children.count(this.props.children),
+      isMenuShowing: false
+    };
+  },
+
   getStyle: function() {
     return {
       actionBar: {
         position: 'relative',
+        //Flex container
         display: 'flex',
         flexDirection: 'row',
         flexWrap: 'nowrap',
@@ -39,12 +48,16 @@ var ActionBar = React.createClass({
         alignItems: 'center',
       },
       action: {
-        flex: '0 0 auto'
+        //No shrinking in flex container (actionBar)
+        flex: '0 0 auto',
+      },
+      hiddenAction: {
+        position: 'absolute',
+        visibility: 'hidden'
       },
       overflow: {
+        //No shrinking in flex container (actionBar)
         flex: '0 0 auto',
-        //Determine display after render
-        display: 'none',
         position: 'relative',
         height: Dimension.touchTarget,
         width: Dimension.touchTarget,
@@ -56,10 +69,9 @@ var ActionBar = React.createClass({
         left: (Dimension.touchTarget - Dimension.icon) / 2,
       },
       menu: {
-        //display: 'none',
         position: 'absolute', 
-        top: Dimension.space,
-        right: Dimension.space
+        top: Dimension.quantum,
+        right: Dimension.quantum
       },
       menuItem: {
         display: 'flex',
@@ -70,44 +82,96 @@ var ActionBar = React.createClass({
   },
 
   render: function() {
-    var style = this.getStyle();
+    var style = Util.merge(this.getStyle(), this.props.style);
 
+    //Must always render all actions; their widths are needed to calculate actionsVisible
     var actions = React.Children.map(this.props.children, function(child, childIndex) {
+      var actionStyle = childIndex < this.state.actionsVisible ? style.action : Util.merge(style.action, style.hiddenAction);
       return (
-        <div ref={"action" + childIndex} style={style.action}>
+        <div ref={"action" + childIndex} style={actionStyle}>
             {child}
         </div>
       );
-    });
+    }, this);
 
-    var menuItems = React.Children.map(this.props.children, function(child, childIndex) {
-      return (
-        <div ref={"menuItem" + childIndex} style={style.menuItem}>
-            {child}
-            <Subheader text={child.props.action}/>
+    var overflow = null;
+    if (this.state.actionsVisible < React.Children.count(this.props.children)) {
+      overflow = (
+        <div ref="overflow" onClick={this.showMenu} style={style.overflow}>
+            <MaterialIconMoreVert style={style.overflowIcon}/>
         </div>
       );
-    });
+    }
+    
+    var menu = null;
+    if (this.state.isMenuShowing) {
+      var menuItems = [];
+      React.Children.forEach(this.props.children, function(child, childIndex) {
+        if (childIndex >= this.state.actionsVisible) {
+          menuItems.push(
+            <div style={style.menuItem} key={"menuItem" + childIndex}>
+                {child}
+                <Subheader text={child.props.action}/>
+            </div>
+          );
+        }
+      }, this);
+      menu = (
+        <Menu onMenuHide={this.hideMenu} 
+              style={style.menu}>
+            {menuItems}
+        </Menu>
+      );
+    }
 
     return (
-      <div style={Util.merge(this.props.style, style.actionBar)}>
+      <div style={style.actionBar}>
           {actions}
-          <div ref="overflow" style={style.overflow}>
-              <MaterialIconMoreVert style={style.overflowIcon}/>
-          </div>
-          <Menu style={style.menu}>
-              {menuItems}
-          </Menu>
+          {overflow}
+          {menu}
       </div>
     );
+
+  },
+
+  hideMenu: function() {
+    if (this.state.isMenuShowing) {
+      this.setState({isMenuShowing: false});
+    }
+  },
+
+  showMenu: function() {
+    if (!this.state.isMenuShowing) {
+      this.setState({isMenuShowing: true});
+    }
   },
 
   componentDidMount: function() {
-    //Determine if action bar is overflowing
+    var actionsVisible = this.calculateActionsVisible();
+    if (actionsVisible !== this.state.actionsVisible) {
+      this.setState({actionsVisible: actionsVisible});
+    }
+  },
 
-    var isOverflowing = false;
-    var overflowWidth = findDOMNodeWidth(this.refs.overflow);
+  componentDidUpdate: function() {
+    var actionsVisible = this.calculateActionsVisible();
+    if (actionsVisible !== this.state.actionsVisible) {
+      this.setState({actionsVisible: actionsVisible});
+    }
+  },
+
+  calculateActionsVisible: function() {
+    //Determine the number of actions to show in the action bar
+
+    //Only call this after render, so action widths are available
+
+    //Don't hide an action by setting its width to 0; 
+    //if render is triggered by setState, 
+    //action will not be re-rendered and the 0 width 
+    //would be used in the width calculation.
+
     var actionBarWidth = findDOMNodeWidth(this);
+    var overflowWidth = this.getStyle().overflow.width;
 
     var childCount = React.Children.count(this.props.children);
     var currentChild = 0;
@@ -115,36 +179,16 @@ var ActionBar = React.createClass({
 
     while (currentChild < childCount) {
       var currentChildWidth = findDOMNodeWidth(this.refs["action" + currentChild]);
-      if (widthBeforeCurrentChild + currentChildWidth > actionBarWidth - overflowWidth) {
-        //Action bar is overflowing
-        isOverflowing = true;
+      if (widthBeforeCurrentChild + currentChildWidth + overflowWidth > actionBarWidth) {
+        //currentChild would overflow the action bar
         break;
       }
       currentChild ++;
       widthBeforeCurrentChild += currentChildWidth;
     }
-
-    //Handle overflow
-    if (isOverflowing) {
-      var overflowNode = React.findDOMNode(this.refs.overflow);
-      overflowNode.style.display = "block";
-    }
-
-    //Hide actions starting from currentChild
-    for (var child = currentChild; child < childCount; child++) {
-      var actionNode = React.findDOMNode(this.refs["action" + child]);
-      actionNode.style.display = "none";
-    }
-
-    //Hide menu items ending before currentChild
-    for (var child = 0; child < currentChild; child++) {
-      var menuItemNode = React.findDOMNode(this.refs["menuItem" + child]);
-      menuItemNode.style.display = "none";
-    }
     
-  },
-
-  
+    return currentChild;
+  }
 
 });
 
