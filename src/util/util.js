@@ -1,6 +1,11 @@
 var Immutable = require('immutable');
 
 var properties = {
+  'flex': true,
+  'flexDirection': true,
+  'flexWrap': true,
+  'justifyContent': true,
+  'alignItems': true,
   'userSelect': true,
   'transform': true,
   'transformOrigin': true,
@@ -26,21 +31,19 @@ module.exports = {
   },
 
   prefix: function(styles) {
-    for (var style in styles) {
-      for (var property in styles[style]) {
-        if (properties[property]) {
+    var prefixedStyles = Immutable.fromJS(styles).map(function(style, component) {
+      for (var property in properties) {
+        if (style.has(property)) {
           var capitalizedProperty = property.charAt(0).toUpperCase() + property.slice(1);
-          var value = styles[style][property];
-          var prefixedProperties = {};
-          prefixedProperties["Webkit" + capitalizedProperty] = value;
-          prefixedProperties["Moz" + capitalizedProperty] = value;
-          prefixedProperties["ms" + capitalizedProperty] = value;
-          prefixedProperties["O" + capitalizedProperty] = value;
-          this.merge(styles[style], prefixedProperties);
+          style = style.set("Webkit" + capitalizedProperty, style.get(property));
+          style = style.set("Moz" + capitalizedProperty, style.get(property));
+          style = style.set("ms" + capitalizedProperty, style.get(property));
+          style = style.set("O" + capitalizedProperty, style.get(property));
         }
       }
-    }
-    return styles;
+      return style;
+    });
+    return prefixedStyles.toJS();
   }
 
 };
