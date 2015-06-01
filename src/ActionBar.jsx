@@ -172,13 +172,7 @@ var ActionBar = React.createClass({
 
   calculateActionsVisible: function() {
     //Determine the number of actions to show in the action bar
-
-    //Only call this after render, so action widths are available
-
-    //Don't hide an action by setting its width to 0; 
-    //if render is triggered by setState, 
-    //action will not be re-rendered and the 0 width 
-    //would be used in the width calculation.
+    //Call this after render, so action widths are available
 
     var actionBarWidth = findDOMNodeWidth(this);
     var overflowWidth = this.getStyle().overflow.width;
