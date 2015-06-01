@@ -8,6 +8,7 @@ var Util = require('./util/util');
 var Menu = React.createClass({
 
   propTypes: {
+    onMenuHide: React.PropTypes.func,
     hoverColor: React.PropTypes.string,
     style: React.PropTypes.object,
     zDepth: React.PropTypes.number,
@@ -52,6 +53,14 @@ var Menu = React.createClass({
           {childNodes}
       </Paper>
     );
+  },
+
+  componentDidMount: function() {
+    document.addEventListener("mousedown", this.props.onMenuHide);
+  },
+
+  componentWillUnmount: function() {
+    document.removeEventListener("mousedown", this.props.onMenuHide);
   },
 
   handleMouseEnter: function(childIndex) {
