@@ -82,7 +82,7 @@ var ActionBar = React.createClass({
   },
 
   render: function() {
-    var style = Util.merge(this.getStyle(), this.props.style);
+    var style = Util.prefix(Util.merge(this.getStyle(), this.props.style));
 
     //Must always render all actions; their widths are needed to calculate actionsVisible
     var actions = React.Children.map(this.props.children, function(child, childIndex) {
