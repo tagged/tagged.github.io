@@ -11,6 +11,13 @@ var Subheader = React.createClass({
     style: React.PropTypes.object
   },
 
+  getDefaultProps: function() {
+    return {
+      text: "",
+      style: {},
+    };
+  },
+
   getStyle: function() {
     var verticalPadding = (Dimension.heightSubheader - Typography.lineHeightSmall * Typography.fontSizeSmall) / 2;
 
