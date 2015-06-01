@@ -13,6 +13,7 @@ var AppBar = require('./AppBar');
 var AppBarActions = require('./AppBarActions');
 var AppBarAction = require('./AppBarAction');
 var MaterialIcon = require('./MaterialIcon');
+var MaterialIconCheckboxPartial = require('./MaterialIconCheckboxPartial');
 var MaterialIconSearch = require('./MaterialIconSearch');
 var MaterialIconCloudQueue = require('./MaterialIconCloudQueue');
 
@@ -204,6 +205,7 @@ var Main = React.createClass({
                   </AppBarAction></Link>
               </AppBarActions>
           </AppBar>
+          <MaterialIconCheckboxPartial fill={Color.blue500} fillOpacity={1}/>
           <ActionBar style={actionBarStyle}>
               <div action="Blackify" style={{backgroundColor: 'black', width:48, height: 48}}/>
               <div action="Grayify" style={{backgroundColor: 'gray', width:48, height: 48}}/>
