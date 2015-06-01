@@ -180,7 +180,9 @@ var Main = React.createClass({
     var actionBarStyle = {
       actionBar: {
         position: 'fixed', bottom: 0, left:0, right: 0, zIndex: 99, 
-        backgroundColor: 'limegreen', height: 56, paddingRight: 4
+        backgroundColor: 'limegreen', 
+        paddingTop: 4, paddingBottom: 4,
+        paddingRight: 4, paddingLeft: 4,
       },
       menu: {bottom: 4, top:'auto'},
     };

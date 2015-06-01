@@ -37,31 +37,32 @@ var ActionBar = React.createClass({
   },
 
   getStyle: function() {
+    //Note: (verticalAlign: top) removes space below inline-block elements
     return {
       actionBar: {
         position: 'relative',
-        //Flex container
-        display: 'flex',
-        flexDirection: 'row',
-        flexWrap: 'nowrap',
-        justifyContent: 'flex-end',
-        alignItems: 'center',
+        whiteSpace: 'nowrap',
+        textAlign: 'right',
+      },
+      actionBarInner: {
+        //Overflow actions out the left edge
+        float: 'right'
       },
       action: {
-        //No shrinking in flex container (actionBar)
-        flex: '0 0 auto',
+        display: 'inline-block', 
+        verticalAlign: 'top'
       },
       hiddenAction: {
         position: 'absolute',
         visibility: 'hidden'
       },
       overflow: {
-        //No shrinking in flex container (actionBar)
-        flex: '0 0 auto',
+        display: 'inline-block', 
+        verticalAlign: 'top',
         position: 'relative',
         height: Dimension.touchTarget,
         width: Dimension.touchTarget,
-        cursor: 'pointer'        
+        cursor: 'pointer'
       },
       overflowIcon: {
         position: 'absolute',
@@ -74,9 +75,17 @@ var ActionBar = React.createClass({
         right: Dimension.quantum
       },
       menuItem: {
-        display: 'flex',
-        flexDirection: 'row',
-        flexWrap: 'nowrap'
+        whiteSpace: 'nowrap',
+        //Override (textAlign: right) in actionBarInner
+        textAlign: 'left',
+      },
+      menuItemIcon: {
+        display: 'inline-block',
+        verticalAlign: 'top'
+      },
+      menuItemText: {
+        display: 'inline-block',
+        verticalAlign: 'top'
       }
     };
   },
@@ -110,15 +119,14 @@ var ActionBar = React.createClass({
         if (childIndex >= this.state.actionsVisible) {
           menuItems.push(
             <div style={style.menuItem} key={"menuItem" + childIndex}>
-                {child}
-                <Subheader text={child.props.action}/>
+                <div style={style.menuItemIcon}>{child}</div>
+                <Subheader text={child.props.action} style={style.menuItemText}/>
             </div>
           );
         }
       }, this);
       menu = (
-        <Menu onMenuHide={this.hideMenu} 
-              style={style.menu}>
+        <Menu onMenuHide={this.hideMenu} style={style.menu}>
             {menuItems}
         </Menu>
       );
@@ -126,9 +134,11 @@ var ActionBar = React.createClass({
 
     return (
       <div style={style.actionBar}>
-          {actions}
-          {overflow}
-          {menu}
+          <div style={style.actionBarInner}>
+              {actions}
+              {overflow}
+              {menu}
+          </div>
       </div>
     );
 
