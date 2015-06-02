@@ -24,11 +24,6 @@ var ActionBar = React.createClass({
     style: React.PropTypes.object
   },
 
-  getDefaultProps: function() {
-    return {
-    }
-  },
-
   //Invariant: isMenuShowing can be true only if actionsVisible < React.Children.count
   getInitialState: function() {
     return {
@@ -44,6 +39,8 @@ var ActionBar = React.createClass({
         position: 'relative',
         whiteSpace: 'nowrap',
         textAlign: 'right',
+        //Clear floated actionBarInner
+        overflow: 'hidden'
       },
       actionBarInner: {
         //Overflow actions out the left edge
