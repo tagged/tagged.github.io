@@ -1,10 +1,10 @@
 var React = require('react/addons');
-var MaterialIconCheckbox = require('./MaterialIconCheckbox');
-var MaterialIconCheckboxOutline = require('./MaterialIconCheckboxOutline');
-var Ripples = require('./Ripples');
+var MaterialIcon = require('./MaterialIcon');
+
 var R = require('./res/index');
 var Color = R.color;
 var Dimension = R.dimension;
+var Icon = R.icon;
 var Util = require('./util/util');
 
 var Checkbox = React.createClass({
@@ -20,30 +20,86 @@ var Checkbox = React.createClass({
     return {
       component: {
         position: 'relative',
-        boxSizing: 'border-box',
-        height: Dimension.touchTarget,
-        width: Dimension.touchTarget,
-        cursor: 'pointer'
       },
-      icon: {
-        position: 'absolute',
-        top:  (Dimension.touchTarget - Dimension.icon) / 2,
-        left: (Dimension.touchTarget - Dimension.icon) / 2,
-      }
+      checkbox: {
+        clearance: {
+          position: 'absolute',
+          top: 0,
+          left: 0,
+        }
+      },
+      checkboxOutline: {
+      },
     };
   },
 
   render: function() {
     var style = this.getStyle();
+
+    var initializations = [
+      {
+        properties: {
+          fill: this.props.color,
+          fillOpacity: this.props.isChecked ? 1 : 0,
+          scale: this.props.isChecked ? 1 : 0,
+          transformOriginX: Dimension.icon / 2,
+          transformOriginY: Dimension.icon / 2
+        },
+        options: {
+          duration: 0
+        }
+      },
+
+      // Fake out Velocity: set initial scale to 1, 
+      // then set true initial scale.
+      // For reason, see 'Transforms' section of velocity.js and
+      // http://stackoverflow.com/questions/10417890/css3-animations-with-transform-causes-blurred-elements-on-webkit/10417962#10417962
+      // This cannot precede the previous animation;
+      // it would cause scale to flash from 1 to 0
+      {
+        properties: {
+          scale: 1
+        },
+        options: {
+          duration: 0
+        }
+      },
+
+      {
+        properties: {
+          scale: this.props.isChecked ? 1 : 0
+        },
+        options: {
+          duration: 0
+        }
+      }
+    ];
+
+    var animations = [
+      {
+        properties: {
+          fillOpacity: this.props.isChecked ? 1 : 0,
+          scale: this.props.isChecked ? 1 : 0
+        },
+        options: {
+          duration: 350,
+          easing: "ease"
+        }
+      }
+    ];
+
     return (
       <div style={Util.merge(style.component, this.props.style)}
            onClick={this.props.handleCheck}>
-          <MaterialIconCheckboxOutline fill={Color.black}
-                                       fillOpacity={Color.blackSecondaryOpacity}
-                                       style={style.icon}/>
-          <MaterialIconCheckbox isChecked={this.props.isChecked}
-                                fill={this.props.color}
-                                style={style.icon}/>
+          <MaterialIcon d={Icon.checkboxOutline}
+                        fill={Color.black}
+                        fillOpacity={Color.blackSecondaryOpacity}
+                        style={style.checkboxOutline}/>
+          <MaterialIcon d={Icon.checkbox}
+                        fill={this.props.color}
+                        initializations={initializations}
+                        animations={animations}
+                        style={style.checkbox}/>
       </div>
     );
   }

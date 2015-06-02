@@ -10,30 +10,52 @@ var MaterialIcon = React.createClass({
   propTypes: {
     initializations: React.PropTypes.array,
     animations: React.PropTypes.array,
-    d: React.PropTypes.string.isRequired
+    d: React.PropTypes.string.isRequired,
+    fill: React.PropTypes.string,
+    fillOpacity: React.PropTypes.number,
+    style: React.PropTypes.object
   },
 
   getDefaultProps: function() {
     // Provide defaults for optional props
     return {
       initializations: [],
-      animations: []      
+      animations: []    
     };
   },
 
-  render: function() {
-    var style = {
-      display: 'inline-block',
-      height: Dimension.icon,
-      width: Dimension.icon,
-      userSelect: 'none'
+  getStyle: function() {
+    return {
+      clearance: {
+        position: 'relative',
+        height: Dimension.touchTarget,
+        width: Dimension.touchTarget,
+        cursor: 'pointer'
+      },
+      svg: {
+        display: 'inline-block',
+        position: 'absolute',
+        top:  (Dimension.touchTarget - Dimension.icon) / 2,
+        left: (Dimension.touchTarget - Dimension.icon) / 2,
+        height: Dimension.icon,
+        width: Dimension.icon,
+        userSelect: 'none'
+      },
     }
+  },
+
+  render: function() {
+    var style = Util.merge(this.getStyle(), this.props.style);
     return (
-      <svg viewBox={"0 0 " + Dimension.icon + " " + Dimension.icon}
-           style={Util.merge(style, this.props.style)}>
-          <path ref="iconPath"
-                d={this.props.d}/>
-      </svg>
+      <div style={style.clearance}>
+          <svg viewBox={"0 0 " + Dimension.icon + " " + Dimension.icon}
+               style={style.svg}>
+              <path ref="iconPath"
+                    d={this.props.d}
+                    fill={this.props.fill}
+                    fillOpacity={this.props.fillOpacity}/>
+          </svg>
+      </div>
     );
   },
 

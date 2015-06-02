@@ -6,6 +6,7 @@ var MaterialIcon = require('./MaterialIcon');
 var MaterialIconExpand = React.createClass({
 
   getMaterialIconProps: function() {
+    
     var initializations = [{
       properties: {
         transformOriginX: Dimension.icon / 2,
@@ -30,9 +31,7 @@ var MaterialIconExpand = React.createClass({
 
     return {
       initializations: initializations,
-      animations: animations,
-      style: this.props.style,
-      d: d
+      animations: animations
     };
   },
 
