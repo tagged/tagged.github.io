@@ -2,6 +2,7 @@ var React = require('react');
 var MaterialIcon = require('./MaterialIcon');
 
 var MaterialIconSearch = React.createClass({
+
   getMaterialIconProps: function() {
     var initializations = [{
       properties: {

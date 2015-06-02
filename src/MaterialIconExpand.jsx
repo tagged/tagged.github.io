@@ -1,8 +1,10 @@
-var React = require('react/addons'); 
-var Dimension = require('./res/dimension');
+var React = require('react/addons');
+var R = require('./res/index');
+var Dimension = R.dimension;
 var MaterialIcon = require('./MaterialIcon');
 
 var MaterialIconExpand = React.createClass({
+
   getMaterialIconProps: function() {
     var initializations = [{
       properties: {

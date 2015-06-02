@@ -1,8 +1,10 @@
 var React = require('react/addons');
 var Util = require('./util/util');
-var Color = require('./res/color');
-var Shadow = require('./res/shadow');
-var Transition = require('./res/transition');
+var R = require('./res/index');
+var Color = R.color;
+var Shadow = R.shadow;
+var Transition = R.transition;
+
 
 var Paper = React.createClass({
 

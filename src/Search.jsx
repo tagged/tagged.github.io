@@ -3,7 +3,8 @@ var Tag = require('./Tag');
 var TagInput = require('./TagInput');
 var Subheader = require('./Subheader');
 var Files = require('./Files');
-var Dimension = require('./res/dimension');
+var R = require('./res/index');
+var Dimension = R.dimension;
 
 
 var Search = React.createClass({

@@ -20,7 +20,8 @@ var MaterialIconCloudQueue = require('./MaterialIconCloudQueue');
 var Search = require('./Search');
 var ActionBar = require('./ActionBar');
 
-var Color = require('./res/color');
+var R = require('./res/index');
+var Color = R.color;
 var _Database = require('./res/_database');
 var Immutable = require('immutable');
 

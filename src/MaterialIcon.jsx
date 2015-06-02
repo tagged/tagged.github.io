@@ -1,7 +1,8 @@
 var React = require('react/addons');
-var Color = require('./res/color');
+var R = require('./res/index');
+var Color = R.color;
+var Dimension = R.dimension;
 var Util = require('./util/util');
-var Dimension = require('./res/dimension');
 var Velocity = require('../velocity/velocity.js');
 
 var MaterialIcon = React.createClass({

@@ -2,6 +2,7 @@ var React = require('react/addons');
 var MaterialIcon = require('./MaterialIcon');
 
 var MaterialIconCloudQueue = React.createClass({
+
   getMaterialIconProps: function() {
     var initializations = [{
       properties: {

@@ -1,7 +1,8 @@
 var React = require('react/addons');
-var Color = require('./res/color');
-var Dimension = require('./res/dimension');
-var Typography = require('./res/typography');
+var R = require('./res/index');
+var Color = R.color;
+var Dimension = R.dimension;
+var Typography = R.typography;
 
 var Tag = React.createClass({
   

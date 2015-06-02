@@ -1,5 +1,6 @@
 var React = require('react/addons');
-var Dimension = require('./res/dimension');
+var R = require('./res/index');
+var Dimension = R.dimension;
 //var Velocity = require('../velocity/velocity.js');
 
 var Collapsible = React.createClass({

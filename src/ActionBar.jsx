@@ -2,7 +2,8 @@ var React = require('react');
 var Menu = require('./Menu');
 var Subheader = require('./Subheader');
 var MaterialIconMoreVert = require('./MaterialIconMoreVert');
-var Dimension = require('./res/dimension');
+var R = require('./res/index');
+var Dimension = R.dimension;
 var Util = require('./util/util');
 
 

@@ -1,6 +1,7 @@
 var React = require('react/addons');
 var Util = require('./util/util');
-var Dimension = require('./res/dimension');
+var R = require('./res/index');
+var Dimension = R.dimension;
 
 var ImageIcon = React.createClass({
 

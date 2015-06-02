@@ -1,6 +1,7 @@
 var React = require('react/addons');
-var Color = require('./res/color');
-var Dimension = require('./res/dimension');
+var R = require('./res/index');
+var Color = R.color;
+var Dimension = R.dimension;
 var Velocity = require('../velocity/velocity.js');
 
 var Ripple = React.createClass({

@@ -2,6 +2,7 @@ var React = require('react/addons');
 var MaterialIcon = require('./MaterialIcon');
 
 var MaterialIconCheckboxOutline = React.createClass({
+
   getMaterialIconProps: function() {
     var initializations = [{
       properties: {

@@ -1,7 +1,8 @@
 var React = require('react');
 var Paper = require('./Paper');
-var Color = require('./res/color');
-var Dimension = require('./res/dimension');
+var R = require('./res/index');
+var Color = R.color;
+var Dimension = R.dimension;
 var Util = require('./util/util');
 
 
