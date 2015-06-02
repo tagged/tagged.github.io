@@ -6,6 +6,8 @@ var Files = React.createClass({
   
   propTypes: {
     files: React.PropTypes.object,
+    filesSelected: React.PropTypes.object,
+    filesOpen: React.PropTypes.object,
     onFileSelect: React.PropTypes.func,
     onFileToggle: React.PropTypes.func,
     disabledTags: React.PropTypes.array,
@@ -33,8 +35,8 @@ var Files = React.createClass({
       tags: file.tags,
       disabledTags: this.props.disabledTags,
       onTagClick: this.props.onTagClick,
-      isSelected: file.isSelected,
-      isOpen: file.isOpen,
+      isSelected: this.props.filesSelected.includes(file.id),
+      isOpen: this.props.filesOpen.includes(file.id),
       onFileSelect: onFileSelect,
       onFileToggle: onFileToggle,
       key: file.id

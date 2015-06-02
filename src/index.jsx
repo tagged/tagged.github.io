@@ -38,53 +38,68 @@ var getGlobalStyle = function() {
 
 var App = React.createClass({
 
+  //Search tags determine files
+  //Files determine which files are allowed in filesOpen, filesSelected
   getInitialState: function() {
     return {
       searchTags: [],
       searchValue: "",
       searchIsFocused: false,
-      searchFiles: Immutable.Map(),
+      files: Immutable.Map(),
+      filesOpen: Immutable.Set(),
+      filesSelected: Immutable.Set(),
     };
   },
 
   addSearchTag: function(tag) {
-    //Add tag to search tags, and clear search input
+    //Add tag to searchTags
+    //Update files, based on new search tags
+    //Filter filesSelected and filesOpen, based on files
+    //Clear searchValue
     var newSearchTags = this.state.searchTags.concat([tag]);
-    var newSearchFiles = this.updateSearchFiles(newSearchTags);
+    var newFileState = this.updateFileState(newSearchTags);
     this.setState({
       searchTags: newSearchTags,
       searchValue: "",
-      searchFiles: newSearchFiles,
+      files: newFileState.files,
+      filesSelected: newFileState.filesSelected,
+      filesOpen: newFileState.filesOpen,
     });
   },
 
   deleteSearchTag: function(tagIndex) {
+    //Remove tag from searchTags
+    //Update files, based on new search tags
+    //Filter filesSelected and filesOpen, based on files
     var newSearchTags = React.addons.update(this.state.searchTags, {
       $splice: [[tagIndex, 1]]
     });
-    var newSearchFiles = this.updateSearchFiles(newSearchTags);
+    var newFileState = this.updateFileState(newSearchTags);
     this.setState({
       searchTags: newSearchTags,
-      searchFiles: newSearchFiles,
+      files: newFileState.files,
+      filesSelected: newFileState.filesSelected,
+      filesOpen: newFileState.filesOpen,
     });
   },
 
-  updateSearchFiles: function(searchTags) {
-    //Search tags determine files
-    //Return type is Immutable.Map
+  updateFileState: function(searchTags) {
+    //Returns what the next file state (files, filesSelected, filesOpen) 
+    //would look like, given the search tags
     var files = _Database.getFiles(searchTags);
-
-    //Preserve previous UI state of file (isOpen, isSelected)
-    var syncedFiles = files.map(function(file, fileId) {
-      var currentFile = this.state.searchFiles.get(fileId);
-      file.isSelected = currentFile !== undefined ? currentFile.isSelected : false;
-      file.isOpen = currentFile !== undefined ? currentFile.isOpen : false;
-      return file;
-    }, this);
-
-    return syncedFiles;
+    var filesSelected = this.state.filesSelected.filter(function(fileId) {
+      return files.has(fileId);
+    });
+    var filesOpen = this.state.filesOpen.filter(function(fileId) {
+      return files.has(fileId);
+    });
+    return {
+      files: files,
+      filesSelected: filesSelected,
+      filesOpen: filesOpen
+    };
   },
-    
+
   handleFocus: function() {
     this.setState({searchIsFocused: true});
   },
@@ -98,19 +113,17 @@ var App = React.createClass({
   },
 
   handleFileSelect: function(fileId) {
-    var newFiles = this.state.searchFiles.update(fileId, function(file) {
-      file.isSelected = !file.isSelected;
-      return file;
-    });
-    this.setState({searchFiles: newFiles});
+    var filesSelected = this.state.filesSelected.includes(fileId) ?
+                        this.state.filesSelected.delete(fileId) :
+                        this.state.filesSelected.add(fileId);
+    this.setState({filesSelected: filesSelected});
   },
 
   handleFileToggle: function(fileId) {
-    var newFiles = this.state.searchFiles.update(fileId, function(file) {
-      file.isOpen = !file.isOpen;
-      return file;
-    });
-    this.setState({searchFiles: newFiles});
+    var filesOpen = this.state.filesOpen.includes(fileId) ?
+                        this.state.filesOpen.delete(fileId) :
+                        this.state.filesOpen.add(fileId);
+    this.setState({filesOpen: filesOpen});
   },
 
   getSearchProps: function() {
@@ -129,7 +142,9 @@ var App = React.createClass({
       searchTags: this.state.searchTags,
       searchValue: this.state.searchValue,
       searchIsFocused: this.state.searchIsFocused,
-      searchFiles: this.state.searchFiles,
+      files: this.state.files,
+      filesSelected: this.state.filesSelected,
+      filesOpen: this.state.filesOpen,
 
       suggestedTags: suggestedTags,
       suggestionTitle: suggestionTitle,

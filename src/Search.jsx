@@ -12,7 +12,9 @@ var Search = React.createClass({
     searchTags: React.PropTypes.array.isRequired,
     searchValue: React.PropTypes.string,
     searchIsFocused: React.PropTypes.bool,
-    searchFiles: React.PropTypes.object,
+    files: React.PropTypes.object,
+    filesSelected: React.PropTypes.object,
+    filesOpen: React.PropTypes.object,
 
     suggestedTags: React.PropTypes.array,
     suggestionTitle: React.PropTypes.string,
@@ -96,7 +98,9 @@ var Search = React.createClass({
                         maxWidth="none"/>
               {suggestions}
           </div>
-          <Files files={this.props.searchFiles}
+          <Files files={this.props.files}
+                 filesSelected={this.props.filesSelected}
+                 filesOpen={this.props.filesOpen}
                  onFileSelect={this.props.onFileSelect}
                  onFileToggle={this.props.onFileToggle}
                  disabledTags={this.props.searchTags}
