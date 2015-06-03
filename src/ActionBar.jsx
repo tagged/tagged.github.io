@@ -39,12 +39,14 @@ var ActionBar = React.createClass({
         position: 'relative',
         whiteSpace: 'nowrap',
         textAlign: 'right',
-        //Clear floated actionBarInner
-        overflow: 'hidden'
       },
       actionBarInner: {
         //Overflow actions out the left edge
         float: 'right'
+      },
+      clear: {
+        //Clear earlier floats (actionBarInner)
+        clear: 'both'
       },
       action: {
         display: 'inline-block', 
@@ -137,6 +139,7 @@ var ActionBar = React.createClass({
               {overflow}
               {menu}
           </div>
+          <div style={style.clear}/>
       </div>
     );
 
