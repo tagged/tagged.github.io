@@ -29,6 +29,7 @@ var Tag = React.createClass({
         marginBottom: Dimension.space,
         borderRadius: Dimension.borderRadius,
         backgroundColor: this.props.isDisabled ? Color.blackDivider : Color.blue100,
+        outlineColor: Color.blue500,
         cursor: this.props.isDisabled ? 'auto' : 'pointer'        
       }
     };
