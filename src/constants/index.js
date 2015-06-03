@@ -1,4 +1,4 @@
 module.exports = {
-  FileSelection: require('./FileSelection'),
+  Ternary: require('./Ternary'),
   Page: require('./Page'),
 };
