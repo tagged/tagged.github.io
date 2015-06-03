@@ -38,8 +38,10 @@ var File = React.createClass({
         padding: Dimension.quantum
       },
       checkbox: {
-        float: 'left',
-        marginRight: Dimension.quantum
+        component: {
+          float: 'left',
+          marginRight: Dimension.quantum
+        }
       },
       filename: {
         boxSizing: 'border-box',

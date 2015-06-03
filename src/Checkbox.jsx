@@ -34,7 +34,7 @@ var Checkbox = React.createClass({
   },
 
   render: function() {
-    var style = this.getStyle();
+    var style = Util.merge(this.getStyle(), this.props.style);
 
     var initializations = [
       {
@@ -89,7 +89,7 @@ var Checkbox = React.createClass({
     ];
 
     return (
-      <div style={Util.merge(style.component, this.props.style)}
+      <div style={style.component}
            onClick={this.props.handleCheck}>
           <MaterialIcon d={Icon.checkboxOutline}
                         fill={Color.black}
