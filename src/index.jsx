@@ -66,7 +66,7 @@ var App = React.createClass({
   //Files determine which files are allowed in filesOpen, filesSelected
   getInitialState: function() {
     return {
-      page: Constants.Page.SCRATCH,
+      page: Constants.Page.SEARCH,
       searchTags: [],
       searchValue: "",
       searchIsFocused: false,

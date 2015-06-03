@@ -79,6 +79,7 @@ var TagInput = React.createClass({
                  onBlur={this.props.handleBlur}
                  onChange={this.props.handleChange}
                  placeholder={this.props.placeholder}
+                 tabIndex="1"
                  style={style.input}/>
           <div ref="regulator"
                style={style.regulator}>

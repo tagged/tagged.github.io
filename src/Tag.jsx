@@ -1,4 +1,5 @@
 var React = require('react/addons');
+var Constants = require('./constants/index');
 var R = require('./res/index');
 var Color = R.color;
 var Dimension = R.dimension;
@@ -37,7 +38,9 @@ var Tag = React.createClass({
     var style = this.getStyle();
     return (
       <div style={style.component}
-           onMouseDown={this.handleMouseDown}>
+           onMouseDown={this.handleMouseDown}
+           tabIndex="1"
+           onKeyPress={this.handleKeyPress}>
           {this.props.text}
       </div>
     );
@@ -46,6 +49,12 @@ var Tag = React.createClass({
   handleMouseDown: function(event) {
     event.preventDefault();
     if (!this.props.isDisabled) {
+      this.props.onClick();
+    }
+  },
+
+  handleKeyPress: function(event) {
+    if (!this.props.isDisabled && event.key === 'Enter') {
       this.props.onClick();
     }
   }
