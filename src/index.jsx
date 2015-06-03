@@ -2,38 +2,60 @@ var React = require('react/addons');
 //var injectTapEventPlugin = require("react-tap-event-plugin");
 //injectTapEventPlugin();
 
-var Router = require('react-router');
-var DefaultRoute = Router.DefaultRoute;
-var Link = Router.Link;
-var Route = Router.Route;
-var RouteHandler = Router.RouteHandler;
-
-var Paper = require('./Paper');
-var AppBar = require('./AppBar');
-var AppBarActions = require('./AppBarActions');
-var AppBarAction = require('./AppBarAction');
 var MaterialIcon = require('./MaterialIcon');
-var MaterialIconCheckboxPartial = require('./MaterialIconCheckboxPartial');
-var MaterialIconSearch = require('./MaterialIconSearch');
-var MaterialIconCloudQueue = require('./MaterialIconCloudQueue');
-
 var Search = require('./Search');
 var ActionBar = require('./ActionBar');
 
 var R = require('./res/index');
 var Color = R.color;
+var Dimension = R.dimension;
+var Icon = R.icon;
+var Shadow = R.shadow;
+
 var _Database = require('./res/_database');
 var Immutable = require('immutable');
 
 
 
-var getGlobalStyle = function() {
-  return {
-    color: Color.blackPrimary,
-    fontFamily: 'Roboto, sans-serif',
-    WebkitTapHighlightColor: 'rgba(0,0,0,0)'
-  };
-}
+var Scratchwork = React.createClass({
+
+  render: function() {
+    var actionBarStyle = {
+      actionBar: {
+        position: 'fixed', bottom: 0, left:0, right: 0, zIndex: 99, 
+        backgroundColor: 'limegreen', 
+        paddingTop: 4, paddingBottom: 4,
+        paddingRight: 4, paddingLeft: 4,
+      },
+      menu: {bottom: 4, top:'auto'},
+    };
+    return (
+      <div>
+          <MaterialIcon d={Icon.checkboxPartial}
+                        fill={Color.blue500} 
+                        fillOpacity={1}/>
+          <ActionBar style={actionBarStyle}>
+              <div action="Blackify" style={{backgroundColor: 'black', width:48, height: 48}}/>
+              <div action="Grayify" style={{backgroundColor: 'gray', width:48, height: 48}}/>
+              <div action="Indigoify" style={{backgroundColor: 'indigo', width:48, height: 48}}/>
+              <div action="Purplify" style={{backgroundColor: 'purple', width:48, height: 48}}/>
+              <div action="Yellowify" style={{backgroundColor: 'yellow', width:48, height: 48}}/>
+              <div action="Orangify" style={{backgroundColor: 'orange', width:48, height: 48}}/>
+              <div action="Redify" style={{backgroundColor: 'red', width:48, height: 48}}/>
+              <div action="Pinkify" style={{backgroundColor: 'pink', width:48, height: 48}}/>
+              <div action="Blackify" style={{backgroundColor: 'black', width:48, height: 48}}/>
+              <div action="Grayify" style={{backgroundColor: 'gray', width:48, height: 48}}/>
+              <div action="Indigoify" style={{backgroundColor: 'indigo', width:48, height: 48}}/>
+              <div action="Purplify" style={{backgroundColor: 'purple', width:48, height: 48}}/>
+              <div action="Yellowify" style={{backgroundColor: 'yellow', width:48, height: 48}}/>
+              <div action="Orangify" style={{backgroundColor: 'orange', width:48, height: 48}}/>
+              <div action="Redify" style={{backgroundColor: 'red', width:48, height: 48}}/>
+              <div action="Pinkify" style={{backgroundColor: 'pink', width:48, height: 48}}/>
+          </ActionBar>
+      </div>
+    );
+  }
+});
 
 
 
@@ -43,6 +65,7 @@ var App = React.createClass({
   //Files determine which files are allowed in filesOpen, filesSelected
   getInitialState: function() {
     return {
+      page: "Scratchwork",
       searchTags: [],
       searchValue: "",
       searchIsFocused: false,
@@ -162,101 +185,62 @@ var App = React.createClass({
     };
   },
   
-  render: function() {
-    return (
-      <Search {...this.getSearchProps()}/>
-    );
-  }
+  getPage() {
+    var page;
+    switch(this.state.page) {
+      case "Search":
+        page = <Search {...this.getSearchProps()}/>;
+        break;
+      case "ActionBar":
+        page = <Scratchwork/>;
+        break;
+      default:
+        page = <Search {...this.getSearchProps()}/>;
+    }
+    return page;
+  },
 
-});
-
-
-
-
-
-
-var Cloud = React.createClass({
-  render: function() {
-    var paperStyle = {height:'56px', margin:'0 20px'}
-    return(
-      <Paper style={paperStyle}>
-          <h1>Cloud</h1>
-      </Paper>
-    );
-  }
-});
-
-
-
-
-
-
-var Main = React.createClass({
-
-  render: function() {
-    var actionBarStyle = {
-      actionBar: {
-        position: 'fixed', bottom: 0, left:0, right: 0, zIndex: 99, 
-        backgroundColor: 'limegreen', 
-        paddingTop: 4, paddingBottom: 4,
-        paddingRight: 4, paddingLeft: 4,
+  getStyle: function() {
+    return {
+      app: {
+        color: Color.blackPrimary,
+        fontFamily: 'Roboto, sans-serif',
+        WebkitTapHighlightColor: 'rgba(0,0,0,0)'
       },
-      menu: {bottom: 4, top:'auto'},
+      appBar: {
+        actionBar: {
+          backgroundColor: Color.blue500,
+          boxShadow: Shadow.zDepth[this.props.zDepth],
+          padding: Dimension.quantum,
+        }
+      }
     };
+  },
+
+  render: function() {
+    var style = this.getStyle();
+    var page = this.getPage();
+
     return (
-      <div style={getGlobalStyle()}>
-          <AppBar>
-              <AppBarActions> 
-                  <Link to="app"><AppBarAction>
-                      <MaterialIconSearch fill={Color.black}
-                                          fillOpacity={Color.blackSecondaryOpacity}
-                                          style={{}}
-                      />
-                  </AppBarAction></Link>
-                  <Link to="cloud"><AppBarAction>
-                      <MaterialIconCloudQueue fill={Color.black}
-                                              fillOpacity={Color.blackSecondaryOpacity}
-                                              style={{}}
-                      />
-                  </AppBarAction></Link>
-              </AppBarActions>
-          </AppBar>
-          <MaterialIconCheckboxPartial fill={Color.blue500} fillOpacity={1}/>
-          <ActionBar style={actionBarStyle}>
-              <div action="Blackify" style={{backgroundColor: 'black', width:48, height: 48}}/>
-              <div action="Grayify" style={{backgroundColor: 'gray', width:48, height: 48}}/>
-              <div action="Indigoify" style={{backgroundColor: 'indigo', width:48, height: 48}}/>
-              <div action="Purplify" style={{backgroundColor: 'purple', width:48, height: 48}}/>
-              <div action="Yellowify" style={{backgroundColor: 'yellow', width:48, height: 48}}/>
-              <div action="Orangify" style={{backgroundColor: 'orange', width:48, height: 48}}/>
-              <div action="Redify" style={{backgroundColor: 'red', width:48, height: 48}}/>
-              <div action="Pinkify" style={{backgroundColor: 'pink', width:48, height: 48}}/>
-              <div action="Blackify" style={{backgroundColor: 'black', width:48, height: 48}}/>
-              <div action="Grayify" style={{backgroundColor: 'gray', width:48, height: 48}}/>
-              <div action="Indigoify" style={{backgroundColor: 'indigo', width:48, height: 48}}/>
-              <div action="Purplify" style={{backgroundColor: 'purple', width:48, height: 48}}/>
-              <div action="Yellowify" style={{backgroundColor: 'yellow', width:48, height: 48}}/>
-              <div action="Orangify" style={{backgroundColor: 'orange', width:48, height: 48}}/>
-              <div action="Redify" style={{backgroundColor: 'red', width:48, height: 48}}/>
-              <div action="Pinkify" style={{backgroundColor: 'pink', width:48, height: 48}}/>
+      <div style={style.app}>
+          <ActionBar style={style.appBar}>
+              <MaterialIcon action="Search"
+                            d={Icon.search}
+                            fill={Color.white}
+                            fillOpacity={Color.whitePrimaryOpacity}/>
+              <MaterialIcon action="Cloud"
+                            d={Icon.cloudQueue}
+                            fill={Color.black}
+                            fillOpacity={Color.blackSecondaryOpacity}/>
           </ActionBar>
-
-
-          <RouteHandler/>
-
-          
+          {page}
       </div>
     );
   }
+
 });
 
-var routes = (
-  <Route name="app" path="/" handler={Main}>
-      <Route name="cloud" handler={Cloud}/>
-      <DefaultRoute handler={App}/>
-  </Route>
-);
 
-Router.run(routes, function(Handler) {
-  React.render(<Handler/>, document.getElementById('content'));
-});
+
+
+React.render(<App/>, document.getElementById('content'));

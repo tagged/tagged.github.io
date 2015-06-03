@@ -15,6 +15,10 @@ module.exports = {
   whiteSecondary: 'rgba(255,255,255,0.70)',
   whiteHint: 'rgba(255,255,255,0.30)',
   whiteDivider: 'rgba(255,255,255,0.12)',
+  whitePrimaryOpacity: 1,
+  whiteSecondaryOpacity: 0.70,
+  whiteHintOpacity: 0.30,
+  whiteDividerOpacity: 0.12,
 
   blue50:   '#e3f2fd',
   blue100:  '#bbdefb',
