@@ -1,3 +1,4 @@
 module.exports = {
-  FileSelection: require('./FileSelection')
+  FileSelection: require('./FileSelection'),
+  Page: require('./Page'),
 };

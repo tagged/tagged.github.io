@@ -6,6 +6,7 @@ var MaterialIcon = require('./MaterialIcon');
 var Search = require('./Search');
 var ActionBar = require('./ActionBar');
 
+var Constants = require('./constants/index');
 var R = require('./res/index');
 var Color = R.color;
 var Dimension = R.dimension;
@@ -65,7 +66,7 @@ var App = React.createClass({
   //Files determine which files are allowed in filesOpen, filesSelected
   getInitialState: function() {
     return {
-      page: "Scratchwork",
+      page: Constants.Page.SCRATCH,
       searchTags: [],
       searchValue: "",
       searchIsFocused: false,
@@ -188,16 +189,21 @@ var App = React.createClass({
   getPage() {
     var page;
     switch(this.state.page) {
-      case "Search":
+      case Constants.Page.SEARCH:
         page = <Search {...this.getSearchProps()}/>;
         break;
-      case "ActionBar":
+      case Constants.Page.SCRATCH:
         page = <Scratchwork/>;
         break;
       default:
-        page = <Search {...this.getSearchProps()}/>;
+        //Invariant: this.state.page should always be defined
+        throw "NOT A VALID PAGE";
     }
     return page;
+  },
+
+  navigate: function(page) {
+    this.setState({page: page});
   },
 
   getStyle: function() {
@@ -226,12 +232,14 @@ var App = React.createClass({
           <ActionBar style={style.appBar}>
               <MaterialIcon action="Search"
                             d={Icon.search}
-                            fill={Color.white}
-                            fillOpacity={Color.whitePrimaryOpacity}/>
+                            fill={this.state.page === Constants.Page.SEARCH ? Color.white : Color.black}
+                            fillOpacity={this.state.page === Constants.Page.SEARCH ? Color.whitePrimaryOpacity : Color.blackSecondaryOpacity}
+                            onClick={this.navigate.bind(this, Constants.Page.SEARCH)}/>
               <MaterialIcon action="Cloud"
                             d={Icon.cloudQueue}
-                            fill={Color.black}
-                            fillOpacity={Color.blackSecondaryOpacity}/>
+                            fill={this.state.page === Constants.Page.SCRATCH ? Color.white : Color.black}
+                            fillOpacity={this.state.page === Constants.Page.SCRATCH ? Color.whitePrimaryOpacity : Color.blackSecondaryOpacity}                   
+                            onClick={this.navigate.bind(this, Constants.Page.SCRATCH)}/>
           </ActionBar>
           {page}
       </div>

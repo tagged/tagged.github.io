@@ -13,7 +13,8 @@ var MaterialIcon = React.createClass({
     d: React.PropTypes.string.isRequired,
     fill: React.PropTypes.string,
     fillOpacity: React.PropTypes.number,
-    style: React.PropTypes.object
+    style: React.PropTypes.object,
+    onClick: React.PropTypes.func,
   },
 
   getDefaultProps: function() {
@@ -47,9 +48,10 @@ var MaterialIcon = React.createClass({
   render: function() {
     var style = Util.merge(this.getStyle(), this.props.style);
     return (
-      <div style={style.clearance}>
-          <svg viewBox={"0 0 " + Dimension.icon + " " + Dimension.icon}
-               style={style.svg}>
+      <div style={style.clearance} 
+           onClick={this.props.onClick}>
+          <svg style={style.svg}
+               viewBox={"0 0 " + Dimension.icon + " " + Dimension.icon}>
               <path ref="iconPath"
                     d={this.props.d}
                     fill={this.props.fill}
