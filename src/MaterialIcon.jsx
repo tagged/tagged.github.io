@@ -20,6 +20,8 @@ var MaterialIcon = React.createClass({
   getDefaultProps: function() {
     // Provide defaults for optional props
     return {
+      fill: '#000000',
+      fillOpacity: 0,
       initializations: [],
       animations: []    
     };
