@@ -45,6 +45,7 @@ var Snackbar = React.createClass({
       action: {
         display: 'table-cell',
         verticalAlign: 'middle',
+        width: 1,//table-cell will expand to fit content
         paddingLeft: Dimension.snackbar.paddingHorizontal,
         paddingRight: Dimension.snackbar.paddingHorizontal,
         color: Color.blue500,
