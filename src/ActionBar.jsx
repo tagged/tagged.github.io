@@ -1,9 +1,9 @@
 var React = require('react');
 var Menu = require('./Menu');
 var Subheader = require('./Subheader');
-var MaterialIconMoreVert = require('./MaterialIconMoreVert');
 var R = require('./res/index');
 var Dimension = R.dimension;
+var Icon = R.icon;
 var Util = require('./util/util');
 
 
@@ -107,7 +107,8 @@ var ActionBar = React.createClass({
     if (this.state.actionsVisible < React.Children.count(this.props.children)) {
       overflow = (
         <div ref="overflow" onClick={this.showMenu} style={style.overflow}>
-            <MaterialIconMoreVert style={style.overflowIcon}/>
+            <MaterialIcon d={Icon.moreVert}
+                          style={style.overflowIcon}/>
         </div>
       );
     }
