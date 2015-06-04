@@ -1,8 +1,8 @@
 var React = require('react');
-var Paper = require('./Paper');
 var R = require('./res/index');
 var Color = R.color;
 var Dimension = R.dimension;
+var Shadow = R.shadow;
 var Util = require('./util/util');
 
 
@@ -12,13 +12,11 @@ var Menu = React.createClass({
     onMenuHide: React.PropTypes.func,
     hoverColor: React.PropTypes.string,
     style: React.PropTypes.object,
-    zDepth: React.PropTypes.number,
   },
 
   getDefaultProps: function() {
     return {
       hoverColor: Color.blackDivider,
-      zDepth: 1,
     }
   },
 
@@ -27,7 +25,8 @@ var Menu = React.createClass({
       menu: {
         paddingTop: Dimension.space,
         paddingBottom: Dimension.space,
-        borderRadius: Dimension.borderRadius
+        borderRadius: Dimension.borderRadius,
+        boxShadow: Shadow.zDepth[1]
       },
       item: {
         cursor: 'pointer'
@@ -36,7 +35,7 @@ var Menu = React.createClass({
   },
 
   render: function() {
-    var style = this.getStyle();
+    var style = Util.merge(this.getStyle(), this.props.style);
 
     var childNodes = React.Children.map(this.props.children, function(child, childIndex) {
       return (
@@ -50,9 +49,9 @@ var Menu = React.createClass({
     }, this);
 
     return (
-      <Paper zDepth={this.props.zDepth} style={Util.merge(this.props.style, style.menu)}>
+      <div style={style.menu}>
           {childNodes}
-      </Paper>
+      </div>
     );
   },
 
