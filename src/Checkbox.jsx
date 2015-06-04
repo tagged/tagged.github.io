@@ -1,5 +1,5 @@
 var React = require('react/addons');
-var MaterialIcon = require('./MaterialIcon');
+var SVGIcon = require('./SVGIcon');
 
 var Constants = require('./constants/index');
 var FALSE = Constants.Ternary.FALSE;
@@ -8,7 +8,6 @@ var TRUE = Constants.Ternary.TRUE;
 
 var R = require('./res/index');
 var Color = R.color;
-var Dimension = R.dimension;
 var Icon = R.icon;
 var Util = require('./util/util');
 
@@ -33,35 +32,14 @@ var checkmark = {
 
 
 
-
 var Checkbox = React.createClass({
 
   propTypes: {
     checkState: React.PropTypes.oneOf([ FALSE, INDETERMINATE, TRUE ]),
-    handleClick: React.PropTypes.func,
+    onCheck: React.PropTypes.func,
     backgroundColor: React.PropTypes.string,
     color: React.PropTypes.string,
     style: React.PropTypes.object
-  },
-
-  getStyle: function() {
-    return {
-      clearance: {
-        position: 'relative',
-        height: Dimension.touchTarget,
-        width: Dimension.touchTarget,
-        cursor: 'pointer'
-      },
-      svg: {
-        display: 'inline-block',
-        position: 'absolute',
-        top:  (Dimension.touchTarget - Dimension.icon) / 2,
-        left: (Dimension.touchTarget - Dimension.icon) / 2,
-        height: Dimension.icon,
-        width: Dimension.icon,
-        userSelect: 'none'
-      }
-    };
   },
 
   renderCheckbox: function() {
@@ -72,9 +50,9 @@ var Checkbox = React.createClass({
     //Also tried using dangerouslySetInnerHTML, but it seems like 
     //one copy of the SVG is used wherever the string is dangerouslySet.
 
-    var svgNode = React.findDOMNode(this.refs.svg);
+    var svgNode = React.findDOMNode(this.refs.svgIcon.refs.svg);
     svgNode.innerHTML = '';//clear contents
-    var svg = SVG(svgNode).viewbox(0,0,Dimension.icon,Dimension.icon);
+    var svg = SVG(svgNode);
 
     if (this.props.checkState === FALSE) {
       svg.path().attr({
@@ -137,12 +115,10 @@ var Checkbox = React.createClass({
   },
   
   render: function() {
-    var style = Util.merge(this.getStyle(), this.props.style);
-
     return (
-      <div style={style.clearance} onClick={this.handleClick}>
-          <svg style={style.svg} ref="svg"/>
-      </div>
+      <SVGIcon ref="svgIcon" 
+               onClick={this.props.onCheck}
+               style={this.props.style}/>
     );
   },
 
@@ -152,11 +128,6 @@ var Checkbox = React.createClass({
 
   componentDidUpdate: function() {
     this.renderCheckbox();
-  },
-
-  handleClick: function() {
-    this.setState({previousCheckState: this.props.checkState});
-    this.props.handleCheck();
   }
 
 });

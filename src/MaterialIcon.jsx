@@ -1,7 +1,7 @@
-var React = require('react/addons');
+var React = require('react');
+var SVGIcon = require('./SVGIcon');
 var R = require('./res/index');
 var Color = R.color;
-var Dimension = R.dimension;
 var Util = require('./util/util');
 
 var MaterialIcon = React.createClass({
@@ -10,50 +10,28 @@ var MaterialIcon = React.createClass({
     d: React.PropTypes.string.isRequired,
     fill: React.PropTypes.string,
     fillOpacity: React.PropTypes.number,
-    style: React.PropTypes.object,
     onClick: React.PropTypes.func,
+    style: React.PropTypes.object
   },
 
   getDefaultProps: function() {
-    // Provide defaults for optional props
     return {
-      fill: '#000000',
-      fillOpacity: 0
+      fill: Color.black,
+      fillOpacity: Color.blackSecondaryOpacity
     };
   },
 
-  getStyle: function() {
-    return {
-      clearance: {
-        position: 'relative',
-        height: Dimension.touchTarget,
-        width: Dimension.touchTarget,
-        cursor: 'pointer'
-      },
-      svg: {
-        display: 'inline-block',
-        position: 'absolute',
-        top:  (Dimension.touchTarget - Dimension.icon) / 2,
-        left: (Dimension.touchTarget - Dimension.icon) / 2,
-        height: Dimension.icon,
-        width: Dimension.icon,
-        userSelect: 'none'
-      },
-    }
-  },
-
   render: function() {
-    var style = Util.merge(this.getStyle(), this.props.style);
     return (
-      <div style={style.clearance} onClick={this.props.onClick}>
-          <svg style={style.svg} viewBox={"0 0 " + Dimension.icon + " " + Dimension.icon}>
-              <path ref="iconPath"
-                    d={this.props.d}
-                    fill={this.props.fill}
-                    fillOpacity={this.props.fillOpacity}/>
-          </svg>
-      </div>
+      <SVGIcon style={this.props.style} onClick={this.props.onClick}>
+          <path ref="iconPath"
+                d={this.props.d}
+                fill={this.props.fill}
+                fillOpacity={this.props.fillOpacity}/>
+      </SVGIcon>
     );
   }
+
+});
 
 module.exports = MaterialIcon;
