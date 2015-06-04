@@ -26,10 +26,10 @@ var Snackbar = React.createClass({
     return {
       snackbar: {
         display: 'table',
+        width: '100%',
         backgroundColor: "#323232",
         fontSize: Typography.fontSizeSmall,
         lineHeight: Typography.lineHeightSmall,
-        margin: '0 auto',
         minWidth: Dimension.snackbar.minWidth,
         maxWidth: Dimension.snackbar.maxWidth,
       },
