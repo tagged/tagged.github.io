@@ -142,7 +142,7 @@ var File = React.createClass({
 
     return (
       <div style={style.component}>
-          <Checkbox checkState={this.props.isSelected ? Constants.Ternary.TRUE : Constants.Ternary.FALSE} 
+          <Checkbox checkStatus={this.props.isSelected ? Constants.Ternary.TRUE : Constants.Ternary.FALSE} 
                     onCheck={this.props.onFileSelect}
                     backgroundColor={Color.blue500}
                     color={Color.whitePrimary}

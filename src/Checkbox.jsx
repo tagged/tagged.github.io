@@ -35,11 +35,17 @@ var checkmark = {
 var Checkbox = React.createClass({
 
   propTypes: {
-    checkState: React.PropTypes.oneOf([ FALSE, INDETERMINATE, TRUE ]),
+    checkStatus: React.PropTypes.oneOf([ FALSE, INDETERMINATE, TRUE ]),
     onCheck: React.PropTypes.func,
     backgroundColor: React.PropTypes.string,
     color: React.PropTypes.string,
     style: React.PropTypes.object
+  },
+
+  getInitialState: function() {
+    return {
+      previousCheckStatus: this.props.checkStatus
+    };
   },
 
   renderCheckbox: function() {
@@ -54,14 +60,17 @@ var Checkbox = React.createClass({
     svgNode.innerHTML = '';//clear contents
     var svg = SVG(svgNode);
 
-    if (this.props.checkState === FALSE) {
+    var current = this.props.checkStatus;
+    var previous = this.state.previousCheckStatus;
+
+    if (current === FALSE) {
       svg.path().attr({
         d: Icon.checkboxOutline,
         fill: Color.black,
         'fill-opacity': Color.blackSecondaryOpacity
       });
     }
-    else if (this.props.checkState === INDETERMINATE) {
+    else if (current === INDETERMINATE) {
       svg.rect().attr({
         fill: this.props.backgroundColor,
         x: 3, y: 3, rx: 2, ry: 2,
@@ -86,30 +95,46 @@ var Checkbox = React.createClass({
         'stroke-dashoffset': 0
       });
     }
-    else if (this.props.checkState === TRUE) {
+    else if (current === TRUE) {
       svg.rect().attr({
         fill: this.props.backgroundColor,
         x: 3, y: 3, rx: 2, ry: 2,
         height: 18, width: 18
       });
-      svg.polyline().attr({
-        points: checkmark.points,
-        fill: 'none',
-        stroke: this.props.color,
-        'stroke-width': 2,
-        'stroke-linecap': 'butt',
-        'stroke-linejoin': 'miter',
-        'stroke-opacity': 1,
-        'stroke-miterlimit': 4,
-        'stroke-dasharray': checkmark.downLength + checkmark.upLength,
-        'stroke-dashoffset': checkmark.downLength + checkmark.upLength
-      }).animate(checkmark.downAnimation).attr({
-        'stroke-dashoffset': checkmark.upLength - checkmark.thickness / 2
-      }).after(function() {
-        this.animate(checkmark.upAnimation).attr({
-          'stroke-dashoffset': 0
+      if (previous === TRUE) {
+        //Just draw checkmark
+        svg.polyline().attr({
+          points: checkmark.points,
+          fill: 'none',
+          stroke: this.props.color,
+          'stroke-width': 2,
+          'stroke-linecap': 'butt',
+          'stroke-linejoin': 'miter',
+          'stroke-opacity': 1,
+          'stroke-miterlimit': 4
         });
-      });
+      }
+      else {
+        //Animate checkmark in
+        svg.polyline().attr({
+          points: checkmark.points,
+          fill: 'none',
+          stroke: this.props.color,
+          'stroke-width': 2,
+          'stroke-linecap': 'butt',
+          'stroke-linejoin': 'miter',
+          'stroke-opacity': 1,
+          'stroke-miterlimit': 4,
+          'stroke-dasharray': checkmark.downLength + checkmark.upLength,
+          'stroke-dashoffset': checkmark.downLength + checkmark.upLength
+        }).animate(checkmark.downAnimation).attr({
+          'stroke-dashoffset': checkmark.upLength - checkmark.thickness / 2
+        }).after(function() {
+          this.animate(checkmark.upAnimation).attr({
+            'stroke-dashoffset': 0
+          });
+        });
+      }
     }
 
   },
@@ -128,8 +153,12 @@ var Checkbox = React.createClass({
 
   componentDidUpdate: function() {
     this.renderCheckbox();
-  }
+  },
 
+  componentWillReceiveProps: function() {
+    //Save previous check status
+    this.setState({previousCheckStatus: this.props.checkStatus});
+  }
 });
 
 module.exports = Checkbox;
