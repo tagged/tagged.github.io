@@ -13,6 +13,14 @@ var Util = require('./util/util');
 
 var SVG = require('svg.js');
 
+var quarticEaseIn = function(x) {
+  return Math.pow(x,4);
+}
+
+var quarticEaseOut = function(x) {
+  return -(Math.pow((x-1), 4) -1);
+}
+
 var checkmark = {
   points: '5.705,11.295 10,15.585 18.295,7.29',
   downLength: 6.07051,
@@ -20,13 +28,11 @@ var checkmark = {
   thickness: 2,
   downAnimation: {
     duration: 50,
-    ease: '-'
+    ease: quarticEaseOut
   },
   upAnimation: {
     duration: 100,
-    ease: function(x) {
-      return Math.pow(x,4);
-    }
+    ease: quarticEaseIn
   }
 };
 
