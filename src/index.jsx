@@ -4,6 +4,7 @@ var React = require('react/addons');
 
 var MaterialIcon = require('./MaterialIcon');
 var Search = require('./Search');
+var FileActionBar = require('./FileActionBar');
 var ActionBar = require('./ActionBar');
 
 var Constants = require('./constants/index');
@@ -144,6 +145,15 @@ var App = React.createClass({
     this.setState({filesSelected: filesSelected});
   },
 
+  handleFileSelectAll: function() {
+    var filesSelected = Immutable.Set.fromKeys(this.state.files);
+    this.setState({filesSelected: filesSelected});
+  },
+
+  handleFileUnselectAll: function() {
+    this.setState({filesSelected: Immutable.Set()});
+  },
+
   handleFileToggle: function(fileId) {
     var filesOpen = this.state.filesOpen.includes(fileId) ?
                         this.state.filesOpen.delete(fileId) :
@@ -226,7 +236,16 @@ var App = React.createClass({
   render: function() {
     var style = this.getStyle();
     var page = this.getPage();
-
+    var fileActionBar = null;
+    if (!this.state.searchIsFocused && this.state.searchTags.length > 0) {
+      fileActionBar = (
+        <FileActionBar numberOfFiles={this.state.files.size}
+                       numberOfFilesSelected={this.state.filesSelected.size}
+                       onSelectAll={this.handleFileSelectAll}
+                       onUnselectAll={this.handleFileUnselectAll}
+                       style={style.fileActionBar}/>
+      );
+    }
     return (
       <div style={style.app}>
           <ActionBar style={style.appBar}>
@@ -242,6 +261,7 @@ var App = React.createClass({
                             onClick={this.navigate.bind(this, Constants.Page.SCRATCH)}/>
           </ActionBar>
           {page}
+          {fileActionBar}
       </div>
     );
   }
