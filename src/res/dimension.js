@@ -10,6 +10,7 @@ module.exports = {
   marginContentMobile: 72,
   marginContentTablet: 80,
 
+  heightActionBar: 48,
   heightSubheader: 48,
   heightTag: 32,
 
@@ -18,7 +19,6 @@ module.exports = {
 
   heightAppBarMobile: 56,
   heightAppBarTablet: 64,
-  heightToolbar: 48,
 
   icon: 24,
   borderWidth: 1,

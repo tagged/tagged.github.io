@@ -221,7 +221,8 @@ var App = React.createClass({
       app: {
         color: Color.blackPrimary,
         fontFamily: 'Roboto, sans-serif',
-        WebkitTapHighlightColor: 'rgba(0,0,0,0)'
+        WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+        paddingBottom: Dimension.heightActionBar + Dimension.space + Dimension.quantum,
       },
       appBar: {
         actionBar: {
