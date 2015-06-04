@@ -90,6 +90,23 @@ var FileActionBar = React.createClass({
     var plural = number !== 1;
     var text = number + " file" + (plural ? "s" : "") + suffix;
 
+    var actionBar = null;
+    if (this.props.numberOfFilesSelected > 0) {
+      actionBar = (
+        <ActionBar style={style.actionBar}>
+            <MaterialIcon action="Tag"
+                          d={Icon.tag}
+                          fill={Color.white}
+                          fillOpacity={Color.whitePrimaryOpacity}/>
+            <MaterialIcon action="Delete"
+                          d={Icon.trash}
+                          fill={Color.white}
+                          fillOpacity={Color.whitePrimaryOpacity}
+                          onClick={this.props.onDelete}/>
+        </ActionBar>
+      );
+    }
+
     return (
       <div style={style.root}>
           <Checkbox checkStatus={checkStatus}
@@ -99,17 +116,7 @@ var FileActionBar = React.createClass({
                     style={style.checkbox}/>
           <Subheader text={text}
                      style={style.subheader}/>
-          <ActionBar style={style.actionBar}>
-              <MaterialIcon action="Tag"
-                            d={Icon.tag}
-                            fill={Color.white}
-                            fillOpacity={Color.whitePrimaryOpacity}/>
-              <MaterialIcon action="Delete"
-                            d={Icon.trash}
-                            fill={Color.white}
-                            fillOpacity={Color.whitePrimaryOpacity}
-                            onClick={this.props.onDelete}/>
-          </ActionBar>
+          {actionBar}
       </div>
     );
   },
