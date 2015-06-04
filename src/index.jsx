@@ -80,6 +80,10 @@ var App = React.createClass({
       files: Immutable.Map(),
       filesOpen: Immutable.Set(),
       filesSelected: Immutable.Set(),
+      snackbarTimeoutId: null,
+      snackbarMessage: "",
+      snackbarAction: "",
+      snackbarAct: function() {}
     };
   },
 
@@ -116,7 +120,7 @@ var App = React.createClass({
   },
 
   updateFileState: function(searchTags) {
-    //Returns what the next file state (files, filesSelected, filesOpen) 
+    //Returns what the next state of files, filesSelected, and filesOpen
     //would look like, given the search tags
     var files = _Database.getFiles(searchTags);
     var filesSelected = this.state.filesSelected.filter(function(fileId) {
@@ -163,15 +167,49 @@ var App = React.createClass({
   handleFileDelete: function() {
     //Delete each fileId in filesSelected
 
-    //(Delete in database)
+    //If no files selected, do nothing
+    if (this.state.filesSelected.size === 0) {
+      return;
+    }
 
-    //Optimistically update files
+    //Optimistically update files - remove filesSelected from files
     var files = this.state.files.filter(function(file, fileId) {
       return !this.state.filesSelected.includes(fileId);
     }, this);
+
+    //Show snackbar
+    var snackbarDelay = 2000;
+    var snackbarTimeoutId = window.setTimeout(function() {
+      //(Delete in database)
+      //alert('Files deleted in database!');
+      this.setState({
+        filesSelected: Immutable.Set(),
+        snackbarTimeoutId: null
+      });
+    }.bind(this), snackbarDelay);
+
+    //Don't clear filesSelected yet
+    //Do it after snackbar times out
+    var plural = this.state.filesSelected.size !== 1 ? "s" : "";
     this.setState({
       files: files,
-      filesSelected: Immutable.Set()
+      snackbarTimeoutId: snackbarTimeoutId,
+      snackbarMessage: "Deleted " + this.state.filesSelected.size + " file" + plural,
+      snackbarAction: "UNDO",
+      snackbarAct: this.handleFileUndoDelete
+    });
+  },
+
+  handleFileUndoDelete: function() {
+    //Cancel snackbar timeout
+    window.clearTimeout(this.state.snackbarTimeoutId);
+
+    //Refresh files from search tags
+    var fileState = this.updateFileState(this.state.searchTags);
+    
+    this.setState({
+      files: fileState.files,
+      snackbarTimeoutId: null
     });
   },
   
@@ -251,6 +289,14 @@ var App = React.createClass({
           boxShadow: Shadow.zDepth[this.props.zDepth],
           padding: Dimension.quantum,
         }
+      },
+      fileActionBar: {
+      },
+      snackbar: {
+        snackbar: {
+          position: 'fixed',
+          bottom: 0
+        }
       }
     };
   },
@@ -258,17 +304,34 @@ var App = React.createClass({
   render: function() {
     var style = this.getStyle();
     var page = this.getPage();
+
+    var snackbar = null;
+    var isSnackbarVisible = this.state.snackbarTimeoutId !== null;
+    if(isSnackbarVisible) {
+      snackbar = (
+        <Snackbar message={this.state.snackbarMessage}
+                  action={this.state.snackbarAction}
+                  onAction={this.state.snackbarAct}
+                  style={style.snackbar}/>
+      );
+    }
+
     var fileActionBar = null;
     if (this.state.searchTags.length > 0) {
+      //If snackbar is visible, because all selected files were deleted,
+      //pretend no files are selected
+      //This may change as snackbar is used for more than undoing deleted files
+      var numberOfFilesSelected = isSnackbarVisible ? 0 : this.state.filesSelected.size;
       fileActionBar = (
         <FileActionBar numberOfFiles={this.state.files.size}
-                       numberOfFilesSelected={this.state.filesSelected.size}
+                       numberOfFilesSelected={numberOfFilesSelected}
                        onSelectAll={this.handleFileSelectAll}
                        onUnselectAll={this.handleFileUnselectAll}
                        onDelete={this.handleFileDelete}
                        style={style.fileActionBar}/>
       );
     }
+
     return (
       <div style={style.app}>
           <ActionBar style={style.appBar}>
@@ -285,6 +348,7 @@ var App = React.createClass({
           </ActionBar>
           {page}
           {fileActionBar}
+          {snackbar}
       </div>
     );
   }
