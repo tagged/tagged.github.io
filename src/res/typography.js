@@ -4,7 +4,7 @@ module.exports = {
   fontSize: 16,
   fontSizeLarge: 20,
 
-  lineHeightSmall: 16 / 14,
+  lineHeightSmall: 20 / 14,
   lineHeight: 20 / 16,
 
   fontWeightThin: 300,
