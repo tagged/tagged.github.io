@@ -3,13 +3,10 @@ var R = require('./res/index');
 var Color = R.color;
 var Dimension = R.dimension;
 var Util = require('./util/util');
-var Velocity = require('../velocity/velocity.js');
 
 var MaterialIcon = React.createClass({
 
   propTypes: {
-    initializations: React.PropTypes.array,
-    animations: React.PropTypes.array,
     d: React.PropTypes.string.isRequired,
     fill: React.PropTypes.string,
     fillOpacity: React.PropTypes.number,
@@ -21,9 +18,7 @@ var MaterialIcon = React.createClass({
     // Provide defaults for optional props
     return {
       fill: '#000000',
-      fillOpacity: 0,
-      initializations: [],
-      animations: []    
+      fillOpacity: 0
     };
   },
 
@@ -50,10 +45,8 @@ var MaterialIcon = React.createClass({
   render: function() {
     var style = Util.merge(this.getStyle(), this.props.style);
     return (
-      <div style={style.clearance} 
-           onClick={this.props.onClick}>
-          <svg style={style.svg}
-               viewBox={"0 0 " + Dimension.icon + " " + Dimension.icon}>
+      <div style={style.clearance} onClick={this.props.onClick}>
+          <svg style={style.svg} viewBox={"0 0 " + Dimension.icon + " " + Dimension.icon}>
               <path ref="iconPath"
                     d={this.props.d}
                     fill={this.props.fill}
@@ -61,34 +54,6 @@ var MaterialIcon = React.createClass({
           </svg>
       </div>
     );
-  },
-
-  componentDidMount: function() {
-    // Initialize animations
-
-    var iconPath = this.refs.iconPath.getDOMNode();
-    var initializations = this.props.initializations;
-
-    for (var i = 0; i < initializations.length; i++) {
-      var initialization = initializations[i];
-      Velocity(iconPath, initialization.properties, initialization.options);
-    }
-  },
-
-  componentDidUpdate: function(nextProps) {
-    // Animate according to new props
-
-    var iconPath = this.refs.iconPath.getDOMNode();
-    var animations = this.props.animations;
-
-    Velocity(iconPath, "finish");
-
-    for (var i = 0; i < animations.length; i++) {
-      var animation = animations[i];
-      Velocity(iconPath, animation.properties, animation.options);
-    }
   }
-
-});
 
 module.exports = MaterialIcon;
