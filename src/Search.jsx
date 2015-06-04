@@ -95,7 +95,7 @@ var Search = React.createClass({
                         handleFocus={this.props.onFocus} 
                         handleBlur={this.props.onBlur} 
                         handleChange={this.props.onChange} 
-                        placeholder="Search files by tag"
+                        placeholder={this.props.searchTags.length === 0 ? "Search files by tag" : "Refine search"}
                         maxWidth="none"/>
               {suggestions}
           </div>
