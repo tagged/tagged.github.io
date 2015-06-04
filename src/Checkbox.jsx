@@ -36,13 +36,21 @@ var checkmark = {
   }
 };
 
+var checkline = {
+  points: '5,12 12,12 19,12',
+  totalLength: 14,
+  animation: {
+    duration: 150,
+    ease: quarticEaseIn
+  }
+};
 
 
 var Checkbox = React.createClass({
 
   propTypes: {
     checkStatus: React.PropTypes.oneOf([ FALSE, INDETERMINATE, TRUE ]),
-    onCheck: React.PropTypes.func,
+    onClick: React.PropTypes.func,
     backgroundColor: React.PropTypes.string,
     color: React.PropTypes.string,
     style: React.PropTypes.object
@@ -82,24 +90,36 @@ var Checkbox = React.createClass({
         x: 3, y: 3, rx: 2, ry: 2,
         height: 18, width: 18
       });
-
-      svg.polyline().attr({
-        points: '5,12 12,12 19,12',
-        fill: 'none',
-        stroke: this.props.color,
-        'stroke-width': 2,
-        'stroke-linecap': 'butt',
-        'stroke-linejoin': 'miter',
-        'stroke-opacity': 1,
-        'stroke-miterlimit': 4,
-        'stroke-dasharray': 14,
-        'stroke-dashoffset': 14
-      }).animate({
-        duration: 450, 
-        ease: '-'
-      }).attr({
-        'stroke-dashoffset': 0
-      });
+      if (previous === INDETERMINATE) {
+        //Just draw checkline
+        svg.polyline().attr({
+          points: checkline.points,
+          fill: 'none',
+          stroke: this.props.color,
+          'stroke-width': 2,
+          'stroke-linecap': 'butt',
+          'stroke-linejoin': 'miter',
+          'stroke-opacity': 1,
+          'stroke-miterlimit': 4
+        });
+      }
+      else {
+        //Animate checkline in
+        svg.polyline().attr({
+          points: checkline.points,
+          fill: 'none',
+          stroke: this.props.color,
+          'stroke-width': 2,
+          'stroke-linecap': 'butt',
+          'stroke-linejoin': 'miter',
+          'stroke-opacity': 1,
+          'stroke-miterlimit': 4,
+          'stroke-dasharray': checkline.totalLength,
+          'stroke-dashoffset': checkline.totalLength
+        }).animate(checkline.animation).attr({
+          'stroke-dashoffset': 0
+        });
+      }
     }
     else if (current === TRUE) {
       svg.rect().attr({
@@ -148,7 +168,7 @@ var Checkbox = React.createClass({
   render: function() {
     return (
       <SVGIcon ref="svgIcon" 
-               onClick={this.props.onCheck}
+               onClick={this.props.onClick}
                style={this.props.style}/>
     );
   },
