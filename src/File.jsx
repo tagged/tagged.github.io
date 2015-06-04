@@ -39,7 +39,7 @@ var File = React.createClass({
         padding: Dimension.quantum
       },
       checkbox: {
-        component: {
+        clearance: {
           float: 'left',
           marginRight: Dimension.quantum
         }
