@@ -27,6 +27,7 @@ var FileActionBar = React.createClass({
     numberOfFilesSelected: React.PropTypes.number,
     onSelectAll: React.PropTypes.func,
     onUnselectAll: React.PropTypes.func,
+    onDelete: React.PropTypes.func,
     style: React.PropTypes.object
   },
 
@@ -106,7 +107,8 @@ var FileActionBar = React.createClass({
               <MaterialIcon action="Delete"
                             d={Icon.trash}
                             fill={Color.white}
-                            fillOpacity={Color.whitePrimaryOpacity}/>
+                            fillOpacity={Color.whitePrimaryOpacity}
+                            onClick={this.props.onDelete}/>
           </ActionBar>
       </div>
     );

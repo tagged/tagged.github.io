@@ -160,6 +160,21 @@ var App = React.createClass({
     this.setState({filesSelected: Immutable.Set()});
   },
 
+  handleFileDelete: function() {
+    //Delete each fileId in filesSelected
+
+    //(Delete in database)
+
+    //Optimistically update files
+    var files = this.state.files.filter(function(file, fileId) {
+      return !this.state.filesSelected.includes(fileId);
+    }, this);
+    this.setState({
+      files: files,
+      filesSelected: Immutable.Set()
+    });
+  },
+  
   handleFileToggle: function(fileId) {
     var filesOpen = this.state.filesOpen.includes(fileId) ?
                         this.state.filesOpen.delete(fileId) :
@@ -250,6 +265,7 @@ var App = React.createClass({
                        numberOfFilesSelected={this.state.filesSelected.size}
                        onSelectAll={this.handleFileSelectAll}
                        onUnselectAll={this.handleFileUnselectAll}
+                       onDelete={this.handleFileDelete}
                        style={style.fileActionBar}/>
       );
     }
