@@ -14,6 +14,13 @@ module.exports = {
   heightSubheader: 48,
   heightTag: 32,
 
+  snackbar: {
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    minWidth: 288,
+    maxWidth: 'none',//568
+  },
+
   heightListItemSingle: 48,
   heightListItemDouble: 56,
 

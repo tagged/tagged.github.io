@@ -6,6 +6,7 @@ var MaterialIcon = require('./MaterialIcon');
 var Search = require('./Search');
 var FileActionBar = require('./FileActionBar');
 var ActionBar = require('./ActionBar');
+var Snackbar = require('./Snackbar');
 
 var Constants = require('./constants/index');
 var R = require('./res/index');
@@ -36,6 +37,11 @@ var Scratchwork = React.createClass({
           <MaterialIcon d={Icon.checkboxPartial}
                         fill={Color.blue500} 
                         fillOpacity={1}/>
+          
+          <Snackbar message="Hello, this is a really long message. What happens if a message is really long? Let's find out" 
+                    action="UNDO"
+                    onAction={function(){alert('Undone!')}}/>
+          
           <ActionBar style={actionBarStyle}>
               <div action="Blackify" style={{backgroundColor: 'black', width:48, height: 48}}/>
               <div action="Grayify" style={{backgroundColor: 'gray', width:48, height: 48}}/>
