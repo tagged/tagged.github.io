@@ -38,7 +38,7 @@ var FileActionBar = React.createClass({
         bottom: 0,
         left:0,
         right: 0,
-        zIndex: 99,
+        zIndex: 2,
         backgroundColor: Color.blue500,
         paddingLeft: Dimension.quantum,
         paddingRight: Dimension.quantum,
@@ -47,7 +47,7 @@ var FileActionBar = React.createClass({
         clearance: {
           float: 'left',
           marginRight: Dimension.quantum,
-          zIndex: 100,
+          zIndex: 3,
         }
       },
       subheader: {

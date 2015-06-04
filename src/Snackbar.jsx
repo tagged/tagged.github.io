@@ -32,6 +32,7 @@ var Snackbar = React.createClass({
         lineHeight: Typography.lineHeightSmall,
         minWidth: Dimension.snackbar.minWidth,
         maxWidth: Dimension.snackbar.maxWidth,
+        zIndex: 4
       },
       message: {
         display: 'table-cell',
