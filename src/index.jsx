@@ -237,7 +237,7 @@ var App = React.createClass({
     var style = this.getStyle();
     var page = this.getPage();
     var fileActionBar = null;
-    if (!this.state.searchIsFocused && this.state.searchTags.length > 0) {
+    if (this.state.searchTags.length > 0) {
       fileActionBar = (
         <FileActionBar numberOfFiles={this.state.files.size}
                        numberOfFilesSelected={this.state.filesSelected.size}
