@@ -18,7 +18,8 @@
     "immutable": "^3.7.3",
     "react": "^0.13.3",
     "react-router": "^0.13.3",
-    "react-tap-event-plugin": "^0.1.7"
+    "react-tap-event-plugin": "^0.1.7",
+    "svg.js": "^1.1.0"
   },
   "devDependencies": {
     "watch": "^0.16.0"
