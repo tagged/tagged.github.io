@@ -1,21 +1,21 @@
 var React = require('react');
 var Immutable = require('immutable');
 
-var properties = {
-  'flex': true,
-  'flexDirection': true,
-  'flexWrap': true,
-  'justifyContent': true,
-  'alignItems': true,
-  'userSelect': true,
-  'transform': true,
-  'transformOrigin': true,
-  'transition': true,
-  'transitionDelay': true,
-  'transitionDuration': true,
-  'transitionProperty': true,
-  'transitionTimingFunction': true
-};
+var properties = Immutable.Set([
+  'flex',
+  'flexDirection',
+  'flexWrap',
+  'justifyContent',
+  'alignItems',
+  'userSelect',
+  'transform',
+  'transformOrigin',
+  'transition',
+  'transitionDelay',
+  'transitionDuration',
+  'transitionProperty',
+  'transitionTimingFunction'
+]);
 
 module.exports = {
 
@@ -37,20 +37,28 @@ module.exports = {
     return pathArray.join(String.fromCharCode(8203) + "/");
   },
 
-  prefix: function(styles) {
-    var prefixedStyles = Immutable.fromJS(styles).map(function(style, component) {
-      for (var property in properties) {
-        if (style.has(property)) {
-          var capitalizedProperty = property.charAt(0).toUpperCase() + property.slice(1);
-          style = style.set("Webkit" + capitalizedProperty, style.get(property));
-          style = style.set("Moz" + capitalizedProperty, style.get(property));
-          style = style.set("ms" + capitalizedProperty, style.get(property));
-          style = style.set("O" + capitalizedProperty, style.get(property));
+  prefix: function(obj) {
+    //Prefix styles. Recursively handles nesting.
+    var newObj = {};
+    for (var key in obj) {
+      if (typeof obj[key] === 'object') {
+        //Recursively prefix nested objects
+        newObj[key] = this.prefix(obj[key]);
+      }
+      else {
+        //Push style to new object
+        newObj[key] = obj[key];
+        if (properties.includes(key)) {
+          //Also push prefixed styles to new object
+          var capitalizedProperty = key.charAt(0).toUpperCase() + key.slice(1);
+          newObj["Webkit" + capitalizedProperty] = obj[key];
+          newObj["Moz" + capitalizedProperty] = obj[key];
+          newObj["ms" + capitalizedProperty] = obj[key];
+          newObj["O" + capitalizedProperty] = obj[key];
         }
       }
-      return style;
-    });
-    return prefixedStyles.toJS();
+    }
+    return newObj;
   }
 
 };
