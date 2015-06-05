@@ -1,3 +1,4 @@
+var React = require('react');
 var Immutable = require('immutable');
 
 var properties = {
@@ -17,6 +18,12 @@ var properties = {
 };
 
 module.exports = {
+
+  getDOMNodeComputedStyle: function(ref, property) {
+    //Of a rendered React element
+    var node = React.findDOMNode(ref);
+    return parseInt(window.getComputedStyle(node)[property]);
+  },
 
   merge: function(object1, object2) {
     var immutableObj1 = Immutable.fromJS(object1);

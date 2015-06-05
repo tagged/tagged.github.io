@@ -4,7 +4,6 @@ var Color = R.color;
 var Dimension = R.dimension;
 var Typography = R.typography;
 var Util = require('./util/util');
-var Velocity = require('../velocity/velocity.js');
 
 var TagInput = React.createClass({
   //Single line of text
@@ -106,18 +105,13 @@ var TagInput = React.createClass({
 
     var input = this.refs.input.getDOMNode();
     
-    var inputWidth;
+    var inputWidthGuide;
     if (this.props.value === "") {
-      var placeholder = React.findDOMNode(this.refs.placeholder);
-      var placeholderWidth = window.getComputedStyle(placeholder).width;
-      inputWidth = placeholderWidth;
+      inputWidthGuide = this.refs.placeholder;
     } else {
-      var regulator = React.findDOMNode(this.refs.regulator);
-      var regulatorWidth = window.getComputedStyle(regulator).width;
-      inputWidth = regulatorWidth;
+      inputWidthGuide = this.refs.regulator;
     }
-
-    input.style.width = inputWidth;
+    input.style.width = Util.getDOMNodeComputedStyle(inputWidthGuide, 'width') + "px";
   }
   
 });

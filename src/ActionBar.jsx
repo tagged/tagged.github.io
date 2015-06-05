@@ -1,17 +1,11 @@
 var React = require('react');
 var Menu = require('./Menu');
 var Subheader = require('./Subheader');
+var MaterialIcon = require('./MaterialIcon');
 var R = require('./res/index');
 var Dimension = R.dimension;
 var Icon = R.icon;
 var Util = require('./util/util');
-
-
-//Compute width of a rendered React element
-function findDOMNodeWidth(ref) {
-  var node = React.findDOMNode(ref);
-  return parseInt(window.getComputedStyle(node).width);
-}
 
 
 //Children of ActionBar should provide a prop called `action`
@@ -176,7 +170,7 @@ var ActionBar = React.createClass({
     //Determine the number of actions to show in the action bar
     //Call this after render, so action widths are available
 
-    var actionBarWidth = findDOMNodeWidth(this);
+    var actionBarWidth = Util.getDOMNodeComputedStyle(this, 'width');
     var overflowWidth = this.getStyle().overflow.width;
 
     var childCount = React.Children.count(this.props.children);
@@ -184,7 +178,7 @@ var ActionBar = React.createClass({
     var widthBeforeCurrentChild = 0;
 
     while (currentChild < childCount) {
-      var currentChildWidth = findDOMNodeWidth(this.refs["action" + currentChild]);
+      var currentChildWidth = Util.getDOMNodeComputedStyle(this.refs["action" + currentChild], 'width');
       if (widthBeforeCurrentChild + currentChildWidth + overflowWidth > actionBarWidth) {
         //currentChild would overflow the action bar
         break;
