@@ -65,7 +65,7 @@ var Snackbar = React.createClass({
     return (
       <div style={style.snackbar}>
           <div style={style.message} ref="message">
-              {this.props.message + "alskdfj ;laksjf ;laksjf ;lkasdjflkasdj flksjdflkja sdfljlsdkf"}
+              {this.props.message}
           </div>
           <div style={style.action} ref="action" onClick={this.props.onAction}>
               {this.props.action}
