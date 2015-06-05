@@ -88,6 +88,39 @@ var App = React.createClass({
     };
   },
 
+  _setStateFromHistory: function(event) {
+    var searchTags = event.state.searchTags;
+    var fileState = this.updateFileState(searchTags);
+    this.setState({
+      searchTags: searchTags,
+      searchValue: "",
+      //searchIsFocused: false,
+      files: fileState.files,
+      filesOpen: Immutable.Set(),
+      filesSelected: Immutable.Set(),
+      snackbarTimeoutId: null,
+      snackbarMessage: "",
+      snackbarAction: "",
+      snackbarAct: function() {}
+    });
+  },
+
+  componentDidMount: function() {console.log('mounted');
+    //Give first page a non-null state object
+    window.history.replaceState({searchTags: this.state.searchTags}, '');
+    window.addEventListener('popstate', this._setStateFromHistory);
+  },
+
+  componentWillUnmount: function() {console.log('unmounting');
+    window.removeEventListener('popstate', this._setStateFromHistory);
+  },
+
+  pushState: function() {
+    window.history.pushState({
+      searchTags: this.state.searchTags
+    }, '');
+  },
+
   addSearchTag: function(tag) {
     //Add tag to searchTags
     //Update files, based on new search tags
@@ -101,7 +134,7 @@ var App = React.createClass({
       files: newFileState.files,
       filesSelected: newFileState.filesSelected,
       filesOpen: newFileState.filesOpen,
-    });
+    }, this.pushState);
   },
 
   deleteSearchTag: function(tagIndex) {
@@ -117,7 +150,7 @@ var App = React.createClass({
       files: newFileState.files,
       filesSelected: newFileState.filesSelected,
       filesOpen: newFileState.filesOpen,
-    });
+    }, this.pushState);
   },
 
   updateFileState: function(searchTags) {
