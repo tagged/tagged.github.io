@@ -30,7 +30,7 @@ var Scratchwork = React.createClass({
         paddingTop: 4, paddingBottom: 4,
         paddingRight: 4, paddingLeft: 4,
       },
-      menu: {bottom: 4, top:'auto'},
+      menu: {menu: {bottom: 4, top:'auto'}},
     };
     return (
       <div>

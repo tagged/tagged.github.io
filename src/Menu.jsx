@@ -26,6 +26,7 @@ var Menu = React.createClass({
         paddingTop: Dimension.space,
         paddingBottom: Dimension.space,
         borderRadius: Dimension.borderRadius,
+        backgroundColor: Color.white,
         boxShadow: Shadow.zDepth[1]
       },
       item: {

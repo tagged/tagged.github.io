@@ -64,9 +64,11 @@ var ActionBar = React.createClass({
         left: (Dimension.touchTarget - Dimension.icon) / 2,
       },
       menu: {
-        position: 'absolute', 
-        top: Dimension.quantum,
-        right: Dimension.quantum
+        menu: {
+          position: 'absolute', 
+          top: Dimension.quantum,
+          right: Dimension.quantum
+        }
       },
       menuItem: {
         whiteSpace: 'nowrap',
