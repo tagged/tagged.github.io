@@ -12,9 +12,9 @@ var TagInput = React.createClass({
   propTypes: {
     value: React.PropTypes.string,
     isFocused: React.PropTypes.bool,
-    handleFocus: React.PropTypes.func.isRequired,
-    handleBlur: React.PropTypes.func.isRequired,
-    handleChange: React.PropTypes.func.isRequired,
+    onFocus: React.PropTypes.func.isRequired,
+    onBlur: React.PropTypes.func.isRequired,
+    onChange: React.PropTypes.func.isRequired,
 
     placeholder: React.PropTypes.string,  //input placeholder text
     //max width of input; excludes padding and borders
@@ -74,9 +74,9 @@ var TagInput = React.createClass({
           <input ref="input"
                  type="text"
                  value={nbspValue}
-                 onFocus={this.props.handleFocus}
-                 onBlur={this.props.handleBlur}
-                 onChange={this.props.handleChange}
+                 onFocus={this.props.onFocus}
+                 onBlur={this.props.onBlur}
+                 onChange={this.props.onChange}
                  placeholder={this.props.placeholder}
                  tabIndex="1"
                  style={style.input}/>

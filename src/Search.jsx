@@ -92,9 +92,9 @@ var Search = React.createClass({
               {searchTags}
               <TagInput value={this.props.searchValue} 
                         isFocused={this.props.searchIsFocused} 
-                        handleFocus={this.props.onFocus} 
-                        handleBlur={this.props.onBlur} 
-                        handleChange={this.props.onChange} 
+                        onFocus={this.props.onFocus} 
+                        onBlur={this.props.onBlur} 
+                        onChange={this.props.onChange} 
                         placeholder={this.props.searchTags.length === 0 ? "Search files by tag" : "Refine search"}
                         maxWidth="none"/>
               {suggestions}
