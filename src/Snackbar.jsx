@@ -30,7 +30,6 @@ var Snackbar = React.createClass({
         width: '100%',
         position: 'fixed',
         bottom: 0,
-        opacity: 1,
         backgroundColor: "#323232",
         fontSize: Typography.fontSizeSmall,
         lineHeight: Typography.lineHeightSmall,
@@ -65,10 +64,10 @@ var Snackbar = React.createClass({
     var style = Util.prefix(Util.merge(this.getStyle(), this.props.style));
     return (
       <div style={style.snackbar}>
-          <div style={style.message}>
-              {this.props.message}
+          <div style={style.message} ref="message">
+              {this.props.message + "alskdfj ;laksjf ;laksjf ;lkasdjflkasdj flksjdflkja sdfljlsdkf"}
           </div>
-          <div style={style.action} onClick={this.props.onAction}>
+          <div style={style.action} ref="action" onClick={this.props.onAction}>
               {this.props.action}
           </div>
       </div>
@@ -77,25 +76,47 @@ var Snackbar = React.createClass({
 
   componentWillEnter: function(callback) {
     var snackbar = React.findDOMNode(this);
+    var message = React.findDOMNode(this.refs.message);
+    var action = React.findDOMNode(this.refs.action);
+
     var snackbarHeight = Util.getDOMNodeComputedStyle(this, 'height');
+    //Initialize
     Velocity({
       elements: snackbar,
       properties: {bottom: -snackbarHeight},
       options: {duration: 0}
     });
     Velocity({
+      elements: [message, action],
+      properties: {opacity: 0},
+      options: {duration: 0}
+    });
+    //Animate
+    Velocity({
       elements: snackbar,
       properties: {bottom: 0},
-      options: {duration: 450, easing: 'ease', complete: callback}
+      options: {duration: 350, easing: 'ease'}
+    });
+    Velocity({
+      elements: [message, action],
+      properties: {opacity: 1},
+      options: {
+        delay: 60,
+        duration: 290,
+        easing: 'easeInOutSine',
+        queue: false,
+        complete: callback
+      }
     });
   },
   
   componentWillLeave: function(callback) {
     var snackbar = React.findDOMNode(this);
+    var snackbarHeight = Util.getDOMNodeComputedStyle(this, 'height');
     Velocity({
       elements: snackbar,
-      properties: {opacity: 0},
-      options: {duration: 450, easing: 'ease', complete: callback} 
+      properties: {bottom: -snackbarHeight},
+      options: {duration: 200, easing: 'ease', complete: callback} 
     });
   }
 
