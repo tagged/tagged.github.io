@@ -13,12 +13,12 @@ var Util = require('./util/util');
 
 var SVG = require('svg.js');
 
-var quarticEaseIn = function(x) {
-  return Math.pow(x,4);
+var easeIn = function(x) {
+  return Math.pow(x,2);
 }
 
-var quarticEaseOut = function(x) {
-  return -(Math.pow((x-1), 4) -1);
+var easeOut = function(x) {
+  return -(Math.pow((x-1), 2) -1);
 }
 
 var checkmark = {
@@ -27,12 +27,12 @@ var checkmark = {
   upLength: 11.7309,
   thickness: 2,
   downAnimation: {
-    duration: 50,
-    ease: quarticEaseOut
+    duration: 30,
+    ease: easeOut
   },
   upAnimation: {
-    duration: 100,
-    ease: quarticEaseIn
+    duration: 60,
+    ease: easeIn
   }
 };
 
@@ -40,8 +40,8 @@ var checkline = {
   points: '5,12 12,12 19,12',
   totalLength: 14,
   animation: {
-    duration: 150,
-    ease: quarticEaseIn
+    duration: 90,
+    ease: easeIn
   }
 };
 
