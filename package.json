@@ -11,7 +11,8 @@
     "build": "npm run bundle:vendor && npm run build:app",
     "watch:app": "./node_modules/watch/cli.js 'npm run build:app' ./src",
     "watch": "npm run bundle:vendor && npm run watch:app",
-    "clean": "rm -rf ./build && rm -f ./app.js && rm -f ./vendor.js"
+    "clean": "rm -rf ./build && rm -f ./app.js && rm -f ./vendor.js",
+    "test": "jest"
   },
   "dependencies": {
     "collections": "^1.2.3",
@@ -19,9 +20,18 @@
     "react": "^0.13.3",
     "react-router": "^0.13.3",
     "react-tap-event-plugin": "^0.1.7",
+    "react-tools": "^0.13.3",
     "svg.js": "^1.1.0"
   },
   "devDependencies": {
+    "jest-cli": "^0.4.5",
     "watch": "^0.16.0"
+  },
+  "jest": {
+    "scriptPreprocessor": "./preprocessor.js",
+    "unmockedModulePathPatterns": [
+      "./node_modules/react",
+      "./node_modules/immutable"
+    ]
   }
 }
