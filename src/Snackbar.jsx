@@ -4,6 +4,7 @@ var Color = R.color;
 var Dimension = R.dimension;
 var Typography = R.typography;
 var Util = require('./util/util');
+var Velocity = require('../velocity/velocity.js');
 
 var Snackbar = React.createClass({
   
@@ -27,12 +28,15 @@ var Snackbar = React.createClass({
       snackbar: {
         display: 'table',
         width: '100%',
+        position: 'fixed',
+        bottom: 0,
+        opacity: 1,
         backgroundColor: "#323232",
         fontSize: Typography.fontSizeSmall,
         lineHeight: Typography.lineHeightSmall,
         minWidth: Dimension.snackbar.minWidth,
         maxWidth: Dimension.snackbar.maxWidth,
-        zIndex: 4
+        zIndex: 4,
       },
       message: {
         display: 'table-cell',
@@ -69,6 +73,30 @@ var Snackbar = React.createClass({
           </div>
       </div>
     );
+  },
+
+  componentWillEnter: function(callback) {
+    var snackbar = React.findDOMNode(this);
+    var snackbarHeight = Util.getDOMNodeComputedStyle(this, 'height');
+    Velocity({
+      elements: snackbar,
+      properties: {bottom: -snackbarHeight},
+      options: {duration: 0}
+    });
+    Velocity({
+      elements: snackbar,
+      properties: {bottom: 0},
+      options: {duration: 450, easing: 'ease', complete: callback}
+    });
+  },
+  
+  componentWillLeave: function(callback) {
+    var snackbar = React.findDOMNode(this);
+    Velocity({
+      elements: snackbar,
+      properties: {opacity: 0},
+      options: {duration: 450, easing: 'ease', complete: callback} 
+    });
   }
 
 });

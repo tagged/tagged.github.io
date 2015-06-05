@@ -1,6 +1,7 @@
 var React = require('react/addons');
 //var injectTapEventPlugin = require("react-tap-event-plugin");
 //injectTapEventPlugin();
+var ReactTransitionGroup = React.addons.TransitionGroup;
 
 var MaterialIcon = require('./MaterialIcon');
 var Search = require('./Search');
@@ -183,8 +184,11 @@ var App = React.createClass({
       //(Delete in database)
       //alert('Files deleted in database!');
       this.setState({
-        filesSelected: Immutable.Set(),
         snackbarTimeoutId: null
+      }, function() {
+        //Clear selected files after snackbar 
+        //has been fully animated out, unmounted
+        this.setState({filesSelected: Immutable.Set()});
       });
     }.bind(this), snackbarDelay);
 
@@ -293,10 +297,6 @@ var App = React.createClass({
       fileActionBar: {
       },
       snackbar: {
-        snackbar: {
-          position: 'fixed',
-          bottom: 0
-        }
       }
     };
   },
@@ -348,7 +348,9 @@ var App = React.createClass({
           </ActionBar>
           {page}
           {fileActionBar}
-          {snackbar}
+          <ReactTransitionGroup>
+              {snackbar}
+          </ReactTransitionGroup>
       </div>
     );
   }
