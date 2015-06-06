@@ -41,7 +41,6 @@ var TagInput = React.createClass({
       input: {
         display: 'inline-block',
         margin: 0,
-        outline: 0,
         borderWidth: Dimension.borderWidth,
         borderStyle: 'solid',
         borderColor: Color.blackSecondary,

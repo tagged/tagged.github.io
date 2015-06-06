@@ -77,7 +77,7 @@ var App = React.createClass({
       page: Constants.Page.SEARCH,
       searchTags: [],
       searchValue: "",
-      searchIsFocused: false,
+      areSuggestionsVisible: true,
       files: Immutable.Map(),
       filesOpen: Immutable.Set(),
       filesSelected: Immutable.Set(),
@@ -94,7 +94,7 @@ var App = React.createClass({
     this.setState({
       searchTags: searchTags,
       searchValue: "",
-      //searchIsFocused: false,
+      areSuggestionsVisible: searchTags.length === 0,
       files: fileState.files,
       filesOpen: Immutable.Set(),
       filesSelected: Immutable.Set(),
@@ -134,7 +134,10 @@ var App = React.createClass({
       files: newFileState.files,
       filesSelected: newFileState.filesSelected,
       filesOpen: newFileState.filesOpen,
-    }, this.pushState);
+    }, function() {
+      this.pushState();
+      this.hideSuggestions();
+    });
   },
 
   deleteSearchTag: function(tagIndex) {
@@ -150,7 +153,10 @@ var App = React.createClass({
       files: newFileState.files,
       filesSelected: newFileState.filesSelected,
       filesOpen: newFileState.filesOpen,
-    }, this.pushState);
+    }, function() {
+      this.pushState();
+      this.hideSuggestions();
+    });
   },
 
   updateFileState: function(searchTags) {
@@ -169,14 +175,19 @@ var App = React.createClass({
       filesOpen: filesOpen
     };
   },
-
   
-  handleSearchFocus: function() {
-    this.setState({searchIsFocused: true});
+  showSuggestions: function() {
+    this.setState({areSuggestionsVisible: true});
   },
 
-  handleSearchBlur: function() {
-    this.setState({searchIsFocused: false});
+  hideSuggestions: function() {
+    //Show suggestions if there are no search tags
+    if (this.state.searchTags.length === 0) {
+      this.setState({areSuggestionsVisible: true});
+    }
+    else {
+      this.setState({areSuggestionsVisible: false});
+    }
   },
 
   handleSearchValueChange: function(event) {
@@ -274,20 +285,19 @@ var App = React.createClass({
     return {
       searchTags: this.state.searchTags,
       searchValue: this.state.searchValue,
-      searchIsFocused: this.state.searchIsFocused,
-
+      
       files: this.state.files,
       filesSelected: this.state.filesSelected,
       filesOpen: this.state.filesOpen,
 
+      areSuggestionsVisible: this.state.areSuggestionsVisible,
       suggestedTags: suggestedTags,
       suggestionTitle: suggestionTitle,
       
       onSearchTagAdd: this.addSearchTag,
       onSearchTagDelete: this.deleteSearchTag,
 
-      onSearchFocus: this.handleSearchFocus,
-      onSearchBlur: this.handleSearchBlur,
+      onSearchFocus: this.showSuggestions,
       onSearchValueChange: this.handleSearchValueChange,
       
       onFileSelect: this.handleFileSelect,
@@ -370,7 +380,7 @@ var App = React.createClass({
     }
 
     return (
-      <div style={style.app}>
+      <div style={style.app} onMouseDown={this.hideSuggestions}>
           <ActionBar style={style.appBar}>
               <MaterialIcon action="Search"
                             d={Icon.search}

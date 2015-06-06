@@ -13,12 +13,12 @@ var Search = React.createClass({
   propTypes: {
     searchTags: React.PropTypes.array.isRequired,
     searchValue: React.PropTypes.string,
-    searchIsFocused: React.PropTypes.bool,
-
+    
     files: React.PropTypes.object,
     filesSelected: React.PropTypes.object,
     filesOpen: React.PropTypes.object,
 
+    areSuggestionsVisible: React.PropTypes.bool,
     suggestedTags: React.PropTypes.array,
     suggestionTitle: React.PropTypes.string,
 
@@ -26,7 +26,6 @@ var Search = React.createClass({
     onSearchTagDelete: React.PropTypes.func,
 
     onSearchFocus: React.PropTypes.func,
-    onSearchBlur: React.PropTypes.func,
     onSearchValueChange: React.PropTypes.func,
     
     onFileSelect: React.PropTypes.func,
@@ -46,7 +45,8 @@ var Search = React.createClass({
       },
       tagInput: {
         input: {
-          borderColor: this.props.searchIsFocused ? Color.blue500 : Color.blackSecondary
+          borderColor: Color.blackSecondary,
+          outlineColor: Color.blue500 //focused input
         }
       },
       tag: {
@@ -64,6 +64,11 @@ var Search = React.createClass({
 
     var searchTags = this.props.searchTags.map(function(tag, tagIndex) {
 
+      var onMouseDown = function(event) {
+        //Don't hide suggestions yet
+        event.stopPropagation();
+      };
+      
       var onClick = function(event) {
         this.props.onSearchTagDelete(tagIndex);
       }.bind(this);
@@ -78,6 +83,7 @@ var Search = React.createClass({
         <Tag text={tag}
              style={style.tag}
              onClick={onClick}
+             onMouseDown={onMouseDown}
              onKeyDown={onKeyDown}
              key={tag}/>
       );
@@ -88,6 +94,11 @@ var Search = React.createClass({
 
       var placeholder = this.props.searchTags.length === 0 ?
         "Search files by tag" : "Refine search";
+
+      var onMouseDown = function(event) {
+        //Don't hide suggestions yet
+        event.stopPropagation();
+      };
 
       var onKeyDown = function(event) {
         if (event.key === 'Enter') {
@@ -101,20 +112,22 @@ var Search = React.createClass({
                   style={style.tagInput}
                   placeholder={placeholder}
                   onChange={this.props.onSearchValueChange}
+                  onMouseDown={onMouseDown}
                   onKeyDown={onKeyDown}
-                  onFocus={this.props.onSearchFocus}
-                  onBlur={this.props.onSearchBlur}/>
+                  onFocus={this.props.onSearchFocus}/>
       );
     }.bind(this))();
     
     var suggestions = null;
-    //Show suggestions if focused or if there are no search tags, 
-    //even if not focused
-    if (this.props.searchIsFocused || this.props.searchTags.length === 0) {
+    if (this.props.areSuggestionsVisible) {
       var suggestedTags = this.props.suggestedTags.map(function(tag) {
 
-        //Mousedown precedes blur
         var onMouseDown = function(event) {
+          //Don't hide suggestions yet
+          event.stopPropagation();
+        };
+
+        var onClick = function(event) {
           this.props.onSearchTagAdd(tag);
         }.bind(this);
 
@@ -127,6 +140,7 @@ var Search = React.createClass({
         return (
           <Tag text={tag}
                style={style.tag}
+               onClick={onClick}
                onMouseDown={onMouseDown}
                onKeyDown={onKeyDown}
                key={tag}/>
