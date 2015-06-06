@@ -259,7 +259,6 @@ var App = React.createClass({
   },
 
   getSearchProps: function() {
-    var suggestionsVisible = this.state.searchIsFocused || this.state.searchTags.length === 0;
     
     var suggestedTags = _Database.makeSuggestion(
       this.state.searchValue, 
@@ -281,7 +280,6 @@ var App = React.createClass({
       filesSelected: this.state.filesSelected,
       filesOpen: this.state.filesOpen,
 
-      suggestionsVisible: suggestionsVisible,
       suggestedTags: suggestedTags,
       suggestionTitle: suggestionTitle,
       
@@ -371,7 +369,7 @@ var App = React.createClass({
     }
 
     return (
-      <div style={style.app} onClick={this.handleSearchBlur}>
+      <div style={style.app}>
           <ActionBar style={style.appBar}>
               <MaterialIcon action="Search"
                             d={Icon.search}

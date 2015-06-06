@@ -25,8 +25,6 @@ var File = React.createClass({
     tags: React.PropTypes.array,
     disabledTags: React.PropTypes.array,
     onTagClick: React.PropTypes.func,
-    onKeyUp: React.PropTypes.func,
-    onKeyDown: React.PropTypes.func,
     isSelected: React.PropTypes.bool,
     isOpen: React.PropTypes.bool,
     onFileSelect: React.PropTypes.func,
@@ -128,7 +126,6 @@ var File = React.createClass({
       var isDisabled = this.props.disabledTags.indexOf(tag) >= 0;
 
       var onClick = function(event) {
-        event.stopPropagation();
         this.props.onTagClick(tag);
       }.bind(this);
 
@@ -136,8 +133,6 @@ var File = React.createClass({
         <Tag text={tag}
              style={isDisabled ? style.tagDisabled : style.tag}
              onClick={onClick}
-             onKeyUp={this.props.onKeyUp}
-             onKeyDown={this.props.onKeyDown}
              key={tag}/>
       );
     }, this);

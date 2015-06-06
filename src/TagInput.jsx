@@ -13,15 +13,16 @@ var TagInput = React.createClass({
   //Grows with user input
 
   propTypes: {
-    isFocused: React.PropTypes.bool
+    value: React.PropTypes.string,
+    style: React.PropTypes.object,
   },
 
   getDefaultProps: function() {
     return {
       value: "",
+      style: {},
       placeholder: "",
       tabIndex: 1,
-      style: {}
     };
   },
 
@@ -43,7 +44,7 @@ var TagInput = React.createClass({
         outline: 0,
         borderWidth: Dimension.borderWidth,
         borderStyle: 'solid',
-        borderColor: this.props.isFocused ? Color.blue500 : Color.blackSecondary,
+        borderColor: Color.blackSecondary,
         borderRadius: Dimension.borderRadius,
         paddingLeft: Dimension.space,
         paddingRight: Dimension.space,
@@ -66,23 +67,20 @@ var TagInput = React.createClass({
   render: function() {
     //Extract props, and pass the rest to input
     //onClick, onKeyUp, onKeyDown, onChange, placeholder, tabIndex, ...
-    var {value, isFocused, style, ...inputProps} = this.props;
+    var {value, style, ...inputProps} = this.props;
 
     // Make spaces count towards computed regulator width
     var nbspValue = value.replace(/ /g, String.fromCharCode(160));
 
-    var style = Util.merge(this.getStyle(), this.props.style);
+    var style = Util.merge(this.getStyle(), style);
 
-    //Prevent manual focus and blur
     return (
       <div style={style.component}>
           <input ref="input"
                  type="text"
                  value={nbspValue}
                  style={style.input}
-                 {...inputProps}
-                 onFocus={function() {console.log('onFocus'); this.shouldRegulateFocus();}.bind(this)}
-                 onBlur={function() {console.log('onBlur'); this.shouldRegulateFocus();}.bind(this)}/>
+                 {...inputProps}/>
           <div ref="regulator"
                style={style.regulator}>
               {nbspValue}
@@ -95,40 +93,16 @@ var TagInput = React.createClass({
     );
   },
 
-  shouldRegulateFocus: function() {
-    //Double-regulation was causing a problem in Chrome for Android,
-    //where if a focused input was scrolled off the screen, no elements
-    //on the screen could be clicked without first blurring the input.
-
-    console.log('just responded to onFocus or onBlur? ', justRespondedToFocusOrBlur);
-
-    if (justRespondedToFocusOrBlur) { console.log('do nothing');
-      justRespondedToFocusOrBlur = false;
-    }
-    else {
-      justRespondedToFocusOrBlur = true;
-      this.regulateFocus();
-    }
+  focus: function() {
+    React.findDOMNode(this.refs.input).focus();
   },
 
-  regulateFocus: function() {
-    var inputNode = React.findDOMNode(this.refs.input);
-    if (this.props.isFocused) { console.log('forcing focus');
-      inputNode.focus();
-    }
-    else { console.log('forcing blur');
-      inputNode.blur();
-    }
-  },
-
-  componentDidMount: function() {console.log('mounting');
+  componentDidMount: function() {
     this.regulateInputWidth();
-    this.regulateFocus();
   },
 
-  componentDidUpdate: function() {console.log('updating');
+  componentDidUpdate: function() {
     this.regulateInputWidth();
-    this.regulateFocus();
   },
 
   regulateInputWidth: function() {

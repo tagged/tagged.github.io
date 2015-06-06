@@ -37,7 +37,7 @@ var Tag = React.createClass({
         marginBottom: Dimension.space,
         borderRadius: Dimension.borderRadius,
         backgroundColor: Color.blackDivider,
-        outline: 0,
+        outlineColor: Color.blackHint,
         cursor: 'pointer'
       }
     };
@@ -54,20 +54,7 @@ var Tag = React.createClass({
           {this.props.text}
       </div>
     );
-  },
-
-  handleClick: function(event) {
-    event.preventDefault();
-    if (!this.props.isDisabled) {
-      this.props.onClick(event);
-    }
-  },
-
-  handleKeyDown: function(event) {
-    if (!this.props.isDisabled && event.key === 'Enter') {
-      this.props.onKeyDown(event);
-    }
-  }
+  }  
 
 });
 

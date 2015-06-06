@@ -19,7 +19,6 @@ var Search = React.createClass({
     filesSelected: React.PropTypes.object,
     filesOpen: React.PropTypes.object,
 
-    suggestionsVisible: React.PropTypes.bool,
     suggestedTags: React.PropTypes.array,
     suggestionTitle: React.PropTypes.string,
 
@@ -45,10 +44,16 @@ var Search = React.createClass({
       suggestions: {
         paddingTop: Dimension.space
       },
+      tagInput: {
+        input: {
+          borderColor: this.props.searchIsFocused ? Color.blue500 : Color.blackSecondary
+        }
+      },
       tag: {
         tag: {
           backgroundColor: Color.blue100,
-          cursor: 'pointer'
+          cursor: 'pointer',
+          outlineColor: Color.blue500
         }
       }      
     };
@@ -60,16 +65,20 @@ var Search = React.createClass({
     var searchTags = this.props.searchTags.map(function(tag, tagIndex) {
 
       var onClick = function(event) {
-        event.stopPropagation();
         this.props.onSearchTagDelete(tagIndex);
+      }.bind(this);
+
+      var onKeyDown = function(event) {
+        if (event.key === 'Enter') {
+          this.props.onSearchTagDelete(tagIndex);
+        }
       }.bind(this);
 
       return (
         <Tag text={tag}
              style={style.tag}
              onClick={onClick}
-             onKeyUp={this.handleKeyUp}
-             onKeyDown={this.handleKeyDown}
+             onKeyDown={onKeyDown}
              key={tag}/>
       );
 
@@ -80,39 +89,46 @@ var Search = React.createClass({
       var placeholder = this.props.searchTags.length === 0 ?
         "Search files by tag" : "Refine search";
 
-      var onClick = function(event) {
-        event.stopPropagation();
-        this.props.onSearchFocus();
+      var onKeyDown = function(event) {
+        if (event.key === 'Enter') {
+          this.props.onSearchTagAdd(this.props.searchValue);
+        }
       }.bind(this);
-      
+
       return (
         <TagInput ref="tagInput"
-                  isFocused={this.props.searchIsFocused}
                   value={this.props.searchValue}
+                  style={style.tagInput}
                   placeholder={placeholder}
                   onChange={this.props.onSearchValueChange}
-                  onClick={onClick}
-                  onKeyUp={this.handleKeyUp}
-                  onKeyDown={this.handleKeyDown}/>
+                  onKeyDown={onKeyDown}
+                  onFocus={this.props.onSearchFocus}
+                  onBlur={this.props.onSearchBlur}/>
       );
     }.bind(this))();
     
     var suggestions = null;
-    //Show suggestions if focused or if there are no search tags, even if not focused
-    if (this.props.suggestionsVisible) {
+    //Show suggestions if focused or if there are no search tags, 
+    //even if not focused
+    if (this.props.searchIsFocused || this.props.searchTags.length === 0) {
       var suggestedTags = this.props.suggestedTags.map(function(tag) {
 
-        var onClick = function(event) {
-          event.stopPropagation();
+        //Mousedown precedes blur
+        var onMouseDown = function(event) {
           this.props.onSearchTagAdd(tag);
+        }.bind(this);
+
+        var onKeyDown = function(event) {
+          if (event.key === 'Enter') {
+            this.props.onSearchTagAdd(tag);
+          }
         }.bind(this);
 
         return (
           <Tag text={tag}
                style={style.tag}
-               onClick={onClick}
-               onKeyUp={this.handleKeyUp}
-               onKeyDown={this.handleKeyDown}
+               onMouseDown={onMouseDown}
+               onKeyDown={onKeyDown}
                key={tag}/>
         );
 
@@ -142,30 +158,10 @@ var Search = React.createClass({
                  onFileSelect={this.props.onFileSelect}
                  onFileToggle={this.props.onFileToggle}
                  disabledTags={this.props.searchTags}
-                 onTagClick={this.props.onSearchTagAdd}
-                 onKeyUp={this.handleKeyUp}
-                 onKeyDown={this.handleKeyDown}/>
+                 onTagClick={this.props.onSearchTagAdd}/>
       </div>
     );
   },
-
-  handleKeyUp: function(event) {
-    //console.log(event,event.target,event.currentTarget,event.type);
-    //Handle tab in
-    if (event.key === 'Tab') {
-      var inputNode = React.findDOMNode(this.refs.tagInput.refs.input);
-      if (event.target.isEqualNode(inputNode)) {
-        this.props.onSearchFocus();
-      }
-    }
-  },
-
-  handleKeyDown: function(event) {
-    //Handle tab out
-    if (event.key === 'Tab') {
-      this.props.onSearchBlur();
-    }
-  }
 
 });
 
