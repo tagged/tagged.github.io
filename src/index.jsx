@@ -105,13 +105,13 @@ var App = React.createClass({
     });
   },
 
-  componentDidMount: function() {console.log('mounted');
+  componentDidMount: function() {
     //Give first page a non-null state object
     window.history.replaceState({searchTags: this.state.searchTags}, '');
     window.addEventListener('popstate', this._setStateFromHistory);
   },
 
-  componentWillUnmount: function() {console.log('unmounting');
+  componentWillUnmount: function() {
     window.removeEventListener('popstate', this._setStateFromHistory);
   },
 
@@ -170,15 +170,16 @@ var App = React.createClass({
     };
   },
 
-  handleFocus: function() {
+  
+  handleSearchFocus: function() {
     this.setState({searchIsFocused: true});
   },
 
-  handleBlur: function() {
+  handleSearchBlur: function() {
     this.setState({searchIsFocused: false});
   },
 
-  handleChange: function(event) {
+  handleSearchValueChange: function(event) {
     this.setState({searchValue: event.target.value});
   },
 
@@ -252,12 +253,14 @@ var App = React.createClass({
   
   handleFileToggle: function(fileId) {
     var filesOpen = this.state.filesOpen.includes(fileId) ?
-                        this.state.filesOpen.delete(fileId) :
-                        this.state.filesOpen.add(fileId);
+                    this.state.filesOpen.delete(fileId) :
+                    this.state.filesOpen.add(fileId);
     this.setState({filesOpen: filesOpen});
   },
 
   getSearchProps: function() {
+    var suggestionsVisible = this.state.searchIsFocused || this.state.searchTags.length === 0;
+    
     var suggestedTags = _Database.makeSuggestion(
       this.state.searchValue, 
       this.state.searchTags
@@ -273,19 +276,21 @@ var App = React.createClass({
       searchTags: this.state.searchTags,
       searchValue: this.state.searchValue,
       searchIsFocused: this.state.searchIsFocused,
+
       files: this.state.files,
       filesSelected: this.state.filesSelected,
       filesOpen: this.state.filesOpen,
 
+      suggestionsVisible: suggestionsVisible,
       suggestedTags: suggestedTags,
       suggestionTitle: suggestionTitle,
       
       onSearchTagAdd: this.addSearchTag,
       onSearchTagDelete: this.deleteSearchTag,
 
-      onFocus: this.handleFocus,
-      onBlur: this.handleBlur,
-      onChange: this.handleChange,
+      onSearchFocus: this.handleSearchFocus,
+      onSearchBlur: this.handleSearchBlur,
+      onSearchValueChange: this.handleSearchValueChange,
       
       onFileSelect: this.handleFileSelect,
       onFileToggle: this.handleFileToggle,
@@ -366,7 +371,7 @@ var App = React.createClass({
     }
 
     return (
-      <div style={style.app}>
+      <div style={style.app} onClick={this.handleSearchBlur}>
           <ActionBar style={style.appBar}>
               <MaterialIcon action="Search"
                             d={Icon.search}
