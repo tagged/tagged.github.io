@@ -110,10 +110,10 @@ var FileActionBar = React.createClass({
     return (
       <div style={style.root}>
           <Checkbox checkStatus={checkStatus}
-                    onClick={this.handleClick.bind(this,checkStatus)}
-                    backgroundColor={Color.white}
-                    color={Color.blue500}
-                    style={style.checkbox}/>
+                    boxColor={Color.white}
+                    checkColor={Color.blue500}
+                    style={style.checkbox}
+                    onClick={this.handleClick.bind(this,checkStatus)}/>
           <Subheader text={text}
                      style={style.subheader}/>
           {actionBar}

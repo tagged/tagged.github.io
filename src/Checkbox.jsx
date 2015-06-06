@@ -50,9 +50,8 @@ var Checkbox = React.createClass({
 
   propTypes: {
     checkStatus: React.PropTypes.oneOf([ FALSE, INDETERMINATE, TRUE ]),
-    onClick: React.PropTypes.func,
-    backgroundColor: React.PropTypes.string,
-    color: React.PropTypes.string,
+    boxColor: React.PropTypes.string,
+    checkColor: React.PropTypes.string,
     style: React.PropTypes.object
   },
 
@@ -86,7 +85,7 @@ var Checkbox = React.createClass({
     }
     else if (current === INDETERMINATE) {
       svg.rect().attr({
-        fill: this.props.backgroundColor,
+        fill: this.props.boxColor,
         x: 3, y: 3, rx: 2, ry: 2,
         height: 18, width: 18
       });
@@ -95,7 +94,7 @@ var Checkbox = React.createClass({
         svg.polyline().attr({
           points: checkline.points,
           fill: 'none',
-          stroke: this.props.color,
+          stroke: this.props.checkColor,
           'stroke-width': 2,
           'stroke-linecap': 'butt',
           'stroke-linejoin': 'miter',
@@ -108,7 +107,7 @@ var Checkbox = React.createClass({
         svg.polyline().attr({
           points: checkline.points,
           fill: 'none',
-          stroke: this.props.color,
+          stroke: this.props.checkColor,
           'stroke-width': 2,
           'stroke-linecap': 'butt',
           'stroke-linejoin': 'miter',
@@ -123,7 +122,7 @@ var Checkbox = React.createClass({
     }
     else if (current === TRUE) {
       svg.rect().attr({
-        fill: this.props.backgroundColor,
+        fill: this.props.boxColor,
         x: 3, y: 3, rx: 2, ry: 2,
         height: 18, width: 18
       });
@@ -132,7 +131,7 @@ var Checkbox = React.createClass({
         svg.polyline().attr({
           points: checkmark.points,
           fill: 'none',
-          stroke: this.props.color,
+          stroke: this.props.checkColor,
           'stroke-width': 2,
           'stroke-linecap': 'butt',
           'stroke-linejoin': 'miter',
@@ -145,7 +144,7 @@ var Checkbox = React.createClass({
         svg.polyline().attr({
           points: checkmark.points,
           fill: 'none',
-          stroke: this.props.color,
+          stroke: this.props.checkColor,
           'stroke-width': 2,
           'stroke-linecap': 'butt',
           'stroke-linejoin': 'miter',
@@ -166,10 +165,12 @@ var Checkbox = React.createClass({
   },
   
   render: function() {
+    var {checkStatus, boxColor, checkColor, style, ...props} = this.props;
+
     return (
-      <SVGIcon ref="svgIcon" 
-               onClick={this.props.onClick}
-               style={this.props.style}/>
+      <SVGIcon ref="svgIcon"
+               style={style}
+               {...props}/>
     );
   },
 

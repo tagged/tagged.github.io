@@ -147,10 +147,14 @@ var File = React.createClass({
       </div>
     );
 
+    var onClickFileLink = function(event){
+      //Don't bubble click to Collapsible header
+      event.stopPropagation();
+    };
     var fileLink = (
       <a href={this.props.link}
          target="_blank"
-         onClick={function(e){e.stopPropagation();}}>
+         onClick={onClickFileLink}>
           <ImageIcon cloud={this.props.cloud}
                      style={style.icon}/>
       </a>
@@ -159,10 +163,10 @@ var File = React.createClass({
     return (
       <div style={style.component}>
           <Checkbox checkStatus={this.props.isSelected ? Constants.Ternary.TRUE : Constants.Ternary.FALSE} 
-                    onClick={this.props.onFileSelect}
-                    backgroundColor={Color.blue500}
-                    color={Color.whitePrimary}
-                    style={style.checkbox}/>
+                    boxColor={Color.blue500}
+                    checkColor={Color.whitePrimary}
+                    style={style.checkbox}
+                    onClick={this.props.onFileSelect}/>
           <Collapsible head={headContent}
                        body={bodyContent}
                        isOpen={this.props.isOpen}
