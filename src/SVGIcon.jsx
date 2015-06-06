@@ -9,7 +9,6 @@ var SVGIcon = React.createClass({
 
   propTypes: {
     style: React.PropTypes.object,
-    onClick: React.PropTypes.func,
   },
 
   getDefaultProps: function() {
@@ -33,15 +32,19 @@ var SVGIcon = React.createClass({
         left: (Dimension.touchTarget - Dimension.icon) / 2,
         height: Dimension.icon,
         width: Dimension.icon,
-        userSelect: 'none'
+        userSelect: 'none',
+        pointerEvents: 'none'
       },
     }
   },
 
   render: function() {
-    var style = Util.merge(this.getStyle(), this.props.style);
+    var {style, ...props} = this.props;
+
+    var style = Util.merge(this.getStyle(), style);
+    
     return (
-      <div style={style.clearance} onClick={this.props.onClick}>
+      <div style={style.clearance} {...props}>
           <svg ref="svg"
                style={style.svg} 
                viewBox={"0 0 " + Dimension.icon + " " + Dimension.icon}>
