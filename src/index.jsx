@@ -357,7 +357,8 @@ var App = React.createClass({
       //If snackbar is visible, because all selected files were deleted,
       //pretend no files are selected
       //This may change as snackbar is used for more than undoing deleted files
-      var numberOfFilesSelected = isSnackbarVisible ? 0 : this.state.filesSelected.size;
+      var numberOfFilesSelected = isSnackbarVisible ? 
+                                  0 : this.state.filesSelected.size;
       fileActionBar = (
         <FileActionBar numberOfFiles={this.state.files.size}
                        numberOfFilesSelected={numberOfFilesSelected}

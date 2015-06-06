@@ -71,13 +71,15 @@ var File = React.createClass({
       tag: {
         tag: {
           backgroundColor: Color.blue100,
-          cursor: 'pointer'
+          cursor: 'pointer',
+          outlineColor: Color.blue500
         }
       },
       tagDisabled: {
         tag: {
           backgroundColor: Color.blackDivider,
-          cursor: 'auto'
+          cursor: 'auto',
+          outlineColor: Color.blackHint
         }
       },
       icon: {
@@ -126,7 +128,9 @@ var File = React.createClass({
       var isDisabled = this.props.disabledTags.indexOf(tag) >= 0;
 
       var onClick = function(event) {
-        this.props.onTagClick(tag);
+        if (!isDisabled) {
+          this.props.onTagClick(tag);
+        }
       }.bind(this);
 
       return (
