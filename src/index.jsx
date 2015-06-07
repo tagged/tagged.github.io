@@ -3,13 +3,17 @@ var React = require('react/addons');
 //injectTapEventPlugin();
 var ReactTransitionGroup = React.addons.TransitionGroup;
 
-var MaterialIcon = require('./MaterialIcon');
 var Search = require('./Search');
+var Cloud = require('./Cloud');
+
+var MaterialIcon = require('./MaterialIcon');
 var FileActionBar = require('./FileActionBar');
 var ActionBar = require('./ActionBar');
 var Snackbar = require('./Snackbar');
 
 var Constants = require('./constants/index');
+var Page = Constants.Page;
+
 var R = require('./res/index');
 var Color = R.color;
 var Dimension = R.dimension;
@@ -74,7 +78,7 @@ var App = React.createClass({
   //Files determine which files are allowed in filesOpen, filesSelected
   getInitialState: function() {
     return {
-      page: Constants.Page.SEARCH,
+      page: Page.SEARCH,
       searchTags: [],
       searchValue: "",
       areSuggestionsVisible: true,
@@ -84,7 +88,7 @@ var App = React.createClass({
       snackbarTimeoutId: null,
       snackbarMessage: "",
       snackbarAction: "",
-      snackbarAct: function() {}
+      snackbarAct: function() {}      
     };
   },
 
@@ -308,10 +312,13 @@ var App = React.createClass({
   getPage() {
     var page;
     switch(this.state.page) {
-      case Constants.Page.SEARCH:
+      case Page.SEARCH:
         page = <Search ref="search" {...this.getSearchProps()}/>;
         break;
-      case Constants.Page.SCRATCH:
+      case Page.CLOUD:
+        page = <Cloud/>;
+        break;
+      case Page.SCRATCH:
         page = <Scratchwork/>;
         break;
       default:
@@ -379,19 +386,33 @@ var App = React.createClass({
       );
     }
 
+    var iconProps = {
+      scratchwork: {
+        d: Icon.trash,
+        fill: this.state.page === Page.SCRATCH ? Color.white : Color.black,
+        fillOpacity: this.state.page === Page.SCRATCH ? Color.whitePrimaryOpacity : Color.blackSecondaryOpacity,
+        onClick: this.navigate.bind(this, Page.SCRATCH)
+      },
+      search: {
+        d: Icon.search,
+        fill: this.state.page === Page.SEARCH ? Color.white : Color.black,
+        fillOpacity: this.state.page === Page.SEARCH ? Color.whitePrimaryOpacity : Color.blackSecondaryOpacity,
+        onClick: this.navigate.bind(this, Page.SEARCH)
+      },
+      cloud: {
+        d: Icon.cloud,
+        fill: this.state.page === Page.CLOUD ? Color.white : Color.black,
+        fillOpacity: this.state.page === Page.CLOUD ? Color.whitePrimaryOpacity : Color.blackSecondaryOpacity,
+        onClick: this.navigate.bind(this, Page.CLOUD)
+      }
+    };
+
     return (
       <div style={style.app} onMouseDown={this.hideSuggestions}>
           <ActionBar style={style.appBar}>
-              <MaterialIcon action="Search"
-                            d={Icon.search}
-                            fill={this.state.page === Constants.Page.SEARCH ? Color.white : Color.black}
-                            fillOpacity={this.state.page === Constants.Page.SEARCH ? Color.whitePrimaryOpacity : Color.blackSecondaryOpacity}
-                            onClick={this.navigate.bind(this, Constants.Page.SEARCH)}/>
-              <MaterialIcon action="Cloud"
-                            d={Icon.cloudQueue}
-                            fill={this.state.page === Constants.Page.SCRATCH ? Color.white : Color.black}
-                            fillOpacity={this.state.page === Constants.Page.SCRATCH ? Color.whitePrimaryOpacity : Color.blackSecondaryOpacity}                   
-                            onClick={this.navigate.bind(this, Constants.Page.SCRATCH)}/>
+              <MaterialIcon action="Scratch" {...iconProps.scratchwork}/>
+              <MaterialIcon action="Search" {...iconProps.search}/>
+              <MaterialIcon action="Cloud" {...iconProps.cloud}/>
           </ActionBar>
           {page}
           {fileActionBar}
