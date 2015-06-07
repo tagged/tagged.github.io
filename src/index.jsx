@@ -93,9 +93,11 @@ var App = React.createClass({
   },
 
   _setStateFromHistory: function(event) {
+    var page = event.state.page;
     var searchTags = event.state.searchTags;
     var fileState = this.updateFileState(searchTags);
     this.setState({
+      page: page,
       searchTags: searchTags,
       searchValue: "",
       areSuggestionsVisible: searchTags.length === 0,
@@ -111,7 +113,10 @@ var App = React.createClass({
 
   componentDidMount: function() {
     //Give first page a non-null state object
-    window.history.replaceState({searchTags: this.state.searchTags}, '');
+    window.history.replaceState({
+      page: this.state.page,
+      searchTags: this.state.searchTags
+    }, '');
     window.addEventListener('popstate', this._setStateFromHistory);
   },
 
@@ -120,7 +125,9 @@ var App = React.createClass({
   },
 
   pushState: function() {
+    //Add a browser history entry
     window.history.pushState({
+      page: this.state.page,
       searchTags: this.state.searchTags
     }, '');
   },
@@ -329,7 +336,11 @@ var App = React.createClass({
   },
 
   navigate: function(page) {
-    this.setState({page: page});
+    this.setState({
+      page: page
+    }, function() {
+      this.pushState();
+    });
   },
 
   getStyle: function() {
