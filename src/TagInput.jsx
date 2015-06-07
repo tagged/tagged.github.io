@@ -96,6 +96,13 @@ var TagInput = React.createClass({
     React.findDOMNode(this.refs.input).focus();
   },
 
+  getValue: function() {
+    //Replace nbsp added during render
+    var nbspRegExp = new RegExp(String.fromCharCode(160), 'g');
+    var inputNode = React.findDOMNode(this.refs.input);
+    return inputNode.value.replace(nbspRegExp, ' ');
+  },
+
   componentDidMount: function() {
     this.regulateInputWidth();
   },

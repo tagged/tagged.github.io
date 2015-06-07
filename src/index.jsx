@@ -191,7 +191,7 @@ var App = React.createClass({
   },
 
   handleSearchValueChange: function(event) {
-    this.setState({searchValue: event.target.value});
+    this.setState({searchValue: this.refs.search.refs.tagInput.getValue()});
   },
 
   handleFileSelect: function(fileId) {
@@ -309,7 +309,7 @@ var App = React.createClass({
     var page;
     switch(this.state.page) {
       case Constants.Page.SEARCH:
-        page = <Search {...this.getSearchProps()}/>;
+        page = <Search ref="search" {...this.getSearchProps()}/>;
         break;
       case Constants.Page.SCRATCH:
         page = <Scratchwork/>;
