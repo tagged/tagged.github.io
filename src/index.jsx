@@ -85,7 +85,6 @@ var App = React.createClass({
       files: Immutable.Map(),
       filesOpen: Immutable.Set(),
       filesSelected: Immutable.Set(),
-      snackbarTimeoutId: null,
       snackbarMessage: "",
       snackbarAction: "",
       snackbarAct: function() {}      
@@ -104,7 +103,7 @@ var App = React.createClass({
       files: fileState.files,
       filesOpen: Immutable.Set(),
       filesSelected: Immutable.Set(),
-      snackbarTimeoutId: null,
+      snackbarVisible: true,
       snackbarMessage: "",
       snackbarAction: "",
       snackbarAct: function() {}
@@ -222,54 +221,51 @@ var App = React.createClass({
   },
 
   handleFileDelete: function() {
-    //Delete each fileId in filesSelected
-
     //If no files selected, do nothing
     if (this.state.filesSelected.size === 0) {
       return;
     }
 
-    //Optimistically update files - remove filesSelected from files
-    var files = this.state.files.filter(function(file, fileId) {
-      return !this.state.filesSelected.includes(fileId);
-    }, this);
-
-    //Show snackbar
+    //Hide snackbar and delete files after delay
     var snackbarDelay = 2000;
     var snackbarTimeoutId = window.setTimeout(function() {
       //(Delete in database)
       //alert('Files deleted in database!');
       this.setState({
-        snackbarTimeoutId: null
-      }, function() {
-        //Clear selected files after snackbar 
-        //has been fully animated out, unmounted
-        this.setState({filesSelected: Immutable.Set()});
+        snackbarVisible: false
       });
     }.bind(this), snackbarDelay);
 
-    //Don't clear filesSelected yet
-    //Do it after snackbar times out
+    //Cancel snackbar
+    var filesBeforeDelete = this.state.files;
+    var filesSelectedBeforeDelete = this.state.filesSelected;
+    var undoDelete = function() {
+      window.clearTimeout(snackbarTimeoutId);
+      //Reset files, filesSelected to their states before delete
+      this.setState({
+        files: filesBeforeDelete,
+        filesSelected: filesSelectedBeforeDelete,
+        snackbarVisible: false
+      });
+    }.bind(this);
+    
+    //Optimistically update files - remove ids in filesSelected from files
+    var files = this.state.files.filter(function(file, fileId) {
+      return !this.state.filesSelected.includes(fileId);
+    }, this);
+
+    //Optimistically update filesSelected
+    var filesSelected = Immutable.Set();
+
+    //Show snackbar
     var plural = this.state.filesSelected.size !== 1 ? "s" : "";
     this.setState({
       files: files,
-      snackbarTimeoutId: snackbarTimeoutId,
+      filesSelected: filesSelected,
+      snackbarVisible: true,
       snackbarMessage: "Deleted " + this.state.filesSelected.size + " file" + plural,
       snackbarAction: "UNDO",
-      snackbarAct: this.handleFileUndoDelete
-    });
-  },
-
-  handleFileUndoDelete: function() {
-    //Cancel snackbar timeout
-    window.clearTimeout(this.state.snackbarTimeoutId);
-
-    //Refresh files from search tags
-    var fileState = this.updateFileState(this.state.searchTags);
-    
-    this.setState({
-      files: fileState.files,
-      snackbarTimeoutId: null
+      snackbarAct: undoDelete
     });
   },
   
@@ -370,8 +366,7 @@ var App = React.createClass({
     var page = this.getPage();
 
     var snackbar = null;
-    var isSnackbarVisible = this.state.snackbarTimeoutId !== null;
-    if(isSnackbarVisible) {
+    if(this.state.snackbarVisible) {
       snackbar = (
         <Snackbar message={this.state.snackbarMessage}
                   action={this.state.snackbarAction}
@@ -382,14 +377,9 @@ var App = React.createClass({
 
     var fileActionBar = null;
     if (this.state.searchTags.length > 0) {
-      //If snackbar is visible, because all selected files were deleted,
-      //pretend no files are selected
-      //This may change as snackbar is used for more than undoing deleted files
-      var numberOfFilesSelected = isSnackbarVisible ? 
-                                  0 : this.state.filesSelected.size;
       fileActionBar = (
         <FileActionBar numberOfFiles={this.state.files.size}
-                       numberOfFilesSelected={numberOfFilesSelected}
+                       numberOfFilesSelected={this.state.filesSelected.size}
                        onSelectAll={this.handleFileSelectAll}
                        onUnselectAll={this.handleFileUnselectAll}
                        onDelete={this.handleFileDelete}
