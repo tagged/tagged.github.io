@@ -20,7 +20,7 @@ var Search = React.createClass({
     filesSelected: React.PropTypes.object,
     filesOpen: React.PropTypes.object,
 
-    areSuggestionsVisible: React.PropTypes.bool,
+    suggestionsVisible: React.PropTypes.bool,
     suggestedTags: React.PropTypes.array,
     suggestionTitle: React.PropTypes.string,
 
@@ -127,7 +127,7 @@ var Search = React.createClass({
     }.bind(this))();
     
     var suggestions = null;
-    if (this.props.areSuggestionsVisible) {
+    if (this.props.suggestionsVisible) {
       var suggestedTags = this.props.suggestedTags.map(function(tag) {
 
         var onMouseDown = function(event) {

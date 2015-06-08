@@ -78,12 +78,14 @@ var App = React.createClass({
   getInitialState: function() {
     return {
       page: Page.SEARCH,
-      searchTags: [],
-      searchValue: "",
-      areSuggestionsVisible: true,
-      files: Immutable.Map(),
-      filesOpen: Immutable.Set(),
-      filesSelected: Immutable.Set(),
+      search: Immutable.Map({
+        tags: [],
+        value: "",
+        files: Immutable.Map(),
+        filesOpen: Immutable.Set(),
+        filesSelected: Immutable.Set(),
+        suggestionsVisible: true,
+      }),
       snackbarMessage: "",
       snackbarAction: "",
       snackbarAct: function() {}      
@@ -94,15 +96,17 @@ var App = React.createClass({
     var page = event.state.page;
     var searchTags = event.state.searchTags;
     var fileState = this.updateFileState(searchTags);
+    var search = this.state.search
+                     .set('tags', searchTags)
+                     .set('value', "")
+                     .set('files', fileState.files)
+                     .set('filesSelected', Immutable.Set())
+                     .set('filesOpen', Immutable.Set())
+                     .set('suggestionsVisible', searchTags.length === 0);
     this.setState({
       page: page,
-      searchTags: searchTags,
-      searchValue: "",
-      areSuggestionsVisible: searchTags.length === 0,
-      files: fileState.files,
-      filesOpen: Immutable.Set(),
-      filesSelected: Immutable.Set(),
-      snackbarVisible: true,
+      search: search,
+      snackbarVisible: false,
       snackbarMessage: "",
       snackbarAction: "",
       snackbarAct: function() {}
@@ -113,7 +117,7 @@ var App = React.createClass({
     //Give first page a non-null state object
     window.history.replaceState({
       page: this.state.page,
-      searchTags: this.state.searchTags
+      searchTags: this.state.search.get('tags')
     }, '');
     window.addEventListener('popstate', this._setStateFromHistory);
   },
@@ -126,23 +130,26 @@ var App = React.createClass({
     //Add a browser history entry
     window.history.pushState({
       page: this.state.page,
-      searchTags: this.state.searchTags
+      searchTags: this.state.search.get('tags')
     }, '');
   },
 
   addSearchTag: function(tag) {
-    //Add tag to searchTags
+    //Add tag to search tags
     //Update files, based on new search tags
     //Filter filesSelected and filesOpen, based on files
-    //Clear searchValue
-    var newSearchTags = this.state.searchTags.concat([tag]);
+    //Clear search value
+
+    var newSearchTags = this.state.search.get('tags').concat([tag]);
     var newFileState = this.updateFileState(newSearchTags);
+    var newSearch = this.state.search
+                        .set('tags', newSearchTags)
+                        .set('value', "")
+                        .set('files', newFileState.files)
+                        .set('filesSelected', newFileState.filesSelected)
+                        .set('filesOpen', newFileState.filesOpen);
     this.setState({
-      searchTags: newSearchTags,
-      searchValue: "",
-      files: newFileState.files,
-      filesSelected: newFileState.filesSelected,
-      filesOpen: newFileState.filesOpen,
+      search: newSearch,
     }, function() {
       this.pushState();
       this.hideSuggestions();
@@ -150,18 +157,21 @@ var App = React.createClass({
   },
 
   deleteSearchTag: function(tagIndex) {
-    //Remove tag from searchTags
+    //Remove tag from search tags
     //Update files, based on new search tags
     //Filter filesSelected and filesOpen, based on files
-    var newSearchTags = React.addons.update(this.state.searchTags, {
+    //var newSearchTags = this.state.search.get('tags').delete(tagIndex);
+    var newSearchTags = React.addons.update(this.state.search.get('tags'), {
       $splice: [[tagIndex, 1]]
     });
     var newFileState = this.updateFileState(newSearchTags);
+    var newSearch = this.state.search
+                        .set('tags', newSearchTags)
+                        .set('files', newFileState.files)
+                        .set('filesSelected', newFileState.filesSelected)
+                        .set('filesOpen', newFileState.filesOpen);
     this.setState({
-      searchTags: newSearchTags,
-      files: newFileState.files,
-      filesSelected: newFileState.filesSelected,
-      filesOpen: newFileState.filesOpen,
+      search: newSearch,
     }, function() {
       this.pushState();
       this.hideSuggestions();
@@ -172,12 +182,16 @@ var App = React.createClass({
     //Returns what the next state of files, filesSelected, and filesOpen
     //would look like, given the search tags
     var files = _Database.getFiles(searchTags);
-    var filesSelected = this.state.filesSelected.filter(function(fileId) {
-      return files.has(fileId);
-    });
-    var filesOpen = this.state.filesOpen.filter(function(fileId) {
-      return files.has(fileId);
-    });
+    var filesSelected = this.state.search.get('filesSelected').filter(
+      function(fileId) {
+        return files.has(fileId);
+      }
+    );
+    var filesOpen = this.state.search.get('filesOpen').filter(
+      function(fileId) {
+        return files.has(fileId);
+      }
+    );
     return {
       files: files,
       filesSelected: filesSelected,
@@ -186,42 +200,55 @@ var App = React.createClass({
   },
   
   showSuggestions: function() {
-    this.setState({areSuggestionsVisible: true});
+    this.setState({
+      search: this.state.search.set('suggestionsVisible', true)
+    });
   },
 
   hideSuggestions: function() {
     //Show suggestions if there are no search tags
-    if (this.state.searchTags.length === 0) {
-      this.setState({areSuggestionsVisible: true});
+    if (this.state.search.get('tags').length === 0) {
+      this.setState({
+        search: this.state.search.set('suggestionsVisible', true)
+      });
     }
     else {
-      this.setState({areSuggestionsVisible: false});
+      this.setState({
+        search: this.state.search.set('suggestionsVisible', false)
+      });
     }
   },
 
   handleSearchValueChange: function(event) {
-    this.setState({searchValue: this.refs.search.refs.tagInput.getValue()});
+    var newValue = this.refs.search.refs.tagInput.getValue();
+    this.setState({search: this.state.search.set('value', newValue)});
   },
 
   handleFileSelect: function(fileId) {
-    var filesSelected = this.state.filesSelected.includes(fileId) ?
-                        this.state.filesSelected.delete(fileId) :
-                        this.state.filesSelected.add(fileId);
-    this.setState({filesSelected: filesSelected});
+    var filesSelected = this.state.search.get('filesSelected').includes(fileId) ?
+                        this.state.search.get('filesSelected').delete(fileId) :
+                        this.state.search.get('filesSelected').add(fileId);
+    this.setState({
+      search: this.state.search.set('filesSelected', filesSelected)
+    });
   },
 
   handleFileSelectAll: function() {
-    var filesSelected = Immutable.Set.fromKeys(this.state.files);
-    this.setState({filesSelected: filesSelected});
+    var filesSelected = Immutable.Set.fromKeys(this.state.search.get('files'));
+    this.setState({
+      search: this.state.search.set('filesSelected', filesSelected)
+    });
   },
 
   handleFileUnselectAll: function() {
-    this.setState({filesSelected: Immutable.Set()});
+    this.setState({
+      search: this.state.search.set('filesSelected', Immutable.Set())
+    });
   },
 
   handleFileDelete: function() {
     //If no files selected, do nothing
-    if (this.state.filesSelected.size === 0) {
+    if (this.state.search.get('filesSelected').size === 0) {
       return;
     }
 
@@ -236,67 +263,71 @@ var App = React.createClass({
     }.bind(this), snackbarDelay);
 
     //Cancel snackbar
-    var filesBeforeDelete = this.state.files;
-    var filesSelectedBeforeDelete = this.state.filesSelected;
+    var filesBeforeDelete = this.state.search.get('files');
+    var filesSelectedBeforeDelete = this.state.search.get('filesSelected');
     var undoDelete = function() {
       window.clearTimeout(snackbarTimeoutId);
       //Reset files, filesSelected to their states before delete
       this.setState({
-        files: filesBeforeDelete,
-        filesSelected: filesSelectedBeforeDelete,
+        search: this.state.search
+                    .set('files', filesBeforeDelete)
+                    .set('filesSelected', filesSelectedBeforeDelete),
         snackbarVisible: false
       });
     }.bind(this);
     
     //Optimistically update files - remove ids in filesSelected from files
-    var files = this.state.files.filter(function(file, fileId) {
-      return !this.state.filesSelected.includes(fileId);
+    var files = this.state.search.get('files').filter(function(file, fileId) {
+      return !this.state.search.get('filesSelected').includes(fileId);
     }, this);
 
     //Optimistically update filesSelected
     var filesSelected = Immutable.Set();
 
     //Show snackbar
-    var plural = this.state.filesSelected.size !== 1 ? "s" : "";
+    var plural = this.state.search.get('filesSelected').size !== 1 ? "s" : "";
     this.setState({
-      files: files,
-      filesSelected: filesSelected,
+      search: this.state.search
+                  .set('files', files)
+                  .set('filesSelected', filesSelected),
       snackbarVisible: true,
-      snackbarMessage: "Deleted " + this.state.filesSelected.size + " file" + plural,
+      snackbarMessage: "Deleted " + this.state.search.get('filesSelected').size + " file" + plural,
       snackbarAction: "UNDO",
       snackbarAct: undoDelete
     });
   },
   
   handleFileToggle: function(fileId) {
-    var filesOpen = this.state.filesOpen.includes(fileId) ?
-                    this.state.filesOpen.delete(fileId) :
-                    this.state.filesOpen.add(fileId);
-    this.setState({filesOpen: filesOpen});
+    var filesOpen = this.state.search.get('filesOpen').includes(fileId) ?
+                    this.state.search.get('filesOpen').delete(fileId) :
+                    this.state.search.get('filesOpen').add(fileId);
+    this.setState({
+      search: this.state.search.set('filesOpen', filesOpen)
+    });
   },
 
   getSearchProps: function() {
     
     var suggestedTags = _Database.makeSuggestion(
-      this.state.searchValue, 
-      this.state.searchTags
+      this.state.search.get('value'), 
+      this.state.search.get('tags')
     );
 
     var suggestionTitle = _Database.labelSuggestion(
-      this.state.searchValue, 
-      this.state.searchTags, 
+      this.state.search.get('value'), 
+      this.state.search.get('tags'), 
       suggestedTags
     );
 
     return {
-      searchTags: this.state.searchTags,
-      searchValue: this.state.searchValue,
+      searchTags: this.state.search.get('tags'),
+      searchValue: this.state.search.get('value'),
       
-      files: this.state.files,
-      filesSelected: this.state.filesSelected,
-      filesOpen: this.state.filesOpen,
+      files: this.state.search.get('files'),
+      filesSelected: this.state.search.get('filesSelected'),
+      filesOpen: this.state.search.get('filesOpen'),
 
-      areSuggestionsVisible: this.state.areSuggestionsVisible,
+      suggestionsVisible: this.state.search.get('suggestionsVisible'),
       suggestedTags: suggestedTags,
       suggestionTitle: suggestionTitle,
       
