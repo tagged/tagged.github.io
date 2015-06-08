@@ -3,6 +3,8 @@ var Tag = require('./Tag');
 var TagInput = require('./TagInput');
 var Subheader = require('./Subheader');
 var Files = require('./Files');
+var FileActionBar = require('./FileActionBar');
+
 var R = require('./res/index');
 var Color = R.color;
 var Dimension = R.dimension;
@@ -28,8 +30,11 @@ var Search = React.createClass({
     onSearchFocus: React.PropTypes.func,
     onSearchValueChange: React.PropTypes.func,
     
-    onFileSelect: React.PropTypes.func,
     onFileToggle: React.PropTypes.func,
+    onFileSelect: React.PropTypes.func,
+    onFileSelectAll: React.PropTypes.func,
+    onFileUnselectAll: React.PropTypes.func,
+    onFileDelete: React.PropTypes.func,
   },
 
   getStyle: function() {
@@ -55,7 +60,8 @@ var Search = React.createClass({
           cursor: 'pointer',
           outlineColor: Color.blue500
         }
-      }      
+      },
+      fileActionBar: {}
     };
   },
 
@@ -156,7 +162,18 @@ var Search = React.createClass({
             </div>
         </div>
       );
+    }
 
+    var fileActionBar = null;
+    if (this.props.searchTags.length > 0) {
+      fileActionBar = (
+        <FileActionBar numberOfFiles={this.props.files.size}
+                       numberOfFilesSelected={this.props.filesSelected.size}
+                       onSelectAll={this.props.onFileSelectAll}
+                       onUnselectAll={this.props.onFileUnselectAll}
+                       onDelete={this.props.onFileDelete}
+                       style={style.fileActionBar}/>
+      );
     }
 
     return (
@@ -173,6 +190,7 @@ var Search = React.createClass({
                  onFileToggle={this.props.onFileToggle}
                  disabledTags={this.props.searchTags}
                  onTagClick={this.props.onSearchTagAdd}/>
+          {fileActionBar}
       </div>
     );
   },

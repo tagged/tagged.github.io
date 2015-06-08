@@ -7,7 +7,6 @@ var Search = require('./Search');
 var Cloud = require('./Cloud');
 
 var MaterialIcon = require('./MaterialIcon');
-var FileActionBar = require('./FileActionBar');
 var ActionBar = require('./ActionBar');
 var Snackbar = require('./Snackbar');
 
@@ -307,8 +306,11 @@ var App = React.createClass({
       onSearchFocus: this.showSuggestions,
       onSearchValueChange: this.handleSearchValueChange,
       
-      onFileSelect: this.handleFileSelect,
       onFileToggle: this.handleFileToggle,
+      onFileSelect: this.handleFileSelect,
+      onFileSelectAll: this.handleFileSelectAll,
+      onFileUnselectAll: this.handleFileUnselectAll,
+      onFileDelete: this.handleFileDelete,
     };
   },
   
@@ -354,10 +356,7 @@ var App = React.createClass({
           padding: Dimension.quantum,
         }
       },
-      fileActionBar: {
-      },
-      snackbar: {
-      }
+      snackbar: {}
     };
   },
 
@@ -372,18 +371,6 @@ var App = React.createClass({
                   action={this.state.snackbarAction}
                   onAction={this.state.snackbarAct}
                   style={style.snackbar}/>
-      );
-    }
-
-    var fileActionBar = null;
-    if (this.state.searchTags.length > 0) {
-      fileActionBar = (
-        <FileActionBar numberOfFiles={this.state.files.size}
-                       numberOfFilesSelected={this.state.filesSelected.size}
-                       onSelectAll={this.handleFileSelectAll}
-                       onUnselectAll={this.handleFileUnselectAll}
-                       onDelete={this.handleFileDelete}
-                       style={style.fileActionBar}/>
       );
     }
 
@@ -416,7 +403,6 @@ var App = React.createClass({
               <MaterialIcon action="Cloud" {...iconProps.cloud}/>
           </ActionBar>
           {page}
-          {fileActionBar}
           <ReactTransitionGroup>
               {snackbar}
           </ReactTransitionGroup>
