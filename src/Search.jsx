@@ -108,7 +108,9 @@ var Search = React.createClass({
 
       var onKeyDown = function(event) {
         if (event.key === 'Enter') {
-          this.props.onSearchTagAdd(this.props.searchValue);
+          if (this.props.searchValue.length > 0) {
+            this.props.onSearchTagAdd(this.props.searchValue);
+          }
         }
       }.bind(this);
 
