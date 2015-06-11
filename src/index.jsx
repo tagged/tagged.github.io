@@ -86,6 +86,8 @@ var App = React.createClass({
         filesOpen: Immutable.Set(),
         filesSelected: Immutable.Set(),
         suggestionsVisible: true,
+        suggestionsTags: [],
+        suggestionsTitle: ""
       },
       snackbarVisible: false,
       snackbarMessage: "",
@@ -98,6 +100,7 @@ var App = React.createClass({
     var page = event.state.page;
     var searchTags = event.state.searchTags;
     var fileState = this.updateFileState(searchTags);
+    var suggestionsVisible = searchTags.length === 0;
     this.setState({
       page: page,
       search: Update(this.state.search, {
@@ -105,17 +108,21 @@ var App = React.createClass({
         value: {$set: ""},
         files: {$set: fileState.files},
         filesSelected: {$set: Immutable.Set()},
-        filesOpen: {$set: Immutable.Set()},
-        suggestionsVisible: {$set: searchTags.length === 0}
+        filesOpen: {$set: Immutable.Set()}
       }),
       snackbarVisible: false,
       snackbarMessage: "",
       snackbarAction: "",
       snackbarAct: function() {}
+    }, function() {
+      this.updateSuggestions();
     });
   },
 
   componentDidMount: function() {
+    //Initial tag suggestions
+    this.updateSuggestions();
+
     //Give first page a non-null state object
     window.history.replaceState({
       page: this.state.page,
@@ -151,11 +158,12 @@ var App = React.createClass({
         value: {$set: ""},
         files: {$set: newFileState.files},
         filesSelected: {$set: newFileState.filesSelected},
-        filesOpen: {$set: newFileState.filesOpen}
+        filesOpen: {$set: newFileState.filesOpen},
+        suggestionsVisible: {$set: false}
       }),
     }, function() {
       this.pushState();
-      this.showSuggestions(false);
+      this.updateSuggestions();
     });
   },
 
@@ -168,16 +176,18 @@ var App = React.createClass({
       $splice: [[tagIndex, 1]]
     });
     var newFileState = this.updateFileState(newSearchTags);
+    var suggestionsVisible = newSearchTags.length === 0;
     this.setState({
       search: Update(this.state.search, {
         tags: {$set: newSearchTags},
         files: {$set: newFileState.files},
         filesSelected: {$set: newFileState.filesSelected},
-        filesOpen: {$set: newFileState.filesOpen}
+        filesOpen: {$set: newFileState.filesOpen},
+        suggestionsVisible: {$set: suggestionsVisible}
       }),
     }, function() {
       this.pushState();
-      this.showSuggestions(this.state.search.tags.length === 0);
+      this.updateSuggestions();
     });
   },
 
@@ -187,16 +197,50 @@ var App = React.createClass({
         value: {$set: this.refs.search.refs.tagInput.getValue()}
       })
     }, function() {
-      this.showSuggestions(true);
+      this.updateSuggestions();
     });
   },
 
   showSuggestions: function(condition) {
     //Show suggestions if condition is true
     //Hide suggestions otherwise
+
+    var isVisible;
+
+    //Exception
+    if (this.state.search.tags.length === 0) {
+      isVisible = true;
+    }
+    else {
+      isVisible = condition;
+    }
+
     this.setState({
       search: Update(this.state.search, {
-        suggestionsVisible: {$set: condition}
+        suggestionsVisible: {$set: isVisible}
+      })
+    });
+  },
+
+  updateSuggestions: function() {
+    //Should update suggestions after changing search tags or search value
+    console.log('hit db for tag suggestions');
+
+    var tags = _Database.makeSuggestion(
+      this.state.search.value, 
+      this.state.search.tags
+    );
+
+    var title = _Database.labelSuggestion(
+      this.state.search.value, 
+      this.state.search.tags, 
+      tags
+    );
+
+    this.setState({
+      search: Update(this.state.search, {
+        suggestionsTags: {$set: tags},
+        suggestionsTitle: {$set: title}
       })
     });
   },
@@ -315,19 +359,6 @@ var App = React.createClass({
   },
 
   getSearchProps: function() {
-    console.log('hit db for tag suggestions');
-    
-    var suggestedTags = _Database.makeSuggestion(
-      this.state.search.value, 
-      this.state.search.tags
-    );
-
-    var suggestionTitle = _Database.labelSuggestion(
-      this.state.search.value, 
-      this.state.search.tags, 
-      suggestedTags
-    );
-
     return {
       searchTags: this.state.search.tags,
       searchValue: this.state.search.value,
@@ -337,8 +368,8 @@ var App = React.createClass({
       filesOpen: this.state.search.filesOpen,
 
       suggestionsVisible: this.state.search.suggestionsVisible,
-      suggestionsTags: suggestedTags,
-      suggestionsTitle: suggestionTitle,
+      suggestionsTags: this.state.search.suggestionsTags,
+      suggestionsTitle: this.state.search.suggestionsTitle,
       
       onSearchTagAdd: this.addSearchTag,
       onSearchTagDelete: this.deleteSearchTag,
@@ -436,7 +467,7 @@ var App = React.createClass({
     };
 
     return (
-      <div style={style.app} onMouseDown={this.showSuggestions.bind(this, this.state.search.tags.length === 0)}>
+      <div style={style.app} onMouseDown={this.showSuggestions.bind(this, false)}>
           <ActionBar style={style.appBar}>
               <MaterialIcon action="Scratch" {...iconProps.scratchwork}/>
               <MaterialIcon action="Search" {...iconProps.search}/>
