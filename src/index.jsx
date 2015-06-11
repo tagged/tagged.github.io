@@ -85,9 +85,11 @@ var App = React.createClass({
         files: Immutable.Map(),
         filesOpen: Immutable.Set(),
         filesSelected: Immutable.Set(),
-        suggestionsVisible: true,
-        suggestionsTags: [],
-        suggestionsTitle: ""
+        suggestions: {
+          visible: true,
+          tags: [],
+          title: ""
+        }
       },
       snackbarVisible: false,
       snackbarMessage: "",
@@ -109,8 +111,10 @@ var App = React.createClass({
         files: {$set: fileState.files},
         filesSelected: {$set: Immutable.Set()},
         filesOpen: {$set: Immutable.Set()},
-        suggestionsTags: {$set: suggestions.tags},
-        suggestionsTitle: {$set: suggestions.title}
+        suggestions: {
+          tags: {$set: suggestions.tags},
+          title: {$set: suggestions.title}
+        }
       }),
       snackbarVisible: false,
       snackbarMessage: "",
@@ -134,8 +138,10 @@ var App = React.createClass({
     );
     this.setState({
       search: Update(this.state.search, {
-        suggestionsTags: {$set: suggestions.tags},
-        suggestionsTitle: {$set: suggestions.title}
+        suggestions: {
+          tags: {$set: suggestions.tags},
+          title: {$set: suggestions.title}
+        }
       })
     });
   },
@@ -169,9 +175,11 @@ var App = React.createClass({
         files: {$set: newFileState.files},
         filesSelected: {$set: newFileState.filesSelected},
         filesOpen: {$set: newFileState.filesOpen},
-        suggestionsVisible: {$set: false},
-        suggestionsTags: {$set: suggestions.tags},
-        suggestionsTitle: {$set: suggestions.title}
+        suggestions: {
+          visible: {$set: false},
+          tags: {$set: suggestions.tags},
+          title: {$set: suggestions.title}
+        }
       }),
     }, function() {
       this.pushState();
@@ -196,9 +204,11 @@ var App = React.createClass({
         files: {$set: newFileState.files},
         filesSelected: {$set: newFileState.filesSelected},
         filesOpen: {$set: newFileState.filesOpen},
-        suggestionsVisible: {$set: suggestionsVisible},
-        suggestionsTags: {$set: suggestions.tags},
-        suggestionsTitle: {$set: suggestions.title}
+        suggestions: {
+          visible: {$set: suggestionsVisible},
+          tags: {$set: suggestions.tags},
+          title: {$set: suggestions.title}
+        }
       }),
     }, function() {
       this.pushState();
@@ -207,12 +217,17 @@ var App = React.createClass({
 
   handleSearchValueChange: function(event) {
     var newValue = this.refs.search.refs.tagInput.getValue();
-    var suggestions = this.updateSuggestions(this.state.search.tags, newValue);
+    var suggestions = this.updateSuggestions(
+      this.state.search.tags, 
+      newValue
+    );
     this.setState({
       search: Update(this.state.search, {
         value: {$set: newValue},
-        suggestionsTags: {$set: suggestions.tags},
-        suggestionsTitle: {$set: suggestions.title}
+        suggestions: {
+          tags: {$set: suggestions.tags},
+          title: {$set: suggestions.title}
+        }
       })
     });
   },
@@ -221,19 +236,21 @@ var App = React.createClass({
     //Show suggestions if condition is true
     //Hide suggestions otherwise
 
-    var isVisible;
+    var visible;
 
     //Exception
     if (this.state.search.tags.length === 0) {
-      isVisible = true;
+      visible = true;
     }
     else {
-      isVisible = condition;
+      visible = condition;
     }
 
     this.setState({
       search: Update(this.state.search, {
-        suggestionsVisible: {$set: isVisible}
+        suggestions: {
+          visible: {$set: visible}
+        }
       })
     });
   },
@@ -376,9 +393,9 @@ var App = React.createClass({
       filesSelected: this.state.search.filesSelected,
       filesOpen: this.state.search.filesOpen,
 
-      suggestionsVisible: this.state.search.suggestionsVisible,
-      suggestionsTags: this.state.search.suggestionsTags,
-      suggestionsTitle: this.state.search.suggestionsTitle,
+      suggestionsVisible: this.state.search.suggestions.visible,
+      suggestionsTags: this.state.search.suggestions.tags,
+      suggestionsTitle: this.state.search.suggestions.title,
       
       onSearchTagAdd: this.addSearchTag,
       onSearchTagDelete: this.deleteSearchTag,
