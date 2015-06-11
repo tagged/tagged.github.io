@@ -21,8 +21,8 @@ var Search = React.createClass({
     filesOpen: React.PropTypes.object,
 
     suggestionsVisible: React.PropTypes.bool,
-    suggestedTags: React.PropTypes.array,
-    suggestionTitle: React.PropTypes.string,
+    suggestionsTags: React.PropTypes.array,
+    suggestionsTitle: React.PropTypes.string,
 
     onSearchTagAdd: React.PropTypes.func,
     onSearchTagDelete: React.PropTypes.func,
@@ -128,7 +128,7 @@ var Search = React.createClass({
     
     var suggestions = null;
     if (this.props.suggestionsVisible) {
-      var suggestedTags = this.props.suggestedTags.map(function(tag) {
+      var suggestionsTags = this.props.suggestionsTags.map(function(tag) {
 
         var onMouseDown = function(event) {
           //Don't hide suggestions yet
@@ -158,9 +158,9 @@ var Search = React.createClass({
 
       suggestions = (
         <div>
-            <Subheader text={this.props.suggestionTitle}/>
+            <Subheader text={this.props.suggestionsTitle}/>
             <div style={style.suggestions}>
-                {suggestedTags}
+                {suggestionsTags}
             </div>
         </div>
       );

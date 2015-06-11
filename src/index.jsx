@@ -155,7 +155,7 @@ var App = React.createClass({
       }),
     }, function() {
       this.pushState();
-      this.hideSuggestions();
+      this.showSuggestions(false);
     });
   },
 
@@ -177,7 +177,27 @@ var App = React.createClass({
       }),
     }, function() {
       this.pushState();
-      this.hideSuggestions();
+      this.showSuggestions(this.state.search.tags.length === 0);
+    });
+  },
+
+  handleSearchValueChange: function(event) {
+    this.setState({
+      search: Update(this.state.search, {
+        value: {$set: this.refs.search.refs.tagInput.getValue()}
+      })
+    }, function() {
+      this.showSuggestions(true);
+    });
+  },
+
+  showSuggestions: function(condition) {
+    //Show suggestions if condition is true
+    //Hide suggestions otherwise
+    this.setState({
+      search: Update(this.state.search, {
+        suggestionsVisible: {$set: condition}
+      })
     });
   },
 
@@ -202,40 +222,6 @@ var App = React.createClass({
     };
   },
   
-  showSuggestions: function() {
-    this.setState({
-      search: Update(this.state.search, {
-        suggestionsVisible: {$set: true}
-      })
-    });
-  },
-
-  hideSuggestions: function() {
-    //Show suggestions if there are no search tags
-    if (this.state.search.tags.length === 0) {
-      this.setState({
-        search: Update(this.state.search, {
-          suggestionsVisible: {$set: true}
-        })
-      });
-    }
-    else {
-      this.setState({
-        search: Update(this.state.search, {
-          suggestionsVisible: {$set: false}
-        })
-      });
-    }
-  },
-
-  handleSearchValueChange: function(event) {
-    this.setState({
-      search: Update(this.state.search, {
-        value: {$set: this.refs.search.refs.tagInput.getValue()}
-      })
-    });
-  },
-
   handleFileSelect: function(fileId) {
     var filesSelected = this.state.search.filesSelected.includes(fileId) ?
                         this.state.search.filesSelected.delete(fileId) :
@@ -329,6 +315,7 @@ var App = React.createClass({
   },
 
   getSearchProps: function() {
+    console.log('hit db for tag suggestions');
     
     var suggestedTags = _Database.makeSuggestion(
       this.state.search.value, 
@@ -350,13 +337,13 @@ var App = React.createClass({
       filesOpen: this.state.search.filesOpen,
 
       suggestionsVisible: this.state.search.suggestionsVisible,
-      suggestedTags: suggestedTags,
-      suggestionTitle: suggestionTitle,
+      suggestionsTags: suggestedTags,
+      suggestionsTitle: suggestionTitle,
       
       onSearchTagAdd: this.addSearchTag,
       onSearchTagDelete: this.deleteSearchTag,
 
-      onSearchFocus: this.showSuggestions,
+      onSearchFocus: this.showSuggestions.bind(this, true),
       onSearchValueChange: this.handleSearchValueChange,
       
       onFileToggle: this.handleFileToggle,
@@ -449,7 +436,7 @@ var App = React.createClass({
     };
 
     return (
-      <div style={style.app} onMouseDown={this.hideSuggestions}>
+      <div style={style.app} onMouseDown={this.showSuggestions.bind(this, this.state.search.tags.length === 0)}>
           <ActionBar style={style.appBar}>
               <MaterialIcon action="Scratch" {...iconProps.scratchwork}/>
               <MaterialIcon action="Search" {...iconProps.search}/>
