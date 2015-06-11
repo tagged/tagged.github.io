@@ -163,7 +163,12 @@ var App = React.createClass({
     //Update files, based on new search tags
     //Filter filesSelected and filesOpen, based on files
     //Clear search value
-
+    
+    //Don't add tag if it's not in suggestions
+    if (this.state.search.suggestions.tags.indexOf(tag) === -1) {
+      return;
+    }
+    
     var newSearchTags = this.state.search.tags.concat([tag]);
     var newFileState = this.updateFileState(newSearchTags);
     var suggestions = this.updateSuggestions(newSearchTags, "");
