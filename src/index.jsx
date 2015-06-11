@@ -171,6 +171,9 @@ var App = React.createClass({
     
     var newSearchTags = this.state.search.tags.concat([tag]);
     var newFileState = this.updateFileState(newSearchTags);
+    //Keep suggestions visible iff input is focused
+    var inputNode = React.findDOMNode(this.refs.search.refs.tagInput.refs.input);
+    var suggestionsVisible = inputNode === document.activeElement;
     var suggestions = this.updateSuggestions(newSearchTags, "");
     
     this.setState({
@@ -181,7 +184,7 @@ var App = React.createClass({
         filesSelected: {$set: newFileState.filesSelected},
         filesOpen: {$set: newFileState.filesOpen},
         suggestions: {
-          visible: {$set: false},
+          visible: {$set: suggestionsVisible},
           tags: {$set: suggestions.tags},
           title: {$set: suggestions.title}
         }
@@ -200,6 +203,7 @@ var App = React.createClass({
       $splice: [[tagIndex, 1]]
     });
     var newFileState = this.updateFileState(newSearchTags);
+    //Show suggestions if there are no search tags
     var suggestionsVisible = newSearchTags.length === 0;
     var suggestions = this.updateSuggestions(newSearchTags, this.state.search.value);
 
