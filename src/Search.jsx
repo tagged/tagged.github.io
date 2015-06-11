@@ -30,8 +30,6 @@ var Search = React.createClass({
     onSearchFocus: React.PropTypes.func,
     onSearchValueChange: React.PropTypes.func,
     
-    onMousedownAnywhere: React.PropTypes.func,
-
     onFileToggle: React.PropTypes.func,
     onFileSelect: React.PropTypes.func,
     onFileSelectAll: React.PropTypes.func,
@@ -65,14 +63,6 @@ var Search = React.createClass({
       },
       fileActionBar: {}
     };
-  },
-
-  componentDidMount: function() {
-    document.addEventListener('mousedown', this.props.onMousedownAnywhere);
-  },
-
-  componentWillUnmount: function() {
-    document.removeEventListener('mousedown', this.props.onMousedownAnywhere);
   },
 
   render: function() {

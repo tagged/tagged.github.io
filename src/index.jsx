@@ -412,8 +412,6 @@ var App = React.createClass({
       onSearchFocus: this.showSuggestions.bind(this, true),
       onSearchValueChange: this.handleSearchValueChange,
       
-      onMousedownAnywhere: this.showSuggestions.bind(this, false),
-      
       onFileToggle: this.handleFileToggle,
       onFileSelect: this.handleFileSelect,
       onFileSelectAll: this.handleFileSelectAll,
@@ -504,7 +502,7 @@ var App = React.createClass({
     };
 
     return (
-      <div style={style.app}>
+      <div style={style.app} onMouseDown={this.showSuggestions.bind(this, false)}>
           <ActionBar style={style.appBar}>
               <MaterialIcon action="Scratch" {...iconProps.scratchwork}/>
               <MaterialIcon action="Search" {...iconProps.search}/>
