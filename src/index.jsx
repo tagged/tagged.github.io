@@ -454,6 +454,7 @@ var App = React.createClass({
         fontFamily: 'Roboto, sans-serif',
         WebkitTapHighlightColor: 'rgba(0,0,0,0)',
         paddingBottom: Dimension.heightActionBar + Dimension.space + Dimension.quantum,
+        height: '100%'
       },
       appBar: {
         actionBar: {
