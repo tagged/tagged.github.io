@@ -100,7 +100,7 @@ var App = React.createClass({
     var page = event.state.page;
     var searchTags = event.state.searchTags;
     var fileState = this.updateFileState(searchTags);
-    var suggestionsVisible = searchTags.length === 0;
+    var suggestions = this.updateSuggestions(searchTags, this.state.search.value);
     this.setState({
       page: page,
       search: Update(this.state.search, {
@@ -108,27 +108,36 @@ var App = React.createClass({
         value: {$set: ""},
         files: {$set: fileState.files},
         filesSelected: {$set: Immutable.Set()},
-        filesOpen: {$set: Immutable.Set()}
+        filesOpen: {$set: Immutable.Set()},
+        suggestionsTags: {$set: suggestions.tags},
+        suggestionsTitle: {$set: suggestions.title}
       }),
       snackbarVisible: false,
       snackbarMessage: "",
       snackbarAction: "",
       snackbarAct: function() {}
-    }, function() {
-      this.updateSuggestions();
     });
   },
 
   componentDidMount: function() {
-    //Initial tag suggestions
-    this.updateSuggestions();
-
     //Give first page a non-null state object
     window.history.replaceState({
       page: this.state.page,
       searchTags: this.state.search.tags
     }, '');
     window.addEventListener('popstate', this._setStateFromHistory);
+
+    //Initial tag suggestions
+    var suggestions = this.updateSuggestions(
+      this.state.search.tags, 
+      this.state.search.value
+    );
+    this.setState({
+      search: Update(this.state.search, {
+        suggestionsTags: {$set: suggestions.tags},
+        suggestionsTitle: {$set: suggestions.title}
+      })
+    });
   },
 
   componentWillUnmount: function() {
@@ -151,7 +160,8 @@ var App = React.createClass({
 
     var newSearchTags = this.state.search.tags.concat([tag]);
     var newFileState = this.updateFileState(newSearchTags);
-
+    var suggestions = this.updateSuggestions(newSearchTags, "");
+    
     this.setState({
       search: Update(this.state.search, {
         tags: {$set: newSearchTags},
@@ -159,11 +169,12 @@ var App = React.createClass({
         files: {$set: newFileState.files},
         filesSelected: {$set: newFileState.filesSelected},
         filesOpen: {$set: newFileState.filesOpen},
-        suggestionsVisible: {$set: false}
+        suggestionsVisible: {$set: false},
+        suggestionsTags: {$set: suggestions.tags},
+        suggestionsTitle: {$set: suggestions.title}
       }),
     }, function() {
       this.pushState();
-      this.updateSuggestions();
     });
   },
 
@@ -177,27 +188,32 @@ var App = React.createClass({
     });
     var newFileState = this.updateFileState(newSearchTags);
     var suggestionsVisible = newSearchTags.length === 0;
+    var suggestions = this.updateSuggestions(newSearchTags, this.state.search.value);
+
     this.setState({
       search: Update(this.state.search, {
         tags: {$set: newSearchTags},
         files: {$set: newFileState.files},
         filesSelected: {$set: newFileState.filesSelected},
         filesOpen: {$set: newFileState.filesOpen},
-        suggestionsVisible: {$set: suggestionsVisible}
+        suggestionsVisible: {$set: suggestionsVisible},
+        suggestionsTags: {$set: suggestions.tags},
+        suggestionsTitle: {$set: suggestions.title}
       }),
     }, function() {
       this.pushState();
-      this.updateSuggestions();
     });
   },
 
   handleSearchValueChange: function(event) {
+    var newValue = this.refs.search.refs.tagInput.getValue();
+    var suggestions = this.updateSuggestions(this.state.search.tags, newValue);
     this.setState({
       search: Update(this.state.search, {
-        value: {$set: this.refs.search.refs.tagInput.getValue()}
+        value: {$set: newValue},
+        suggestionsTags: {$set: suggestions.tags},
+        suggestionsTitle: {$set: suggestions.title}
       })
-    }, function() {
-      this.updateSuggestions();
     });
   },
 
@@ -222,32 +238,25 @@ var App = React.createClass({
     });
   },
 
-  updateSuggestions: function() {
-    //Should update suggestions after changing search tags or search value
+  updateSuggestions: function(searchTags, searchValue) {
+    //Returns suggested tags for the given search tags and search value
+    
     console.log('hit db for tag suggestions');
 
-    var tags = _Database.makeSuggestion(
-      this.state.search.value, 
-      this.state.search.tags
-    );
-
-    var title = _Database.labelSuggestion(
-      this.state.search.value, 
-      this.state.search.tags, 
-      tags
-    );
-
-    this.setState({
-      search: Update(this.state.search, {
-        suggestionsTags: {$set: tags},
-        suggestionsTitle: {$set: title}
-      })
-    });
+    var tags = _Database.makeSuggestion(searchValue, searchTags);
+    var title = _Database.labelSuggestion(searchValue, searchTags, tags);
+    return {
+      tags: tags,
+      title: title
+    };
   },
 
   updateFileState: function(searchTags) {
     //Returns what the next state of files, filesSelected, and filesOpen
     //would look like, given the search tags
+
+    console.log('hit database for files');
+
     var files = _Database.getFiles(searchTags);
     var filesSelected = this.state.search.filesSelected.filter(
       function(fileId) {
