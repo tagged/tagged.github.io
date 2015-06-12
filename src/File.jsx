@@ -46,9 +46,7 @@ var File = React.createClass({
         }
       },
       filename: {
-        boxSizing: 'border-box',
         paddingTop: Dimension.quantum,
-        paddingBottom: Dimension.quantum,
         lineHeight: Typography.lineHeight,
         fontSize: Typography.fontSize,
         fontWeight: Typography.fontWeightRegular,
@@ -57,8 +55,6 @@ var File = React.createClass({
         overflow: 'hidden'
       },
       metadata: {
-        boxSizing: 'border-box',
-        paddingBottom: Dimension.quantum,
         lineHeight: Typography.lineHeightSmall,
         fontSize: Typography.fontSizeSmall,
         fontWeight: Typography.fontWeightThin,
