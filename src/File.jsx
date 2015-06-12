@@ -56,7 +56,7 @@ var File = React.createClass({
         textOverflow: 'ellipsis',
         overflow: 'hidden'
       },
-      subheader: {
+      metadata: {
         boxSizing: 'border-box',
         paddingBottom: Dimension.quantum,
         lineHeight: Typography.lineHeightSmall,
@@ -102,17 +102,17 @@ var File = React.createClass({
     if (this.props.isOpen) {
       metadata = (
         <div>
-            <div style={style.subheader}>{this.props.path}</div>
-            <div style={style.subheader}>{this.props.modified}</div>
-            <div style={style.subheader}>{this.props.size}</div>
-            <div style={style.subheader}>{this.props.type}</div>
+            <div style={style.metadata}>{this.props.path}</div>
+            <div style={style.metadata}>{this.props.modified}</div>
+            <div style={style.metadata}>{this.props.size}</div>
+            <div style={style.metadata}>{this.props.type}</div>
         </div>
       );
     }
     
     var plural = this.props.tags.length !== 1;
     var tagCount = (
-      <div style={style.subheader}>
+      <div style={style.metadata}>
           {this.props.tags.length + (plural ? " tags" : " tag")}
       </div>
     );
