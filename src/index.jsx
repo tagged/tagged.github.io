@@ -103,19 +103,22 @@ var App = React.createClass({
   _setStateFromHistory: function(event) {
     var page = event.state.page;
     var searchTags = Immutable.List(event.state.searchTags);
+    var value = "";
     var files = this.updateFiles(searchTags);
-    var suggestions = this.updateSuggestions(searchTags, this.state.search.value);
+    var suggestionsVisible = searchTags.isEmpty() || this.searchInputIsFocused();
+    var suggestions = this.updateSuggestions(searchTags, value);
     this.setState({
       page: page,
       search: Update(this.state.search, {
         tags: {$set: searchTags},
-        value: {$set: ""},
+        value: {$set: value},
         files: {
           files: {$set: files.files},
           open: {$set: Immutable.Set()},
           selected: {$set: Immutable.Set()}
         },
         suggestions: {
+          visible: {$set: suggestionsVisible},
           tags: {$set: suggestions.tags},
           title: {$set: suggestions.title}
         }
@@ -163,6 +166,12 @@ var App = React.createClass({
     window.removeEventListener('popstate', this._setStateFromHistory);
   },
 
+  searchInputIsFocused: function() {
+    //Return true if search input is focused
+    var inputNode = React.findDOMNode(this.refs.search.refs.tagInput.refs.input);
+    return inputNode === document.activeElement;
+  },
+
   addSearchTag: function(tag) {
     //Add tag to search tags
     //Update files, based on new search tags
@@ -176,9 +185,8 @@ var App = React.createClass({
     
     var newSearchTags = this.state.search.tags.push(tag);
     var files = this.updateFiles(newSearchTags);
-    //Keep suggestions visible iff input is focused
-    var inputNode = React.findDOMNode(this.refs.search.refs.tagInput.refs.input);
-    var suggestionsVisible = inputNode === document.activeElement;
+    //Keep suggestions visible if input is focused
+    var suggestionsVisible = this.searchInputIsFocused();
     var suggestions = this.updateSuggestions(newSearchTags, "");
     
     this.setState({
@@ -210,7 +218,7 @@ var App = React.createClass({
     var files = this.updateFiles(newSearchTags);
 
     //Show suggestions if there are no search tags
-    var suggestionsVisible = newSearchTags.size === 0;
+    var suggestionsVisible = newSearchTags.isEmpty();
     var suggestions = this.updateSuggestions(newSearchTags, this.state.search.value);
 
     this.setState({
