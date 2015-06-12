@@ -4,13 +4,14 @@ var Collapsible = require('./Collapsible');
 var Tag = require('./Tag');
 var ImageIcon = require('./ImageIcon');
 
-var Constants = require('./constants/index');
 var R = require('./res/index');
 var Color = R.color;
 var Dimension = R.dimension;
 var Typography = R.typography;
 var Util = require('./util/util');
 
+var TRUE = R.constant.ternary.TRUE;
+var FALSE = R.constant.ternary.FALSE;
 
 var File = React.createClass({
 
@@ -162,7 +163,7 @@ var File = React.createClass({
 
     return (
       <div style={style.component}>
-          <Checkbox checkStatus={this.props.isSelected ? Constants.Ternary.TRUE : Constants.Ternary.FALSE} 
+          <Checkbox checkStatus={this.props.isSelected ? TRUE : FALSE} 
                     boxColor={Color.blue500}
                     checkColor={Color.whitePrimary}
                     style={style.checkbox}

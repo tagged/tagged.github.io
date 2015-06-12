@@ -1,5 +1,0 @@
-module.exports={
-  SEARCH: "PAGE_SEARCH",
-  SCRATCH: "PAGE_SCRATCH",
-  CLOUD: "PAGE_CLOUD",
-};

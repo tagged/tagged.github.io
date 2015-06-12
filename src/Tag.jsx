@@ -1,5 +1,4 @@
 var React = require('react/addons');
-var Constants = require('./constants/index');
 var R = require('./res/index');
 var Color = R.color;
 var Dimension = R.dimension;

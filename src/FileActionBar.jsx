@@ -4,16 +4,15 @@ var Subheader = require('./Subheader');
 var Checkbox = require('./Checkbox');
 var MaterialIcon = require('./MaterialIcon');
 
-var Constants = require('./constants/index');
-var FALSE = Constants.Ternary.FALSE;
-var INDETERMINATE = Constants.Ternary.INDETERMINATE;
-var TRUE = Constants.Ternary.TRUE;
-
 var R = require('./res/index');
 var Color = R.color;
 var Dimension = R.dimension;
 var Icon = R.icon;
 var Util = require('./util/util');
+
+var FALSE = R.constant.ternary.FALSE;
+var INDETERMINATE = R.constant.ternary.INDETERMINATE;
+var TRUE = R.constant.ternary.TRUE;
 
 
 //Children of ActionBar should provide a prop called `action`

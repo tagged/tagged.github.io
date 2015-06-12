@@ -1,15 +1,15 @@
 var React = require('react/addons');
 var SVGIcon = require('./SVGIcon');
 
-var Constants = require('./constants/index');
-var FALSE = Constants.Ternary.FALSE;
-var INDETERMINATE = Constants.Ternary.INDETERMINATE;
-var TRUE = Constants.Ternary.TRUE;
-
 var R = require('./res/index');
 var Color = R.color;
 var Icon = R.icon;
 var Util = require('./util/util');
+
+var FALSE = R.constant.ternary.FALSE;
+var INDETERMINATE = R.constant.ternary.INDETERMINATE;
+var TRUE = R.constant.ternary.TRUE;
+
 
 var SVG = require('svg.js');
 

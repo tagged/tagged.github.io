@@ -1,5 +1,6 @@
 module.exports = {
   color: require('./color'),
+  constant: require('./constant'),
   dimension: require('./dimension'),
   icon: require('./icon'),
   shadow: require('./shadow'),

@@ -11,14 +11,13 @@ var MaterialIcon = require('./MaterialIcon');
 var ActionBar = require('./ActionBar');
 var Snackbar = require('./Snackbar');
 
-var Constants = require('./constants/index');
-var Page = Constants.Page;
-
 var R = require('./res/index');
 var Color = R.color;
 var Dimension = R.dimension;
 var Icon = R.icon;
 var Shadow = R.shadow;
+
+var Page = R.constant.page;
 
 var _Database = require('./res/_database');
 var Immutable = require('immutable');
