@@ -23,7 +23,7 @@ var File = React.createClass({
     cloud: React.PropTypes.string,
     link: React.PropTypes.string,
     tags: React.PropTypes.array,
-    disabledTags: React.PropTypes.array,
+    disabledTags: React.PropTypes.object,
     onTagClick: React.PropTypes.func,
     isSelected: React.PropTypes.bool,
     isOpen: React.PropTypes.bool,
@@ -125,7 +125,7 @@ var File = React.createClass({
     );
     
     var tagNodes = this.props.tags.map(function(tag) {
-      var isDisabled = this.props.disabledTags.indexOf(tag) >= 0;
+      var isDisabled = this.props.disabledTags.includes(tag);
 
       var onClick = function(event) {
         if (!isDisabled) {

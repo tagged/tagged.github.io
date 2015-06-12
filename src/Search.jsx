@@ -13,7 +13,7 @@ var Dimension = R.dimension;
 var Search = React.createClass({
   
   propTypes: {
-    searchTags: React.PropTypes.array.isRequired,
+    searchTags: React.PropTypes.object,
     searchValue: React.PropTypes.string,
     
     files: React.PropTypes.object,
@@ -21,7 +21,7 @@ var Search = React.createClass({
     filesOpen: React.PropTypes.object,
 
     suggestionsVisible: React.PropTypes.bool,
-    suggestionsTags: React.PropTypes.array,
+    suggestionsTags: React.PropTypes.object,
     suggestionsTitle: React.PropTypes.string,
 
     onSearchTagAdd: React.PropTypes.func,
@@ -98,7 +98,7 @@ var Search = React.createClass({
 
     var tagInput = (function() {
 
-      var placeholder = this.props.searchTags.length === 0 ?
+      var placeholder = this.props.searchTags.isEmpty() ?
         "Search files by tag" : "Refine search";
 
       var onMouseDown = function(event) {
@@ -167,7 +167,7 @@ var Search = React.createClass({
     }
 
     var fileActionBar = null;
-    if (this.props.searchTags.length > 0) {
+    if (!this.props.searchTags.isEmpty()) {
       fileActionBar = (
         <FileActionBar numberOfFiles={this.props.files.size}
                        numberOfFilesSelected={this.props.filesSelected.size}

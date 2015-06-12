@@ -80,7 +80,7 @@ var App = React.createClass({
     return {
       page: Page.SEARCH,
       search: {
-        tags: [],
+        tags: Immutable.List(),
         value: "",
         files: {
           files: Immutable.Map(),
@@ -89,7 +89,7 @@ var App = React.createClass({
         },
         suggestions: {
           visible: true,
-          tags: [],
+          tags: Immutable.List(),
           title: ""
         }
       },
@@ -102,7 +102,7 @@ var App = React.createClass({
 
   _setStateFromHistory: function(event) {
     var page = event.state.page;
-    var searchTags = event.state.searchTags;
+    var searchTags = Immutable.List(event.state.searchTags);
     var files = this.updateFiles(searchTags);
     var suggestions = this.updateSuggestions(searchTags, this.state.search.value);
     this.setState({
@@ -127,11 +127,20 @@ var App = React.createClass({
     });
   },
 
+  pushState: function() {
+    //Add a browser history entry
+    //Note: cannot push Immutable.List to history, so converting to array
+    window.history.pushState({
+      page: this.state.page,
+      searchTags: this.state.search.tags.toArray()
+    }, '');
+  },
+
   componentDidMount: function() {
     //Give first page a non-null state object
     window.history.replaceState({
       page: this.state.page,
-      searchTags: this.state.search.tags
+      searchTags: this.state.search.tags.toArray()
     }, '');
     window.addEventListener('popstate', this._setStateFromHistory);
 
@@ -154,14 +163,6 @@ var App = React.createClass({
     window.removeEventListener('popstate', this._setStateFromHistory);
   },
 
-  pushState: function() {
-    //Add a browser history entry
-    window.history.pushState({
-      page: this.state.page,
-      searchTags: this.state.search.tags
-    }, '');
-  },
-
   addSearchTag: function(tag) {
     //Add tag to search tags
     //Update files, based on new search tags
@@ -169,11 +170,11 @@ var App = React.createClass({
     //Clear search value
     
     //Don't add tag if it's not in suggestions
-    if (this.state.search.suggestions.tags.indexOf(tag) === -1) {
+    if (!this.state.search.suggestions.tags.includes(tag)) {
       return;
     }
     
-    var newSearchTags = this.state.search.tags.concat([tag]);
+    var newSearchTags = this.state.search.tags.push(tag);
     var files = this.updateFiles(newSearchTags);
     //Keep suggestions visible iff input is focused
     var inputNode = React.findDOMNode(this.refs.search.refs.tagInput.refs.input);
@@ -204,13 +205,12 @@ var App = React.createClass({
     //Remove tag from search tags
     //Update files, based on new search tags
     //Filter files.selected and files.open, based on files
-    //var newSearchTags = this.state.search.tags.delete(tagIndex);
-    var newSearchTags = React.addons.update(this.state.search.tags, {
-      $splice: [[tagIndex, 1]]
-    });
+
+    var newSearchTags = this.state.search.tags.delete(tagIndex);
     var files = this.updateFiles(newSearchTags);
+
     //Show suggestions if there are no search tags
-    var suggestionsVisible = newSearchTags.length === 0;
+    var suggestionsVisible = newSearchTags.size === 0;
     var suggestions = this.updateSuggestions(newSearchTags, this.state.search.value);
 
     this.setState({
@@ -256,7 +256,7 @@ var App = React.createClass({
     var visible;
 
     //Exception
-    if (this.state.search.tags.length === 0) {
+    if (this.state.search.tags.isEmpty()) {
       visible = true;
     }
     else {

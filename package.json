@@ -15,7 +15,6 @@
     "test": "jest"
   },
   "dependencies": {
-    "collections": "^1.2.3",
     "immutable": "^3.7.3",
     "react": "^0.13.3",
     "react-router": "^0.13.3",

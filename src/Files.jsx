@@ -10,7 +10,7 @@ var Files = React.createClass({
     filesOpen: React.PropTypes.object,
     onFileSelect: React.PropTypes.func,
     onFileToggle: React.PropTypes.func,
-    disabledTags: React.PropTypes.array,
+    disabledTags: React.PropTypes.object,
     onTagClick: React.PropTypes.func
   },
 
