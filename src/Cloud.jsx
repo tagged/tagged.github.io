@@ -11,6 +11,7 @@ var Cloud = React.createClass({
     path: React.PropTypes.object,
     folders: React.PropTypes.object,
     files: React.PropTypes.object,
+    onPathShorten: React.PropTypes.func,
   },
 
   getStyle: function() {
@@ -28,7 +29,8 @@ var Cloud = React.createClass({
     
     return (
       <div style={style.cloud}>
-          <Path path={this.props.path}/>
+          <Path path={this.props.path} 
+                onPathShorten={this.props.onPathShorten}/>
       </div>
     );
   },

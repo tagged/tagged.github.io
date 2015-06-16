@@ -456,11 +456,21 @@ var App = React.createClass({
     };
   },
 
+  handlePathShorten: function(index) {
+    var path = this.state.cloud.path.slice(0, index + 1);
+    this.setState({
+      cloud: Update(this.state.cloud, {
+        path: {$set: path}
+      })
+    });
+  },
+
   getCloudProps: function() {
     return {
       path: this.state.cloud.path,
       folders: this.state.cloud.folders,
-      files: this.state.cloud.files
+      files: this.state.cloud.files,
+      onPathShorten: this.handlePathShorten
     };
   },
   

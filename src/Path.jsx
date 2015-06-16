@@ -9,7 +9,8 @@ var Util = require('./util/util');
 var Path = React.createClass({
   
   propTypes: {
-    text: React.PropTypes.string,
+    path: React.PropTypes.object,
+    onPathShorten: React.PropTypes.func,
     style: React.PropTypes.object
   },
 
@@ -76,7 +77,8 @@ var Path = React.createClass({
       else {
         return (
           <span key={index}>
-              <span style={style.directory}>
+              <span style={style.directory} 
+                    onClick={this.props.onPathShorten.bind(null, index)}>
                   {directory}
               </span>
               {separator}
