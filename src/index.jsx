@@ -77,7 +77,7 @@ var App = React.createClass({
   //Files determine which files are allowed in files.open, files.selected
   getInitialState: function() {
     return {
-      page: Page.SEARCH,
+      page: Page.CLOUD,
       search: {
         tags: Immutable.List(),
         value: "",
@@ -91,6 +91,15 @@ var App = React.createClass({
           tags: Immutable.List(),
           title: ""
         }
+      },
+      cloud: {
+        path: Immutable.List(["Tagged Clouds", "Dropbox", "Samples"]),
+        folders: Immutable.List(),
+        files: {
+          files: Immutable.Map(),
+          open: Immutable.Set(),
+          selected: Immutable.Set(),
+        },
       },
       snackbarVisible: false,
       snackbarMessage: "",
@@ -446,15 +455,23 @@ var App = React.createClass({
       onFileDelete: this.handleFileDelete,
     };
   },
+
+  getCloudProps: function() {
+    return {
+      path: this.state.cloud.path,
+      folders: this.state.cloud.folders,
+      files: this.state.cloud.files
+    };
+  },
   
-  getPage() {
+  getPage: function() {
     var page;
     switch(this.state.page) {
       case Page.SEARCH:
         page = <Search ref="search" {...this.getSearchProps()}/>;
         break;
       case Page.CLOUD:
-        page = <Cloud/>;
+        page = <Cloud {...this.getCloudProps()}/>;
         break;
       case Page.SCRATCH:
         page = <Scratchwork/>;

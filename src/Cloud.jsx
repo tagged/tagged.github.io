@@ -1,28 +1,35 @@
 var React = require('react');
-var Tag = require('./Tag');
+var Path = require('./Path');
 var Files = require('./Files');
 var R = require('./res/index');
-var Color = R.color;
 var Dimension = R.dimension;
-
+var Util = require('./util/util');
 
 var Cloud = React.createClass({
   
   propTypes: {
-    
+    path: React.PropTypes.object,
+    folders: React.PropTypes.object,
+    files: React.PropTypes.object,
   },
 
   getStyle: function() {
     return {
-      
+      cloud: {
+        paddingTop: Dimension.space,
+        paddingLeft: Dimension.marginMobile,
+        paddingRight: Dimension.marginMobile,
+      }
     };
   },
 
   render: function() {
     var style = this.getStyle();
-
+    
     return (
-      <div></div>
+      <div style={style.cloud}>
+          <Path path={this.props.path}/>
+      </div>
     );
   },
 
