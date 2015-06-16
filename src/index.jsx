@@ -82,7 +82,7 @@ var App = React.createClass({
         tags: Immutable.List(),
         value: "",
         files: {
-          files: Immutable.Map(),
+          files: Immutable.OrderedMap(),
           open: Immutable.Set(),
           selected: Immutable.Set(),
         },

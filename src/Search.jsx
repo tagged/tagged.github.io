@@ -2,12 +2,14 @@ var React = require('react');
 var Tag = require('./Tag');
 var TagInput = require('./TagInput');
 var Subheader = require('./Subheader');
-var Files = require('./Files');
+var File = require('./File');
 var FileActionBar = require('./FileActionBar');
 
 var R = require('./res/index');
 var Color = R.color;
 var Dimension = R.dimension;
+var Util = require('./util/util');
+
 
 
 var Search = React.createClass({
@@ -62,6 +64,26 @@ var Search = React.createClass({
         }
       },
       fileActionBar: {}
+    };
+  },
+
+  getFileProps: function(file) {
+    return {
+      name: file.name,
+      path: Util.makePath(file.path),
+      modified: file.modified,
+      size: file.size,
+      type: file.type,
+      cloud: file.cloud,
+      link: file.link,
+      tags: file.tags,
+      disabledTags: this.props.searchTags,
+      onTagClick: this.props.onSearchTagAdd,
+      isSelected: this.props.filesSelected.includes(file.id),
+      isOpen: this.props.filesOpen.includes(file.id),
+      onFileSelect: this.props.onFileSelect.bind(null, file.id),
+      onFileToggle: this.props.onFileToggle.bind(null, file.id),
+      key: file.id
     };
   },
 
@@ -166,6 +188,12 @@ var Search = React.createClass({
       );
     }
 
+    var files = this.props.files.toArray().map(function(file) {
+      return (
+        <File {...this.getFileProps(file)}/>
+      );
+    }, this);
+
     var fileActionBar = null;
     if (!this.props.searchTags.isEmpty()) {
       fileActionBar = (
@@ -185,13 +213,7 @@ var Search = React.createClass({
               {tagInput}
               {suggestions}
           </div>
-          <Files files={this.props.files}
-                 filesSelected={this.props.filesSelected}
-                 filesOpen={this.props.filesOpen}
-                 onFileSelect={this.props.onFileSelect}
-                 onFileToggle={this.props.onFileToggle}
-                 disabledTags={this.props.searchTags}
-                 onTagClick={this.props.onSearchTagAdd}/>
+          {files}
           {fileActionBar}
       </div>
     );
