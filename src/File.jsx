@@ -7,6 +7,7 @@ var ImageIcon = require('./ImageIcon');
 var R = require('./res/index');
 var Color = R.color;
 var Dimension = R.dimension;
+var Image = R.image;
 var Typography = R.typography;
 var Util = require('./util/util');
 
@@ -152,7 +153,7 @@ var File = React.createClass({
       <a href={this.props.link}
          target="_blank"
          onClick={onClickFileLink}>
-          <ImageIcon cloud={this.props.cloud}
+          <ImageIcon {...Image[this.props.cloud]}
                      style={style.icon}/>
       </a>
     );

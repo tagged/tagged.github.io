@@ -1,5 +1,4 @@
 var React = require('react');
-var ImageIcon = require('./ImageIcon');
 var MaterialIcon = require('./MaterialIcon');
 var TextSingle = require('./TextSingle');
 
