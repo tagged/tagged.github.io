@@ -115,10 +115,15 @@ var App = React.createClass({
   _setStateFromHistory: function(event) {
     var page = event.state.page;
     var searchTags = Immutable.List(event.state.searchTags);
+    var path = Immutable.List(event.state.path);
+
     var value = "";
     var files = this.updateFiles(searchTags);
     var suggestionsVisible = searchTags.isEmpty() || this.searchInputIsFocused();
     var suggestions = this.updateSuggestions(searchTags, value);
+
+    var contents = this.getContents(path);
+        
     this.setState({
       page: page,
       search: Update(this.state.search, {
@@ -135,6 +140,15 @@ var App = React.createClass({
           title: {$set: suggestions.title}
         }
       }),
+      cloud: Update(this.state.cloud, {
+        path: {$set: path},
+        folders: {$set: contents.folders},
+        files: {
+          files: {$set: contents.files},
+          open: {$set: Immutable.Set()},
+          selected: {$set: Immutable.Set()}
+        }
+      }),
       snackbarVisible: false,
       snackbarMessage: "",
       snackbarAction: "",
@@ -144,10 +158,11 @@ var App = React.createClass({
 
   pushState: function() {
     //Add a browser history entry
-    //Note: cannot push Immutable.List to history, so converting to array
+    //Note: cannot push Immutable.List to history, so convert to array
     window.history.pushState({
       page: this.state.page,
-      searchTags: this.state.search.tags.toArray()
+      searchTags: this.state.search.tags.toArray(),
+      path: this.state.cloud.path.toArray()
     }, '');
   },
 
@@ -155,8 +170,11 @@ var App = React.createClass({
     //Give first page a non-null state object
     window.history.replaceState({
       page: this.state.page,
-      searchTags: this.state.search.tags.toArray()
+      searchTags: this.state.search.tags.toArray(),
+      path: this.state.cloud.path.toArray()
     }, '');
+
+    //Listen for page changes
     window.addEventListener('popstate', this._setStateFromHistory);
 
     //Initial tag suggestions
@@ -175,6 +193,7 @@ var App = React.createClass({
   },
 
   componentWillUnmount: function() {
+    //Stop listening for page changes
     window.removeEventListener('popstate', this._setStateFromHistory);
   },
 
@@ -216,9 +235,7 @@ var App = React.createClass({
           title: {$set: suggestions.title}
         }
       }),
-    }, function() {
-      this.pushState();
-    });
+    }, this.pushState);
   },
 
   deleteSearchTag: function(tagIndex) {
@@ -247,9 +264,7 @@ var App = React.createClass({
           title: {$set: suggestions.title}
         }
       }),
-    }, function() {
-      this.pushState();
-    });
+    }, this.pushState);
   },
 
   handleSearchValueChange: function(event) {
@@ -531,7 +546,7 @@ var App = React.createClass({
           open: {$set: Immutable.Set()}
         }
       })
-    });
+    }, this.pushState);
   },
 
   handlePathLengthen: function(folder) {
@@ -549,7 +564,7 @@ var App = React.createClass({
           open: {$set: Immutable.Set()}
         }
       })
-    });
+    }, this.pushState);
   },
 
   getContents: function(path) {
@@ -600,9 +615,7 @@ var App = React.createClass({
   navigate: function(page) {
     this.setState({
       page: page
-    }, function() {
-      this.pushState();
-    });
+    }, this.pushState);
   },
 
   getStyle: function() {
