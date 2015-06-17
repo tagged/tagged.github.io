@@ -345,12 +345,38 @@ var App = React.createClass({
     });
   },
 
+  handleCloudFileToggle: function(fileId) {
+    var filesOpen = this.state.cloud.files.open.includes(fileId) ?
+                    this.state.cloud.files.open.delete(fileId) :
+                    this.state.cloud.files.open.add(fileId);
+    this.setState({
+      cloud: Update(this.state.cloud, {
+        files: {
+          open: {$set: filesOpen}
+        }
+      })
+    });
+  },
+
   handleFileSelect: function(fileId) {
     var filesSelected = this.state.search.files.selected.includes(fileId) ?
                         this.state.search.files.selected.delete(fileId) :
                         this.state.search.files.selected.add(fileId);
     this.setState({
       search: Update(this.state.search, {
+        files: {
+          selected: {$set: filesSelected}
+        }
+      })
+    });
+  },
+
+  handleCloudFileSelect: function(fileId) {
+    var filesSelected = this.state.cloud.files.selected.includes(fileId) ?
+                        this.state.cloud.files.selected.delete(fileId) :
+                        this.state.cloud.files.selected.add(fileId);
+    this.setState({
+      cloud: Update(this.state.cloud, {
         files: {
           selected: {$set: filesSelected}
         }
@@ -468,39 +494,60 @@ var App = React.createClass({
 
   handlePathShorten: function(index) {
     var path = this.state.cloud.path.slice(0, index + 1);
-    var folders = this.getFolders(path);
+    var contents = this.getContents(path);
+    var folders = contents.folders;
+    var files = contents.files;
     this.setState({
       cloud: Update(this.state.cloud, {
         path: {$set: path},
-        folders: {$set: folders}
+        folders: {$set: folders},
+        files: {
+          files: {$set: files},
+          selected: {$set: Immutable.Set()},
+          open: {$set: Immutable.Set()}
+        }
       })
     });
   },
 
   handlePathLengthen: function(folder) {
     var path = this.state.cloud.path.push(folder);
-    var folders = this.getFolders(path);
+    var contents = this.getContents(path);
+    var folders = contents.folders;
+    var files = contents.files;
     this.setState({
       cloud: Update(this.state.cloud, {
         path: {$set: path},
-        folders: {$set: folders}
+        folders: {$set: folders},
+        files: {
+          files: {$set: files},
+          selected: {$set: Immutable.Set()},
+          open: {$set: Immutable.Set()}
+        }
       })
     });
   },
 
-  getFolders: function(path) {
+  getContents: function(path) {
     //Use all but first item of path
-    return _Database.getFolders(path.rest());
+    return _Database.getContents(path.rest());
   },
 
   getCloudProps: function() {
     return {
       path: this.state.cloud.path,
       folders: this.state.cloud.folders,
-      files: this.state.cloud.files,
+      accounts: this.state.accounts,
+
+      files: this.state.cloud.files.files,
+      filesSelected: this.state.cloud.files.selected,
+      filesOpen: this.state.cloud.files.open,
+      
       onPathShorten: this.handlePathShorten,
       onPathLengthen: this.handlePathLengthen,
-      accounts: this.state.accounts
+
+      onFileToggle: this.handleCloudFileToggle,
+      onFileSelect: this.handleCloudFileSelect,
     };
   },
   

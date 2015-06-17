@@ -1,3 +1,5 @@
+//Sample files, by folder
+
 module.exports = [
   {
     name: 'Dropbox',
@@ -6,7 +8,13 @@ module.exports = [
       {
         name: 'Apps',
         isFolder: true,
-        contents: []
+        contents: [
+          {
+            name: 'TaggedClouds',
+            isFolder: true,
+            contents: []
+          }
+        ]
       },
       {
         name: 'Samples',
@@ -14,12 +22,15 @@ module.exports = [
         contents: [
           {
             isFolder: false,
-            id: '20123',
-            name: 'Getting Started',
-            size: '2.5 KB',
-            modified: '2015 Aug 28',
+                id: '20123',
+            name: 'Getting Started With a really really really really really Long Title',
+            path: ['Dropbox','Samples'],
+            modified: '2015 Feb 28',
+            size: '25 KB',
             type: 'PDF',
-            tags: ['basic']
+            cloud: 'Dropbox',
+            link: '//www.dropbox.com/home',
+            tags: ['pork','pork shoulder','honey','five spice','food.ingredients.sauces.oyster','red bean paste', 'shoyu'],
           },
           {
             name: 'Recipes',
@@ -27,30 +38,27 @@ module.exports = [
             contents: [
               {
                 isFolder: false,
-                id: '20188',
-                name: 'char siu',
-                size: '5.9 KB',
-                modified: '2012 Aug 28',
-                type: 'PDF',
-                tags: ['basic']
-              },
-              {
-                isFolder: false,
                 id: '83748',
-                name: "pork ribs",
-                modified: "2014 Aug 12",
-                size: "2.1 KB",
-                type: "DOCX",
-                tags: ["pork","ribs","honey","vinegar"],
+                name: 'pork ribs',
+                path: ['Dropbox','Samples','Recipes'],
+                modified: '2014 Aug 12',
+                size: '2 KB',
+                type: 'DOCX',
+                cloud: 'Dropbox',
+                link: '//www.dropbox.com/home',
+                tags: ['pork','ribs','honey','vinegar'],
               },
               {
                 isFolder: false,
-                id: "37428",
-                name: "Spicy pork bulgogi",
-                modified: "2014 Aug 12",
-                size: "2 KB",
-                type: "DOCX",
-                tags: ["gochujang","gochugaru","pork","pork shoulder","spicy"],
+                id: '37428',
+                name: 'Spicy pork bulgogi',
+                path: ['Dropbox','Samples','Recipes'],
+                modified: '2014 Aug 12',
+                size: '2 KB',
+                type: 'DOCX',
+                cloud: 'Dropbox',
+                link: '//dropbox.com/home',
+                tags: ['gochujang','gochugaru','pork','pork shoulder','spicy'],
               }
             ]
           }

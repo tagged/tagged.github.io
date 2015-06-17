@@ -129,11 +129,13 @@ module.exports = {
 
 
   /**
-   * Return an Immutable.List of folder names at the specified path.
+   * Return an object of folders and files at the specified path.
+   * folders is an Immutable.List of folder names
+   * files is an Immutable.List of file objects
    *
    * @param path an Immutable.List of strings representing a directory path
    */
-  getFolders: function(path) {
+  getContents: function(path) {
     var contents = _cloud;
     //follow folders along path
     path.forEach(function(folder) {
@@ -141,14 +143,24 @@ module.exports = {
         return item.name === folder && item.isFolder;
       }).contents;
     });
-    //folders only
-    var folders = Immutable.List(contents).filter(function(item) {
+
+    contents = Immutable.List(contents);
+
+    var folders = contents.filter(function(item) {
       return item.isFolder;
-    });
-    //return folder names
-    return folders.map(function(folder) {
+    }).map(function(folder) {
+      //Folder names only
       return folder.name;
     });
+
+    var files = contents.filter(function(item) {
+      return !item.isFolder;
+    });
+
+    return {
+      folders: folders,
+      files: files
+    };
   }
 
 };
