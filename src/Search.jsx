@@ -42,6 +42,9 @@ var Search = React.createClass({
   getStyle: function() {
     return {
       search: {
+        paddingBottom: Dimension.heightActionBar + Dimension.space + Dimension.quantum
+      },
+      searchHeader: {
         paddingTop: 3 * Dimension.space,
         paddingBottom: Dimension.space,
         paddingLeft: Dimension.marginMobile,
@@ -206,8 +209,8 @@ var Search = React.createClass({
     }
 
     return (
-      <div>
-          <div style={style.search}>
+      <div style={style.search}>
+          <div style={style.searchHeader}>
               {searchTags}
               {tagInput}
               {suggestions}

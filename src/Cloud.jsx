@@ -30,6 +30,9 @@ var Cloud = React.createClass({
 
   getStyle: function() {
     return {
+      cloud: {
+        paddingBottom: Dimension.heightActionBar + Dimension.space + Dimension.quantum
+      },
       path: {
         path: {
           marginTop: Dimension.space,
