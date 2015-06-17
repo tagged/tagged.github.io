@@ -1,8 +1,10 @@
 var React = require('react');
 var Path = require('./Path');
 var Folder = require('./Folder');
-var File = require('./File');
 var CloudFolder = require('./CloudFolder');
+var File = require('./File');
+var FileActionBar = require('./FileActionBar');
+
 var R = require('./res/index');
 var Dimension = R.dimension;
 var Providers = R.providers;
@@ -12,12 +14,18 @@ var Immutable = require('immutable');
 var Cloud = React.createClass({
   
   propTypes: {
+    accounts: React.PropTypes.object,
     path: React.PropTypes.object,
     folders: React.PropTypes.object,
     files: React.PropTypes.object,
+
     onPathShorten: React.PropTypes.func,
     onPathLengthen: React.PropTypes.func,
-    accounts: React.PropTypes.object,
+
+    onFileToggle: React.PropTypes.func,
+    onFileSelect: React.PropTypes.func,
+    onFileSelectAll: React.PropTypes.func,
+    onFileUnselectAll: React.PropTypes.func,
   },
 
   getStyle: function() {
@@ -85,6 +93,17 @@ var Cloud = React.createClass({
       );
     }, this);
 
+    var fileActionBar = null;
+    if (this.props.path.size > 1) {
+      fileActionBar = (
+        <FileActionBar numberOfFiles={this.props.files.size}
+                       numberOfFilesSelected={this.props.filesSelected.size}
+                       onSelectAll={this.props.onFileSelectAll}
+                       onUnselectAll={this.props.onFileUnselectAll}
+                       onDelete={this.props.onFileDelete}/>
+      );
+    }
+
     return (
       <div style={style.cloud}>
           <Path path={this.props.path} 
@@ -92,6 +111,7 @@ var Cloud = React.createClass({
                 style={style.path}/>
           {folders}
           {files}
+          {fileActionBar}
       </div>
     );
   },

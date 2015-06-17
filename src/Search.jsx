@@ -62,8 +62,7 @@ var Search = React.createClass({
           cursor: 'pointer',
           outlineColor: Color.blue500
         }
-      },
-      fileActionBar: {}
+      }
     };
   },
 

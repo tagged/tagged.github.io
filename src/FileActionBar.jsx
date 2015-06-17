@@ -30,6 +30,12 @@ var FileActionBar = React.createClass({
     style: React.PropTypes.object
   },
 
+  getDefaultProps: function() {
+    return {
+      style: {}
+    };
+  },
+
   getStyle: function(checkStatus) {
     return {
       root: {

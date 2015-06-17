@@ -398,9 +398,33 @@ var App = React.createClass({
     });
   },
 
+  handleCloudFileSelectAll: function() {
+    var filesSelected = this.state.cloud.files.files.map(function(file) {
+      return file.id;
+    }).toSet();
+
+    this.setState({
+      cloud: Update(this.state.cloud, {
+        files: {
+          selected: {$set: filesSelected}
+        }
+      })
+    });
+  },
+
   handleFileUnselectAll: function() {
     this.setState({
       search: Update(this.state.search, {
+        files: {
+          selected: {$set: Immutable.Set()}
+        }
+      })
+    });
+  },
+
+  handleCloudFileUnselectAll: function() {
+    this.setState({
+      cloud: Update(this.state.cloud, {
         files: {
           selected: {$set: Immutable.Set()}
         }
@@ -535,10 +559,10 @@ var App = React.createClass({
 
   getCloudProps: function() {
     return {
+      accounts: this.state.accounts,
       path: this.state.cloud.path,
       folders: this.state.cloud.folders,
-      accounts: this.state.accounts,
-
+      
       files: this.state.cloud.files.files,
       filesSelected: this.state.cloud.files.selected,
       filesOpen: this.state.cloud.files.open,
@@ -548,6 +572,9 @@ var App = React.createClass({
 
       onFileToggle: this.handleCloudFileToggle,
       onFileSelect: this.handleCloudFileSelect,
+      onFileSelectAll: this.handleCloudFileSelectAll,
+      onFileUnselectAll: this.handleCloudFileUnselectAll,
+      onFileDelete: this.handleCloudFileDelete,
     };
   },
   
