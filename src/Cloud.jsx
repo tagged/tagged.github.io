@@ -16,10 +16,12 @@ var Cloud = React.createClass({
 
   getStyle: function() {
     return {
-      cloud: {
-        paddingTop: Dimension.space,
-        paddingLeft: Dimension.marginMobile,
-        paddingRight: Dimension.marginMobile,
+      path: {
+        path: {
+          marginTop: Dimension.space,
+          paddingLeft: Dimension.marginMobile,
+          paddingRight: Dimension.marginMobile,
+        }
       }
     };
   },
@@ -30,7 +32,8 @@ var Cloud = React.createClass({
     return (
       <div style={style.cloud}>
           <Path path={this.props.path} 
-                onPathShorten={this.props.onPathShorten}/>
+                onPathShorten={this.props.onPathShorten}
+                style={style.path}/>
       </div>
     );
   },

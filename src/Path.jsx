@@ -55,7 +55,7 @@ var Path = React.createClass({
   },
 
   render: function() {
-    var style = this.getStyle();
+    var style = Util.merge(this.getStyle(), this.props.style);
     
     var separator = (
       <svg viewBox={"0 0 " + Dimension.icon + " " + Dimension.icon} style={style.separator}>
