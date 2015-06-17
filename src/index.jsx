@@ -94,7 +94,7 @@ var App = React.createClass({
       },
       cloud: {
         path: Immutable.List(["Tagged Clouds", "Dropbox", "Samples"]),
-        folders: Immutable.List(),
+        folders: Immutable.List(["Apps", "Really really really really really really really long folder name", "Samples"]),
         files: {
           files: Immutable.Map(),
           open: Immutable.Set(),
