@@ -465,12 +465,22 @@ var App = React.createClass({
     });
   },
 
+  handlePathLengthen: function(folder) {
+    var path = this.state.cloud.path.push(folder);
+    this.setState({
+      cloud: Update(this.state.cloud, {
+        path: {$set: path}
+      })
+    });
+  },
+
   getCloudProps: function() {
     return {
       path: this.state.cloud.path,
       folders: this.state.cloud.folders,
       files: this.state.cloud.files,
-      onPathShorten: this.handlePathShorten
+      onPathShorten: this.handlePathShorten,
+      onPathLengthen: this.handlePathLengthen,
     };
   },
   

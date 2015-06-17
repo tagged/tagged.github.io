@@ -13,6 +13,7 @@ var Cloud = React.createClass({
     folders: React.PropTypes.object,
     files: React.PropTypes.object,
     onPathShorten: React.PropTypes.func,
+    onPathLengthen: React.PropTypes.func,
   },
 
   getStyle: function() {
@@ -32,9 +33,11 @@ var Cloud = React.createClass({
     
     var folders = this.props.folders.map(function(folder) {
       return (
-        <Folder name={folder} key={folder}/>
+        <Folder name={folder} 
+                onClick={this.props.onPathLengthen.bind(null, folder)}
+                key={folder}/>
       );
-    });
+    }, this);
 
     return (
       <div style={style.cloud}>

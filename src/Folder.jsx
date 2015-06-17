@@ -42,13 +42,19 @@ var Folder = React.createClass({
     };
   },
 
+  openMenu: function(event) {
+    event.stopPropagation();
+  },
+
   render: function() {
     var style = this.getStyle();
 
     return (
-      <div style={style.folder}>
+      <div style={style.folder} onClick={this.props.onClick}>
           <MaterialIcon d={Icon.folder} style={style.leftIcon}/>
-          <MaterialIcon d={Icon.moreVert} style={style.rightIcon}/>
+          <MaterialIcon d={Icon.moreVert} 
+                        onClick={this.openMenu}
+                        style={style.rightIcon}/>
           <TextSingle text={this.props.name} style={style.text}/>
       </div>
     );
