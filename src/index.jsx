@@ -198,9 +198,14 @@ var App = React.createClass({
   },
 
   searchInputIsFocused: function() {
-    //Return true if search input is focused
-    var inputNode = React.findDOMNode(this.refs.search.refs.tagInput.refs.input);
-    return inputNode === document.activeElement;
+    //Return false if not in SEARCH mode
+
+    if ('search' in this.refs) {
+      //Return true if search input is focused
+      var inputNode = React.findDOMNode(this.refs.search.refs.tagInput.refs.input);
+      return inputNode === document.activeElement;
+    }
+    return false;
   },
 
   addSearchTag: function(tag) {
@@ -216,6 +221,7 @@ var App = React.createClass({
     
     var newSearchTags = this.state.search.tags.push(tag);
     var files = this.updateFiles(newSearchTags);
+
     //Keep suggestions visible if input is focused
     var suggestionsVisible = this.searchInputIsFocused();
     var suggestions = this.updateSuggestions(newSearchTags, "");
