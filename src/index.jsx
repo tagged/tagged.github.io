@@ -462,20 +462,29 @@ var App = React.createClass({
 
   handlePathShorten: function(index) {
     var path = this.state.cloud.path.slice(0, index + 1);
+    var folders = this.getFolders(path);
     this.setState({
       cloud: Update(this.state.cloud, {
-        path: {$set: path}
+        path: {$set: path},
+        folders: {$set: folders}
       })
     });
   },
 
   handlePathLengthen: function(folder) {
     var path = this.state.cloud.path.push(folder);
+    var folders = this.getFolders(path);
     this.setState({
       cloud: Update(this.state.cloud, {
-        path: {$set: path}
+        path: {$set: path},
+        folders: {$set: folders}
       })
     });
+  },
+
+  getFolders: function(path) {
+    //Use all but first item of path
+    return _Database.getFolders(path.rest());
   },
 
   getCloudProps: function() {

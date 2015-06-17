@@ -4,6 +4,8 @@ var Immutable = require('immutable');
 var _Files = require('./_files');
 var _files = Immutable.Map(_Files);
 
+var _cloud = require('./_cloud');
+
 module.exports = {
 
   //Eventually move to database logic
@@ -97,6 +99,7 @@ module.exports = {
   },
   
 
+
   /**
    * Returns tags suggestions based on specified search tags and search value
    * Return type is Immutable.List
@@ -124,6 +127,31 @@ module.exports = {
       }
     }
     return label;
+  },
+
+
+
+  /**
+   * Return an Immutable.List of folder names at the specified path.
+   *
+   * @param path an Immutable.List of strings representing a directory path
+   */
+  getFolders: function(path) {
+    var contents = _cloud;
+    //follow folders along path
+    path.forEach(function(folder) {
+      contents = Immutable.List(contents).find(function(item) {
+        return item.name === folder && item.isFolder;
+      }).contents;
+    });
+    //folders only
+    var folders = Immutable.List(contents).filter(function(item) {
+      return item.isFolder;
+    });
+    //return folder names
+    return folders.map(function(folder) {
+      return folder.name;
+    });
   }
 
 };
