@@ -77,6 +77,10 @@ var App = React.createClass({
   //Files determine which files are allowed in files.open, files.selected
   getInitialState: function() {
     return {
+      accounts: {
+        'Dropbox': "j.doe@gmail.com",
+        'Google Drive': null
+      },
       page: Page.CLOUD,
       search: {
         tags: Immutable.List(),
@@ -93,8 +97,8 @@ var App = React.createClass({
         }
       },
       cloud: {
-        path: Immutable.List(["Tagged Clouds", "Dropbox", "Samples"]),
-        folders: Immutable.List(["Apps", "Really really really really really really really long folder name", "Samples"]),
+        path: Immutable.List(["Tagged Clouds"]),
+        folders: Immutable.List(),
         files: {
           files: Immutable.Map(),
           open: Immutable.Set(),
@@ -481,6 +485,7 @@ var App = React.createClass({
       files: this.state.cloud.files,
       onPathShorten: this.handlePathShorten,
       onPathLengthen: this.handlePathLengthen,
+      accounts: this.state.accounts
     };
   },
   
