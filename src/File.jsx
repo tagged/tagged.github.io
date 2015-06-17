@@ -80,10 +80,10 @@ var File = React.createClass({
           outlineColor: Color.blackHint
         }
       },
-      icon: {
+      rightIcon: {
+        display: 'block',
         float: 'right',
         marginLeft: Dimension.quantum,
-        userSelect: 'none'
       }
     };
   },
@@ -152,9 +152,10 @@ var File = React.createClass({
     var fileLink = (
       <a href={this.props.link}
          target="_blank"
-         onClick={onClickFileLink}>
-          <ImageIcon {...Image[this.props.cloud]}
-                     style={style.icon}/>
+         onClick={onClickFileLink}
+         tabIndex="1"
+         style={style.rightIcon}>
+          <ImageIcon {...Image[this.props.cloud]}/>
       </a>
     );
 

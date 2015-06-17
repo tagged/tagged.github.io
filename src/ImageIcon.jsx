@@ -17,6 +17,7 @@ var ImageIcon = React.createClass({
 
   getStyle: function() {
     return {
+      display: 'block',
       height: Dimension.touchTarget,
       width: Dimension.touchTarget
     };
