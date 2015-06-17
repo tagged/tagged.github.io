@@ -11,26 +11,23 @@ module.exports = {
   //Eventually move to database logic
 
   /**
-   * Returns files with the specified tags
-   * Return type is Immutable.Map
+   * Returns Immutable.List of files containing the specified tags
    *
-   * @param tags The tags guiding the file search. 
-   *             Type should be Immutable.List.
+   * @param tags Immutable.List of tags guiding the file search
    */
   getFiles: function(tags) {
-
     if (tags.isEmpty()) {
-      return Immutable.Map();
+      return Immutable.List();
     }
     
     var tagSet = tags.toSet();
     
-    var _newFiles = _files.filter(function(file, fileId) {
-      //Keep only files that contain all tags
+    //Keep files that contain all tags
+    var files = _files.filter(function(file) {
       return tagSet.intersect(file.tags).size === tagSet.size;
     });
 
-    return _newFiles;
+    return files.toList();
   },
 
 

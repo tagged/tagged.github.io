@@ -188,7 +188,7 @@ var Search = React.createClass({
       );
     }
 
-    var files = this.props.files.toArray().map(function(file) {
+    var files = this.props.files.map(function(file) {
       return (
         <File {...this.getFileProps(file)}/>
       );

@@ -86,7 +86,7 @@ var App = React.createClass({
         tags: Immutable.List(),
         value: "",
         files: {
-          files: Immutable.OrderedMap(),
+          files: Immutable.List(),
           open: Immutable.Set(),
           selected: Immutable.Set(),
         },
@@ -100,7 +100,7 @@ var App = React.createClass({
         path: Immutable.List(["Tagged Clouds"]),
         folders: Immutable.List(),
         files: {
-          files: Immutable.Map(),
+          files: Immutable.List(),
           open: Immutable.Set(),
           selected: Immutable.Set(),
         },
@@ -309,17 +309,20 @@ var App = React.createClass({
     //Returns what the next state of files, files selected, and files open
     //would look like, given the search tags
 
-    console.log('hit database for files');
+    console.log('ask database for files');
 
     var files = _Database.getFiles(searchTags);
+    var fileIds = files.map(function(file) {
+      return file.id;
+    }).toSet();
     var selected = this.state.search.files.selected.filter(
       function(fileId) {
-        return files.has(fileId);
+        return fileIds.has(fileId);
       }
     );
     var open = this.state.search.files.open.filter(
       function(fileId) {
-        return files.has(fileId);
+        return fileIds.has(fileId);
       }
     );
     return {
@@ -356,7 +359,10 @@ var App = React.createClass({
   },
 
   handleFileSelectAll: function() {
-    var filesSelected = Immutable.Set.fromKeys(this.state.search.files.files);
+    var filesSelected = this.state.search.files.files.map(function(file) {
+      return file.id;
+    }).toSet();
+
     this.setState({
       search: Update(this.state.search, {
         files: {
@@ -409,9 +415,9 @@ var App = React.createClass({
       });
     }.bind(this);
     
-    //Optimistically update files - remove ids in files.selected from files
-    var files = this.state.search.files.files.filter(function(file, fileId) {
-      return !this.state.search.files.selected.includes(fileId);
+    //Optimistically update files - remove files with ids in files.selected
+    var files = this.state.search.files.files.filter(function(file) {
+      return !this.state.search.files.selected.includes(file.id);
     }, this);
 
     //Optimistically update files.selected
