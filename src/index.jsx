@@ -564,6 +564,7 @@ var App = React.createClass({
         color: Color.blackPrimary,
         fontFamily: 'Roboto, sans-serif',
         WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+        paddingBottom: Dimension.heightAppBarMobile,
         height: '100%'
       },
       appBar: {
