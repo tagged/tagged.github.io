@@ -72,11 +72,22 @@ var Cloud = React.createClass({
     //Special folder for each cloud provider
     if (this.props.path.size === 1) {
       folders = Providers.map(function(provider) {
+        var account = this.props.accounts[provider.name];
+        var onClick;
+        if (account === null) {
+          account = "Sign in";
+          onClick = function() {
+            window.open(provider.login, '_blank');
+          };
+        }
+        else {
+          onClick = this.props.onPathLengthen.bind(null, provider.name);
+        }
         return (
-          <CloudFolder account={this.props.accounts[provider] || "Sign in"}
-                       provider={provider}
-                       onClick={this.props.onPathLengthen.bind(null, provider)}
-                       key={provider}/>
+          <CloudFolder account={account}
+                       provider={provider.name}
+                       onClick={onClick}
+                       key={provider.name}/>
         )
       }, this);
     }

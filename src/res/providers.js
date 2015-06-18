@@ -1,4 +1,10 @@
 module.exports = [
-  'Dropbox', 
-  'Google Drive'
+  { 
+    name: 'Dropbox',
+    login: '//www.dropbox.com/home'
+  },
+  {
+    name: 'Google Drive',
+    login: '//drive.google.com'
+  }
 ];

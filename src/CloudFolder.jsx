@@ -53,7 +53,8 @@ var CloudFolder = React.createClass({
     var style = this.getStyle();
 
     return (
-      <div style={style.folder} onClick={this.props.onClick}>
+      <div style={style.folder}
+           onClick={this.props.onClick}>
           <ImageIcon {...Image[this.props.provider]} style={style.leftIcon}/>
           <MaterialIcon d={Icon.moreVert}
                         onClick={this.openMenu}
