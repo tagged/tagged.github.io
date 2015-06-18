@@ -548,6 +548,9 @@ var App = React.createClass({
   },
 
   navigate: function(page) {
+    if (page === this.state.page) {
+      return;
+    }
     this.setState({
       page: page
     }, this.pushState);
