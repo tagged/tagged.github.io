@@ -2,6 +2,7 @@ var React = require('react/addons');
 var MaterialIcon = require('./MaterialIcon');
 var ActionBar = require('./ActionBar');
 var Snackbar = require('./Snackbar');
+var Subheader = require('./Subheader');
 var R = require('./res/index');
 var Color = R.color;
 var Icon = R.icon;
@@ -31,6 +32,15 @@ var Scratchwork = React.createClass({
                     onAction={function(){alert('Undone!')}}/>
           
           <ActionBar style={actionBarStyle}>
+              <MaterialIcon action="Upload"
+                            d={Icon.upload}
+                            fill={Color.whitePrimary}
+                            fillOpacity={1}
+                            style={{clearance: {width: 24},
+                                    svg: {left: 0}}}/>
+              <Subheader action="Upload" 
+                         text="UPLOAD"
+                         style={{color: 'white'}}/>
               <div action="Blackify" style={{backgroundColor: 'black', width:48, height: 48}}/>
               <div action="Grayify" style={{backgroundColor: 'gray', width:48, height: 48}}/>
               <div action="Indigoify" style={{backgroundColor: 'indigo', width:48, height: 48}}/>

@@ -104,7 +104,8 @@ var Cloud = React.createClass({
                        numberOfFilesSelected={this.props.filesSelected.size}
                        onSelectAll={this.props.onFileSelectAll}
                        onUnselectAll={this.props.onFileUnselectAll}
-                       onDelete={this.props.onFileDelete}/>
+                       onDelete={this.props.onFileDelete}
+                       canUpload={true}/>
       );
     }
 

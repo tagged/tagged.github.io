@@ -27,6 +27,7 @@ var FileActionBar = React.createClass({
     onSelectAll: React.PropTypes.func,
     onUnselectAll: React.PropTypes.func,
     onDelete: React.PropTypes.func,
+    canUpload: React.PropTypes.bool,
     style: React.PropTypes.object
   },
 
@@ -67,6 +68,12 @@ var FileActionBar = React.createClass({
           top: 'auto',
         }
       },
+      upload: {
+        color: Color.whitePrimary,
+        cursor: 'pointer',
+        paddingLeft: Dimension.marginMobile,
+        paddingRight: Dimension.marginMobile,
+      }
     };
   },
 
@@ -108,6 +115,15 @@ var FileActionBar = React.createClass({
                           fill={Color.white}
                           fillOpacity={Color.whitePrimaryOpacity}
                           onClick={this.props.onDelete}/>
+        </ActionBar>
+      );
+    }
+    else if (this.props.canUpload) {
+      actionBar = (
+        <ActionBar style={style.actionBar}>
+            <Subheader action="Upload"
+                       text="UPLOAD"
+                       style={style.upload}/>
         </ActionBar>
       );
     }
