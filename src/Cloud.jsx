@@ -55,7 +55,7 @@ var Cloud = React.createClass({
       link: file.link,
       tags: file.tags,
       disabledTags: Immutable.List(), //none
-      onTagClick: function() {}, //nothing
+      onTagClick: Util.noop, //nothing
       isSelected: this.props.filesSelected.includes(file.id),
       isOpen: this.props.filesOpen.includes(file.id),
       onFileSelect: this.props.onFileSelect.bind(null, file.id),

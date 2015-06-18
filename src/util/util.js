@@ -19,6 +19,8 @@ var properties = Immutable.Set([
 
 module.exports = {
 
+  noop: function() {},
+
   getDOMNodeComputedStyle: function(ref, property) {
     //Of a rendered React element
     var node = React.findDOMNode(ref);

@@ -18,6 +18,8 @@ var Dimension = R.dimension;
 var Icon = R.icon;
 var Shadow = R.shadow;
 
+var Util = require('./util/util');
+
 var Page = R.constant.page;
 
 var _Database = require('./res/_database');
@@ -62,7 +64,7 @@ var App = React.createClass({
       snackbarVisible: false,
       snackbarMessage: "",
       snackbarAction: "",
-      snackbarAct: function() {}      
+      snackbarAct: Util.noop     
     };
   },
 
@@ -106,7 +108,7 @@ var App = React.createClass({
       snackbarVisible: false,
       snackbarMessage: "",
       snackbarAction: "",
-      snackbarAct: function() {}
+      snackbarAct: Util.noop
     });
   },
 
