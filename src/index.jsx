@@ -352,159 +352,134 @@ var App = React.createClass({
       open: open
     };
   },
-  
-  handleFileToggle: function(fileId) {
-    var filesOpen = this.state.search.files.open.includes(fileId) ?
-                    this.state.search.files.open.delete(fileId) :
-                    this.state.search.files.open.add(fileId);
-    this.setState({
-      search: Update(this.state.search, {
-        files: {
-          open: {$set: filesOpen}
-        }
-      })
-    });
+ 
+  /**
+   * Setting nested file state is identical for search and cloud states.
+   *
+   * Note: Instead of using this.state.page, this method takes paramter
+   * `page` specifying the page for which to set the file state, because
+   * this.state.page may change before this method is called. As an example,
+   * see the timeout behavior in handleFileDelete.
+   *
+   * @param page Must be 'search' or 'cloud'
+   * @param fileUpdate An object using the React Immutability Helper syntax
+   */
+  setFileState: function(page, fileUpdate) {
+    if (page === Page.SEARCH) {
+      this.setState({
+        search: Update(this.state.search, fileUpdate)
+      });
+    }
+    else if (page === Page.CLOUD) {
+      this.setState({
+        cloud: Update(this.state.cloud, fileUpdate)
+      });
+    }
   },
 
-  handleCloudFileToggle: function(fileId) {
-    var filesOpen = this.state.cloud.files.open.includes(fileId) ?
-                    this.state.cloud.files.open.delete(fileId) :
-                    this.state.cloud.files.open.add(fileId);
-    this.setState({
-      cloud: Update(this.state.cloud, {
-        files: {
-          open: {$set: filesOpen}
-        }
-      })
+  handleFileToggle: function(fileId) {
+    var page = this.state.page;
+    var filesOpen = this.state[page].files.open.includes(fileId) ?
+                    this.state[page].files.open.delete(fileId) :
+                    this.state[page].files.open.add(fileId);
+    this.setFileState(page, {
+      files: {
+        open: {$set: filesOpen}
+      }
     });
   },
 
   handleFileSelect: function(fileId) {
-    var filesSelected = this.state.search.files.selected.includes(fileId) ?
-                        this.state.search.files.selected.delete(fileId) :
-                        this.state.search.files.selected.add(fileId);
-    this.setState({
-      search: Update(this.state.search, {
-        files: {
-          selected: {$set: filesSelected}
-        }
-      })
-    });
-  },
-
-  handleCloudFileSelect: function(fileId) {
-    var filesSelected = this.state.cloud.files.selected.includes(fileId) ?
-                        this.state.cloud.files.selected.delete(fileId) :
-                        this.state.cloud.files.selected.add(fileId);
-    this.setState({
-      cloud: Update(this.state.cloud, {
-        files: {
-          selected: {$set: filesSelected}
-        }
-      })
+    var page = this.state.page;
+    var filesSelected = this.state[page].files.selected.includes(fileId) ?
+                        this.state[page].files.selected.delete(fileId) :
+                        this.state[page].files.selected.add(fileId);
+    this.setFileState(page, {
+      files: {
+        selected: {$set: filesSelected}
+      }
     });
   },
 
   handleFileSelectAll: function() {
-    var filesSelected = this.state.search.files.files.map(function(file) {
+    var page = this.state.page;
+    var filesSelected = this.state[page].files.files.map(function(file) {
       return file.id;
     }).toSet();
 
-    this.setState({
-      search: Update(this.state.search, {
-        files: {
-          selected: {$set: filesSelected}
-        }
-      })
-    });
-  },
-
-  handleCloudFileSelectAll: function() {
-    var filesSelected = this.state.cloud.files.files.map(function(file) {
-      return file.id;
-    }).toSet();
-
-    this.setState({
-      cloud: Update(this.state.cloud, {
-        files: {
-          selected: {$set: filesSelected}
-        }
-      })
+    this.setFileState(page, {
+      files: {
+        selected: {$set: filesSelected}
+      }
     });
   },
 
   handleFileUnselectAll: function() {
-    this.setState({
-      search: Update(this.state.search, {
-        files: {
-          selected: {$set: Immutable.Set()}
-        }
-      })
-    });
-  },
-
-  handleCloudFileUnselectAll: function() {
-    this.setState({
-      cloud: Update(this.state.cloud, {
-        files: {
-          selected: {$set: Immutable.Set()}
-        }
-      })
+    var page = this.state.page;
+    this.setFileState(page, {
+      files: {
+        selected: {$set: Immutable.Set()}
+      }
     });
   },
 
   handleFileDelete: function() {
+    var page = this.state.page;
+
     //If no files selected, do nothing
-    if (this.state.search.files.selected.size === 0) {
+    if (this.state[page].files.selected.size === 0) {
       return;
     }
 
     //Hide snackbar and delete files after delay
     var snackbarDelay = 2000;
     var snackbarTimeoutId = window.setTimeout(function() {
-      //(Delete in database)
-      //alert('Files deleted in database!');
+      //Delete files in database
+      console.log('delete files in database');
       this.setState({
         snackbarVisible: false
       });
     }.bind(this), snackbarDelay);
 
     //Cancel snackbar
-    var filesBeforeDelete = this.state.search.files.files;
-    var filesSelectedBeforeDelete = this.state.search.files.selected;
+    var filesBeforeDelete = this.state[page].files.files;
+    var filesSelectedBeforeDelete = this.state[page].files.selected;
     var undoDelete = function() {
       window.clearTimeout(snackbarTimeoutId);
       //Reset files.files, files.selected to their states before delete
+      this.setFileState(page, {
+        files: {
+          files: {$set: filesBeforeDelete},
+          selected: {$set: filesSelectedBeforeDelete}
+        }
+      });
       this.setState({
-        search: Update(this.state.search, {
-          files: {
-            files: {$set: filesBeforeDelete},
-            selected: {$set: filesSelectedBeforeDelete}
-          }
-        }),
         snackbarVisible: false
       });
     }.bind(this);
     
-    //Optimistically update files - remove files with ids in files.selected
-    var files = this.state.search.files.files.filter(function(file) {
-      return !this.state.search.files.selected.includes(file.id);
+    //Optimistically set file state
+
+    //Update files - remove files with ids in files.selected
+    var files = this.state[page].files.files.filter(function(file) {
+      return !this.state[page].files.selected.includes(file.id);
     }, this);
 
-    //Optimistically update files.selected
+    //Clear files.selected
     var filesSelected = Immutable.Set();
 
     //Show snackbar
-    var plural = this.state.search.files.selected.size !== 1 ? "s" : "";
+    var numberSelected = this.state[page].files.selected.size
+    var plural = numberSelected !== 1 ? "s" : "";
+    this.setFileState(page, {
+      files: {
+        files: {$set: files},
+        selected: {$set: filesSelected}
+      }
+    });
     this.setState({
-      search: Update(this.state.search, {
-        files: {
-          files: {$set: files},
-          selected: {$set: filesSelected}
-        }
-      }),
       snackbarVisible: true,
-      snackbarMessage: "Deleted " + this.state.search.files.selected.size + " file" + plural,
+      snackbarMessage: "Deleted " + numberSelected + " file" + plural,
       snackbarAction: "UNDO",
       snackbarAct: undoDelete
     });
@@ -591,11 +566,11 @@ var App = React.createClass({
       onPathShorten: this.handlePathShorten,
       onPathLengthen: this.handlePathLengthen,
 
-      onFileToggle: this.handleCloudFileToggle,
-      onFileSelect: this.handleCloudFileSelect,
-      onFileSelectAll: this.handleCloudFileSelectAll,
-      onFileUnselectAll: this.handleCloudFileUnselectAll,
-      onFileDelete: this.handleCloudFileDelete,
+      onFileToggle: this.handleFileToggle,
+      onFileSelect: this.handleFileSelect,
+      onFileSelectAll: this.handleFileSelectAll,
+      onFileUnselectAll: this.handleFileUnselectAll,
+      onFileDelete: this.handleFileDelete,
     };
   },
   

@@ -26,6 +26,7 @@ var Cloud = React.createClass({
     onFileSelect: React.PropTypes.func,
     onFileSelectAll: React.PropTypes.func,
     onFileUnselectAll: React.PropTypes.func,
+    onFileDelete: React.PropTypes.func,
   },
 
   getStyle: function() {

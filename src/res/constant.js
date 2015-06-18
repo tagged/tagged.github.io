@@ -1,8 +1,8 @@
 module.exports = {
   page: {
-    SEARCH: "PAGE_SEARCH",
-    CLOUD: "PAGE_CLOUD",
-    SCRATCH: "PAGE_SCRATCH"
+    SEARCH: "search",
+    CLOUD: "cloud",
+    SCRATCH: "scratch"
   },
   ternary: {
     FALSE: 0,
