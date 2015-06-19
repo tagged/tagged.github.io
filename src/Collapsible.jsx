@@ -1,7 +1,6 @@
 var React = require('react/addons');
 var R = require('./res/index');
 var Dimension = R.dimension;
-//var Velocity = require('../velocity/velocity.js');
 
 var Collapsible = React.createClass({
   // Clicking on head reveals body
@@ -41,61 +40,6 @@ var Collapsible = React.createClass({
       </div>
     );
   }
-
-/*
-  componentDidMount: function() {
-    var container = this.getDOMNode();
-    var head = this.refs.head.getDOMNode();
-    var body = this.refs.body.getDOMNode();
-    var containerHeight = this.props.isOpen ? 
-                          head.offsetHeight + body.offsetHeight : 
-                          head.offsetHeight;
-    Velocity({
-      elements: container,
-      properties: {
-        height: containerHeight
-      },
-      options: {
-        duration: 0
-      }
-    });
-  },
-
-  componentWillUpdate: function(nextProps) {
-    // Animate before render; body will not be rendered
-    if (!nextProps.isOpen) {
-      var container = this.getDOMNode();
-      var head = this.refs.head.getDOMNode();
-      Velocity({
-        elements: container,
-        properties: {
-          height: head.offsetHeight
-        },
-        options: {
-          duration: 2000
-        }
-      });
-    }
-  },
-
-  componentDidUpdate: function() {
-    // Animate after render; body height known
-    if (this.props.isOpen) {
-      var container = this.getDOMNode();
-      var head = this.refs.head.getDOMNode();
-      var body = this.refs.body.getDOMNode();
-      Velocity({
-        elements: container,
-        properties: {
-          height: head.offsetHeight + body.offsetHeight
-        },
-        options: {
-          duration: 2000
-        }
-      });
-    }
-  }
-*/
 
 });
 
