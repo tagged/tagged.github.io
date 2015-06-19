@@ -11,6 +11,7 @@ var Scratchwork = require('./Scratchwork');
 var MaterialIcon = require('./MaterialIcon');
 var ActionBar = require('./ActionBar');
 var Snackbar = require('./Snackbar');
+var Tagger = require('./Tagger');
 
 var R = require('./res/index');
 var Color = R.color;
@@ -60,6 +61,10 @@ var App = React.createClass({
           open: Immutable.Set(),
           selected: Immutable.Set(),
         },
+      },
+      tagger: {
+        files: Immutable.List(),
+        isShowingFiles: false,
       },
       snackbarVisible: false,
       snackbarMessage: "",
@@ -465,6 +470,7 @@ var App = React.createClass({
       onFileSelectAll: this.handleFileSelectAll,
       onFileUnselectAll: this.handleFileUnselectAll,
       onFileDelete: this.handleFileDelete,
+      onFileTag: this.openTagger,
     };
   },
 
@@ -527,7 +533,30 @@ var App = React.createClass({
       onFileSelectAll: this.handleFileSelectAll,
       onFileUnselectAll: this.handleFileUnselectAll,
       onFileDelete: this.handleFileDelete,
+      onFileTag: this.openTagger,
     };
+  },
+
+  openTagger: function() {
+    //Set Tagger files to selected files on current page, 
+    //then navigate to Tagger page.
+    var page = this.state.page;
+    var files = this.state[page].files.files.filter(function(file) {
+      return this.state[page].files.selected.includes(file.id);
+    }, this);
+    this.setState({
+      tagger: Update(this.state.tagger, {
+        files: {$set: files}
+      })
+    }, this.navigate.bind(this, Page.TAGGER));
+  },
+
+  handleTaggerToggle: function() {
+    this.setState({
+      tagger: Update(this.state.tagger, {
+        isShowingFiles: {$set: !this.state.tagger.isShowingFiles}
+      })
+    });
   },
   
   getPage: function() {
@@ -538,6 +567,11 @@ var App = React.createClass({
         break;
       case Page.CLOUD:
         page = <Cloud {...this.getCloudProps()}/>;
+        break;
+      case Page.TAGGER:
+        page = <Tagger files={this.state.tagger.files}
+                       isShowingFiles={this.state.tagger.isShowingFiles}
+                       onToggle={this.handleTaggerToggle}/>;
         break;
       case Page.SCRATCH:
         page = <Scratchwork/>;

@@ -37,6 +37,7 @@ var Search = React.createClass({
     onFileSelectAll: React.PropTypes.func,
     onFileUnselectAll: React.PropTypes.func,
     onFileDelete: React.PropTypes.func,
+    onFileTag: React.PropTypes.func,
   },
 
   getStyle: function() {
@@ -204,6 +205,7 @@ var Search = React.createClass({
                        onSelectAll={this.props.onFileSelectAll}
                        onUnselectAll={this.props.onFileUnselectAll}
                        onDelete={this.props.onFileDelete}
+                       onTag={this.props.onFileTag}
                        style={style.fileActionBar}/>
       );
     }

@@ -2,6 +2,7 @@ module.exports = {
   page: {
     SEARCH: "search",
     CLOUD: "cloud",
+    TAGGER: "tagger",
     SCRATCH: "scratch"
   },
   ternary: {
