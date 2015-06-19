@@ -582,16 +582,6 @@ var App = React.createClass({
     var style = this.getStyle();
     var page = this.getPage();
 
-    var snackbar = null;
-    if(this.state.snackbarVisible) {
-      snackbar = (
-        <Snackbar message={this.state.snackbarMessage}
-                  action={this.state.snackbarAction}
-                  onAction={this.state.snackbarAct}
-                  style={style.snackbar}/>
-      );
-    }
-
     var iconProps = {
       scratchwork: {
         d: Icon.trash,
@@ -613,13 +603,30 @@ var App = React.createClass({
       }
     };
 
+    var appBar = null;
+    if (this.state.page === Page.SEARCH || this.state.page === Page.CLOUD) {
+      appBar = (
+        <ActionBar style={style.appBar}>
+            <MaterialIcon action="Scratch" {...iconProps.scratchwork}/>
+            <MaterialIcon action="Search" {...iconProps.search}/>
+            <MaterialIcon action="Cloud" {...iconProps.cloud}/>
+        </ActionBar>
+      );
+    }
+
+    var snackbar = null;
+    if(this.state.snackbarVisible) {
+      snackbar = (
+        <Snackbar message={this.state.snackbarMessage}
+                  action={this.state.snackbarAction}
+                  onAction={this.state.snackbarAct}
+                  style={style.snackbar}/>
+      );
+    }
+
     return (
       <div style={style.app} onMouseDown={this.showSuggestions.bind(this, false)}>
-          <ActionBar style={style.appBar}>
-              <MaterialIcon action="Scratch" {...iconProps.scratchwork}/>
-              <MaterialIcon action="Search" {...iconProps.search}/>
-              <MaterialIcon action="Cloud" {...iconProps.cloud}/>
-          </ActionBar>
+          {appBar}
           {page}
           <ReactTransitionGroup>
               {snackbar}
