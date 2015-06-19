@@ -1,6 +1,7 @@
 var React = require('react/addons');
 var R = require('./res/index');
 var Dimension = R.dimension;
+var Util = require('./util/util');
 
 // Collapsible has two types of children: controller and non-controller.
 // A child is a controller if its `isController` prop is set to true.
@@ -18,6 +19,13 @@ var Collapsible = React.createClass({
   propTypes: {
     isOpen: React.PropTypes.bool,
     onToggle: React.PropTypes.func,
+    style: React.PropTypes.object,
+  },
+
+  getDefaultProps: function() {
+    return {
+      style: {}
+    };
   },
 
   getStyle: function() {
@@ -32,7 +40,7 @@ var Collapsible = React.createClass({
   },
 
   render: function() {
-    var style = this.getStyle();
+    var style = Util.merge(this.getStyle(), this.props.style);
 
     var children = React.Children.map(this.props.children, function(child) {
       if (child.props.isController) {

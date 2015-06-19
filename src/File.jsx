@@ -47,6 +47,11 @@ var File = React.createClass({
           marginRight: Dimension.quantum
         }
       },
+      collapsible: {
+        component: {
+          marginRight: Dimension.touchTarget + Dimension.quantum
+        }
+      },
       filename: {
         paddingTop: Dimension.quantum,
         lineHeight: Typography.lineHeight,
@@ -86,7 +91,6 @@ var File = React.createClass({
         position: 'absolute',
         top: Dimension.quantum,
         right: Dimension.quantum,
-        marginLeft: Dimension.quantum,
       }
     };
   },
@@ -146,7 +150,8 @@ var File = React.createClass({
                     style={style.checkbox}
                     onClick={this.props.onFileSelect}/>
           <Collapsible isOpen={this.props.isOpen}
-                       onToggle={this.props.onFileToggle}>
+                       onToggle={this.props.onFileToggle}
+                       style={style.collapsible}>
               <div isController={true}>
                   {filename}
                   {metadata}
