@@ -36,7 +36,8 @@ var File = React.createClass({
   getStyle: function() {
     return {
       component: {
-        boxSizing: 'border-box',
+        position: 'relative',
+        overflow: 'hidden',//clear floated checkbox
         height: 'auto',
         padding: Dimension.quantum
       },
@@ -80,9 +81,11 @@ var File = React.createClass({
           outlineColor: Color.blackHint
         }
       },
-      rightIcon: {
+      fileLink: {
         display: 'block',
-        float: 'right',
+        position: 'absolute',
+        top: Dimension.quantum,
+        right: Dimension.quantum,
         marginLeft: Dimension.quantum,
       }
     };
@@ -145,20 +148,6 @@ var File = React.createClass({
       </div>
     );
 
-    var onClickFileLink = function(event){
-      //Don't bubble click to Collapsible header
-      event.stopPropagation();
-    };
-    var fileLink = (
-      <a href={this.props.link}
-         target="_blank"
-         onClick={onClickFileLink}
-         tabIndex="1"
-         style={style.rightIcon}>
-          <ImageIcon {...Image[this.props.cloud]}/>
-      </a>
-    );
-
     return (
       <div style={style.component}>
           <Checkbox checkStatus={this.props.isSelected ? TRUE : FALSE} 
@@ -169,8 +158,13 @@ var File = React.createClass({
           <Collapsible head={headContent}
                        body={bodyContent}
                        isOpen={this.props.isOpen}
-                       handleToggle={this.props.onFileToggle}
-                       icon={fileLink}/>
+                       handleToggle={this.props.onFileToggle}/>
+          <a href={this.props.link}
+             target="_blank"
+             tabIndex="1"
+             style={style.fileLink}>
+              <ImageIcon {...Image[this.props.cloud]}/>
+          </a>
       </div>
     );
   }

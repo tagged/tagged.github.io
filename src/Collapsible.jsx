@@ -11,13 +11,11 @@ var Collapsible = React.createClass({
     body: React.PropTypes.element.isRequired,
     isOpen: React.PropTypes.bool.isRequired,
     handleToggle: React.PropTypes.func.isRequired,
-    icon: React.PropTypes.element
   },
 
   getStyle: function() {
     return {
       component: {
-        boxSizing: 'border-box',
         overflow: 'hidden'
       },
       head: {
