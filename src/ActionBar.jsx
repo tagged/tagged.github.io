@@ -91,7 +91,10 @@ var ActionBar = React.createClass({
 
     //Must always render all actions; their widths are needed to calculate actionsVisible
     var actions = React.Children.map(this.props.children, function(child, childIndex) {
-      var actionStyle = childIndex < this.state.actionsVisible ? style.action : Util.merge(style.action, style.hiddenAction);
+      var actionStyle = style.action;
+      if (childIndex >= this.state.actionsVisible) {
+        actionStyle = Util.merge(style.action, style.hiddenAction);
+      }
       return (
         <div ref={"action" + childIndex} style={actionStyle}>
             {child}
