@@ -111,42 +111,32 @@ var File = React.createClass({
     }
     
     var plural = this.props.tags.length !== 1;
+
     var tagCount = (
       <div style={style.metadata}>
           {this.props.tags.length + (plural ? " tags" : " tag")}
       </div>
     );
 
-    var headContent = (
-      <div>
-          {filename}
-          {metadata}
-          {tagCount}
-      </div>
-    );
-    
-    var tagNodes = this.props.tags.map(function(tag) {
-      var isDisabled = this.props.disabledTags.includes(tag);
+    var tagNodes = null;
+    if (this.props.isOpen) {
+      tagNodes = this.props.tags.map(function(tag) {
+        var isDisabled = this.props.disabledTags.includes(tag);
 
-      var onClick = function(event) {
-        if (!isDisabled) {
-          this.props.onTagClick(tag);
-        }
-      }.bind(this);
+        var onClick = function(event) {
+          if (!isDisabled) {
+            this.props.onTagClick(tag);
+          }
+        }.bind(this);
 
-      return (
-        <Tag text={tag}
-             style={isDisabled ? style.tagDisabled : style.tag}
-             onClick={onClick}
-             key={tag}/>
-      );
-    }, this);
-
-    var bodyContent = (
-      <div style={style.tagNodes}>
-          {tagNodes}
-      </div>
-    );
+        return (
+          <Tag text={tag}
+               style={isDisabled ? style.tagDisabled : style.tag}
+               onClick={onClick}
+               key={tag}/>
+        );
+      }, this);
+    }
 
     return (
       <div style={style.component}>
@@ -155,10 +145,17 @@ var File = React.createClass({
                     checkColor={Color.whitePrimary}
                     style={style.checkbox}
                     onClick={this.props.onFileSelect}/>
-          <Collapsible head={headContent}
-                       body={bodyContent}
-                       isOpen={this.props.isOpen}
-                       handleToggle={this.props.onFileToggle}/>
+          <Collapsible isOpen={this.props.isOpen}
+                       onToggle={this.props.onFileToggle}>
+              <div isController={true}>
+                  {filename}
+                  {metadata}
+                  {tagCount}
+              </div>
+              <div style={style.tagNodes}>
+                  {tagNodes}
+              </div>
+          </Collapsible>
           <a href={this.props.link}
              target="_blank"
              tabIndex="1"
