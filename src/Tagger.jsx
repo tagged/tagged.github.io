@@ -171,6 +171,7 @@ var Tagger = React.createClass({
         <div>
             <Subheader text={title}/>
             <Tags tags={this.props.suggestions}
+                  disabledTags={tagsOnAllFiles}
                   onTagClick={Util.noop}/>
         </div>
       );
