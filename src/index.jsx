@@ -384,6 +384,9 @@ var App = React.createClass({
         selected: {$set: filesSelected}
       }
     });
+    this.setState({
+      snackbarVisible: false
+    });
   },
 
   handleFileSelectAll: function() {
