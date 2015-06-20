@@ -1,6 +1,5 @@
 var React = require('react');
-var Tag = require('./Tag');
-var TagInput = require('./TagInput');
+var Tags = require('./Tags');
 var Subheader = require('./Subheader');
 var File = require('./File');
 var FileActionBar = require('./FileActionBar');
@@ -45,26 +44,15 @@ var Search = React.createClass({
       search: {
         paddingBottom: Dimension.heightActionBar + Dimension.space + Dimension.quantum
       },
-      searchHeader: {
+      header: {
         paddingTop: 3 * Dimension.space,
         paddingBottom: Dimension.space,
         paddingLeft: Dimension.marginMobile,
         paddingRight: Dimension.marginMobile,
       },
       suggestions: {
-        paddingTop: Dimension.space
-      },
-      tagInput: {
-        input: {
-          borderColor: Color.blackSecondary,
-          outlineColor: Color.blue500 //focused input
-        }
-      },
-      tag: {
-        tag: {
-          backgroundColor: Color.blue100,
-          cursor: 'pointer',
-          outlineColor: Color.blue500
+        tags: {
+          paddingTop: Dimension.space
         }
       }
     };
@@ -93,100 +81,18 @@ var Search = React.createClass({
   render: function() {
     var style = this.getStyle();
 
-    var searchTags = this.props.searchTags.map(function(tag) {
+    var placeholder = this.props.searchTags.isEmpty() ?
+                      "Search files by tag" : "Refine search";
 
-      var onMouseDown = function(event) {
-        //Don't hide suggestions yet
-        event.stopPropagation();
-      };
-      
-      var onClick = function(event) {
-        this.props.onSearchTagDelete(tag);
-      }.bind(this);
-
-      var onKeyDown = function(event) {
-        if (event.key === 'Enter') {
-          this.props.onSearchTagDelete(tag);
-        }
-      }.bind(this);
-
-      return (
-        <Tag text={tag}
-             style={style.tag}
-             onClick={onClick}
-             onMouseDown={onMouseDown}
-             onKeyDown={onKeyDown}
-             key={tag}/>
-      );
-
-    }, this);
-
-    var tagInput = (function() {
-
-      var placeholder = this.props.searchTags.isEmpty() ?
-        "Search files by tag" : "Refine search";
-
-      var onMouseDown = function(event) {
-        //Don't hide suggestions yet
-        event.stopPropagation();
-      };
-
-      var onKeyDown = function(event) {
-        if (event.key === 'Enter') {
-          if (this.props.searchValue.length > 0) {
-            this.props.onSearchTagAdd(this.props.searchValue);
-          }
-        }
-      }.bind(this);
-
-      return (
-        <TagInput ref="tagInput"
-                  value={this.props.searchValue}
-                  style={style.tagInput}
-                  placeholder={placeholder}
-                  onChange={this.props.onSearchValueChange}
-                  onMouseDown={onMouseDown}
-                  onKeyDown={onKeyDown}
-                  onFocus={this.props.onSearchFocus}/>
-      );
-    }.bind(this))();
-    
     var suggestions = null;
     if (this.props.suggestionsVisible) {
-      var suggestionsTags = this.props.suggestionsTags.map(function(tag) {
-
-        var onMouseDown = function(event) {
-          //Don't hide suggestions yet
-          event.stopPropagation();
-        };
-
-        var onClick = function(event) {
-          this.props.onSearchTagAdd(tag);
-        }.bind(this);
-
-        var onKeyDown = function(event) {
-          if (event.key === 'Enter') {
-            this.props.onSearchTagAdd(tag);
-          }
-        }.bind(this);
-
-        return (
-          <Tag text={tag}
-               style={style.tag}
-               onClick={onClick}
-               onMouseDown={onMouseDown}
-               onKeyDown={onKeyDown}
-               key={tag}/>
-        );
-
-      }, this);
-
       suggestions = (
         <div>
             <Subheader text={this.props.suggestionsTitle}/>
-            <div style={style.suggestions}>
-                {suggestionsTags}
-            </div>
+            <Tags tags={this.props.suggestionsTags}
+                  onTagClick={this.props.onSearchTagAdd}
+                  style={style.suggestions} 
+                  withInput={false}/>
         </div>
       );
     }
@@ -212,9 +118,16 @@ var Search = React.createClass({
 
     return (
       <div style={style.search}>
-          <div style={style.searchHeader}>
-              {searchTags}
-              {tagInput}
+          <div style={style.header}>
+              <Tags ref="searchTags"
+                    tags={this.props.searchTags}
+                    onTagClick={this.props.onSearchTagDelete}
+                    withInput={true}
+                    value={this.props.searchValue}
+                    onValueChange={this.props.onSearchValueChange}
+                    placeholder={placeholder}
+                    onSubmit={this.props.onSearchTagAdd.bind(null, this.props.searchValue)}
+                    onFocus={this.props.onSearchFocus}/>
               {suggestions}
           </div>
           {files}

@@ -164,7 +164,7 @@ var App = React.createClass({
 
     if ('search' in this.refs) {
       //Return true if search input is focused
-      var inputNode = React.findDOMNode(this.refs.search.refs.tagInput.refs.input);
+      var inputNode = this.refs.search.refs.searchTags.getInputNode();
       return inputNode === document.activeElement;
     }
     return false;
@@ -236,7 +236,7 @@ var App = React.createClass({
   },
 
   handleSearchValueChange: function(event) {
-    var newValue = this.refs.search.refs.tagInput.getValue();
+    var newValue = this.refs.search.refs.searchTags.getInputValue();
     var suggestions = this.updateSuggestions(
       this.state.search.tags, 
       newValue
