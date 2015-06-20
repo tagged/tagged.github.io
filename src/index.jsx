@@ -585,6 +585,12 @@ var App = React.createClass({
   },
 
   closeTagger: function() {
+    //Collapse header when closing Tagger
+    this.setState({
+      tagger: Update(this.state.tagger, {
+        isShowingFiles: {$set: false}
+      })
+    });
     this.navigate(this.state.tagger.nextPage);
   },
 
