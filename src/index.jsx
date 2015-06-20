@@ -265,7 +265,7 @@ var App = React.createClass({
     });
   },
 
-  showSuggestions: function(condition) {
+  showSearchSuggestions: function(condition) {
     //Show suggestions if condition is true
     //Hide suggestions otherwise
 
@@ -486,7 +486,7 @@ var App = React.createClass({
       onSearchTagAdd: this.addSearchTag,
       onSearchTagDelete: this.deleteSearchTag,
 
-      onSearchFocus: this.showSuggestions.bind(this, true),
+      onSearchFocus: this.showSearchSuggestions.bind(this, true),
       onSearchValueChange: this.handleSearchValueChange,
       
       onFileToggle: this.handleFileToggle,
@@ -706,7 +706,7 @@ var App = React.createClass({
     }
 
     return (
-      <div style={style.app} onMouseDown={this.showSuggestions.bind(this, false)}>
+      <div style={style.app} onMouseDown={this.showSearchSuggestions.bind(this, false)}>
           {appBar}
           {page}
           <ReactTransitionGroup>
