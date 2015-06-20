@@ -22,6 +22,7 @@ var Tags = React.createClass({
       React.PropTypes.instanceOf(Immutable.OrderedSet),
       React.PropTypes.instanceOf(Immutable.List)
     ]),
+    disabledTags: React.PropTypes.object,
     onTagClick: React.PropTypes.func,
     style: React.PropTypes.object,
 
@@ -37,6 +38,8 @@ var Tags = React.createClass({
 
   getDefaultProps: function() {
     return {
+      disabledTags: Immutable.Set(),
+      withInput: false,
       style: {},
     };
   },
@@ -59,13 +62,19 @@ var Tags = React.createClass({
           outlineColor: Color.blue500
         }
       },
+      tagDisabled: {
+        tag: {
+          backgroundColor: Color.blackDivider,
+          cursor: 'auto',
+          outlineColor: Color.blackHint
+        }
+      },
       tagInput: {
         input: {
           borderColor: Color.blackSecondary,
           outlineColor: Color.blue500 //focused input
         }
       },
-      
     };
   },
 
@@ -75,14 +84,18 @@ var Tags = React.createClass({
 
 
     var tags = this.props.tags.map(function(tag) {
-
+      
+      var isDisabled = this.props.disabledTags.includes(tag);
+      
       var onMouseDown = function(event) {
         //Don't hide suggestions yet
         event.stopPropagation();
       };
       
       var onClick = function(event) {
-        this.props.onTagClick(tag);
+        if (!isDisabled) {
+          this.props.onTagClick(tag);
+        }
       }.bind(this);
 
       var onKeyDown = function(event) {
@@ -93,7 +106,7 @@ var Tags = React.createClass({
 
       return (
         <Tag text={tag}
-             style={style.tag}
+             style={isDisabled ? style.tagDisabled : style.tag}
              onClick={onClick}
              onMouseDown={onMouseDown}
              onKeyDown={onKeyDown}

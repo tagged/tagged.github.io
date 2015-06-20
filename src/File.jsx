@@ -1,7 +1,7 @@
 var React = require('react/addons');
 var Checkbox = require('./Checkbox');
 var Collapsible = require('./Collapsible');
-var Tag = require('./Tag');
+var Tags = require('./Tags');
 var ImageIcon = require('./ImageIcon');
 
 var R = require('./res/index');
@@ -69,22 +69,8 @@ var File = React.createClass({
         textOverflow: 'ellipsis',
         overflow: 'hidden'
       },
-      tagNodes: {
+      tags: {
         paddingTop: Dimension.quantum
-      },
-      tag: {
-        tag: {
-          backgroundColor: Color.blue100,
-          cursor: 'pointer',
-          outlineColor: Color.blue500
-        }
-      },
-      tagDisabled: {
-        tag: {
-          backgroundColor: Color.blackDivider,
-          cursor: 'auto',
-          outlineColor: Color.blackHint
-        }
       },
       fileLink: {
         display: 'block',
@@ -122,26 +108,6 @@ var File = React.createClass({
       </div>
     );
 
-    var tagNodes = null;
-    if (this.props.isOpen) {
-      tagNodes = this.props.tags.map(function(tag) {
-        var isDisabled = this.props.disabledTags.includes(tag);
-
-        var onClick = function(event) {
-          if (!isDisabled) {
-            this.props.onTagClick(tag);
-          }
-        }.bind(this);
-
-        return (
-          <Tag text={tag}
-               style={isDisabled ? style.tagDisabled : style.tag}
-               onClick={onClick}
-               key={tag}/>
-        );
-      }, this);
-    }
-
     return (
       <div style={style.component}>
           <Checkbox checkStatus={this.props.isSelected ? TRUE : FALSE} 
@@ -157,9 +123,10 @@ var File = React.createClass({
                   {metadata}
                   {tagCount}
               </div>
-              <div style={style.tagNodes}>
-                  {tagNodes}
-              </div>
+              <Tags tags={this.props.tags}
+                    disabledTags={this.props.disabledTags}
+                    onTagClick={this.props.onTagClick}
+                    style={style.tags}/>
           </Collapsible>
           <a href={this.props.link}
              target="_blank"
