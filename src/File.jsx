@@ -70,7 +70,9 @@ var File = React.createClass({
         overflow: 'hidden'
       },
       tags: {
-        paddingTop: Dimension.quantum
+        tags: {
+          paddingTop: Dimension.quantum
+        }
       },
       fileLink: {
         display: 'block',
