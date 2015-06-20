@@ -317,7 +317,7 @@ var App = React.createClass({
 
     console.log('ask database for files');
 
-    var files = _Database.getFiles(searchTags);
+    var files = _Database.filterFiles(searchTags);
     var fileIds = files.map(function(file) {
       return file.id;
     }).toSet();

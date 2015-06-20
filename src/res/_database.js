@@ -1,31 +1,43 @@
-var Immutable = require('immutable');
+//Eventually use real database logic
 
-//Treat files as read-only
-var _Files = require('./_files');
-var _files = Immutable.Map(_Files);
+var Immutable = require('immutable');
 
 var _cloud = require('./_cloud');
 
 module.exports = {
 
-  //Eventually move to database logic
+  /**
+   * Returns an array of all files deeply nested within given array
+   */
+  getFiles: function(contents) {
+    var _files = [];
+    contents.forEach(function(item) {
+      if (item.isFolder) {
+        _files = _files.concat(this.getFiles(item.contents));
+      }
+      else {
+        _files.push(item);
+      }
+    }, this);
+    return _files;
+  },
 
   /**
    * Returns Immutable.List of files containing the specified tags
    *
    * @param tags Immutable.Set of tags guiding the file search
    */
-  getFiles: function(tags) {
+  filterFiles: function(tags) {
     if (tags.isEmpty()) {
       return Immutable.List();
     }
     
     //Keep files that contain all tags
-    var files = _files.filter(function(file) {
+    var files = this.getFiles(_cloud).filter(function(file) {
       return tags.intersect(file.tags).size === tags.size;
     });
 
-    return files.toList();
+    return Immutable.List(files);
   },
 
 
@@ -34,7 +46,7 @@ module.exports = {
    */
   getTags: function() {
     var tags = Immutable.Set();
-    _files.forEach(function(file) {
+    this.getFiles(_cloud).forEach(function(file) {
       tags = tags.union(file.tags);
     });
     return tags.sort();
@@ -70,7 +82,7 @@ module.exports = {
       //(empty string starts every string)
       suggestedTags = Immutable.Set();
       searchTagSet = Immutable.Set(searchTags);
-      _files.forEach(function(file) {
+      this.getFiles(_cloud).forEach(function(file) {
         var fileTags = Immutable.Set(file.tags);
         if (searchTagSet.intersect(fileTags).size === searchTagSet.size) { 
           //If file contains all search tags, get all 
