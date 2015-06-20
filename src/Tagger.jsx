@@ -1,5 +1,6 @@
 var React = require('react');
 var Collapsible = require('./Collapsible');
+var ExpandCollapse = require('./ExpandCollapse');
 var Tag = require('./Tag');
 var TagInput = require('./TagInput');
 var Subheader = require('./Subheader');
@@ -48,6 +49,11 @@ var Tagger = React.createClass({
       },
       fileName: {
         fontWeight: Typography.fontWeightMedium,
+      },
+      expandCollapse: {
+        svg: {
+          marginLeft: Dimension.quantum
+        }
       }
     };
   },
@@ -72,6 +78,9 @@ var Tagger = React.createClass({
                            onToggle={this.props.onToggle}>
                   <div isController={true} style={style.fileCount}>
                       {files.size + " file" + plural}
+                      <ExpandCollapse isExpanded={this.props.isShowingFiles}
+                                      fill={Color.whitePrimary}
+                                      style={style.expandCollapse}/>
                   </div>
                   <div>
                       {files}
