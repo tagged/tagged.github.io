@@ -66,7 +66,8 @@ var App = React.createClass({
         files: Immutable.List(),
         isShowingFiles: false,
         nextPage: Page.CLOUD,
-        value: ""
+        value: "",
+        suggestions: Immutable.OrderedSet()
       },
       snackbarVisible: false,
       snackbarMessage: "",
@@ -255,9 +256,11 @@ var App = React.createClass({
 
   handleTaggerValueChange: function(event) {
     var newValue = this.refs.tagger.refs.tagsOnAllFiles.getInputValue();
+    var suggestions = this.updateTaggerSuggestions(newValue);
     this.setState({
       tagger: Update(this.state.tagger, {
-        value: {$set: newValue}
+        value: {$set: newValue},
+        suggestions: {$set: suggestions}
       })
     });
   },
@@ -296,6 +299,16 @@ var App = React.createClass({
       tags: suggestion.tags,
       title: suggestion.title
     };
+  },
+
+  updateTaggerSuggestions: function(value) {
+    //Returns tags starting with the given search value
+    
+    console.log('hit db for tags starting with ' + value);
+
+    var suggestion = _Database.makeTaggerSuggestion(value);
+
+    return suggestion;
   },
 
   updateFiles: function(searchTags) {
@@ -584,6 +597,7 @@ var App = React.createClass({
 
       taggerValue: this.state.tagger.value,
       onTaggerValueChange: this.handleTaggerValueChange,
+      suggestions: this.state.tagger.suggestions,
       onTaggerFocus: Util.noop,
     };
   },

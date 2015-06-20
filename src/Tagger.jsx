@@ -24,6 +24,7 @@ var Tagger = React.createClass({
 
     taggerValue: React.PropTypes.string,
     onTaggerValueChange: React.PropTypes.func,
+    suggestions: React.PropTypes.object,
     onTaggerFocus: React.PropTypes.func,
   },
 
@@ -131,26 +132,53 @@ var Tagger = React.createClass({
     var tagsTitle = "Tags" + suffix;
     
 
-    var suggestionsTitle;
-    if (files.size === 2) {
-      suggestionsTitle = "Tags on one file";
+
+    var suggestions;
+    //No value. Show:
+    //-tags on some files (if more than one file)
+    //-recent tags
+    //-all tags
+    if (this.props.taggerValue.length === 0) {
+      if (files.size > 1) {
+        var title;
+        if (files.size === 2) {
+          title = "Tags on one file";
+        }
+        else if (files.size > 2) {
+          title = "Tags on some files";
+        }
+        suggestions = (
+          <div>
+              <Subheader text={title}/>
+              <Tags ref="tagsOnSomeFiles"
+                    tags={tagsOnSomeFiles}
+                    onTagClick={Util.noop}
+                    withInput={false}/>
+          </div>
+        );
+      }
     }
-    else if (files.size > 2) {
-      suggestionsTitle = "Tags on some files";
-    }
-    
-    var suggestions = null;
-    if (files.size > 1) {
+    //Show tags starting with value
+    //If no tag starting with value, offer to create it
+    else {
+      var title;
+      if (this.props.suggestions.size > 0) {
+        title = '"' + this.props.taggerValue + '"' + " tags";
+      }
+      else {
+        title = "Create new tag " + '"' + this.props.taggerValue + '"';
+      }
       suggestions = (
         <div>
-            <Subheader text={suggestionsTitle}/>
-            <Tags ref="tagsOnSomeFiles"
-                  tags={tagsOnSomeFiles}
+            <Subheader text={title}/>
+            <Tags tags={this.props.suggestions}
                   onTagClick={Util.noop}
                   withInput={false}/>
         </div>
       );
     }
+
+
 
     return (
       <div style={style.tagger}>

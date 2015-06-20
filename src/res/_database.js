@@ -92,7 +92,6 @@ module.exports = {
       tags: suggestedTags,
       title: this.labelSuggestion(searchTags, searchValue, suggestedTags)
     };
-
   },
   
 
@@ -124,6 +123,14 @@ module.exports = {
     return label;
   },
 
+
+  //Return Immutable.OrderedSet of tags starting with given value
+  makeTaggerSuggestion: function(value) {
+    var tags = this.getTags().filter(function(tag) {
+      return tag.indexOf(value) === 0;
+    });
+    return tags;
+  },
 
 
   /**
