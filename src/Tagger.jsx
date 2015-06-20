@@ -152,8 +152,7 @@ var Tagger = React.createClass({
               <Subheader text={title}/>
               <Tags ref="tagsOnSomeFiles"
                     tags={tagsOnSomeFiles}
-                    onTagClick={Util.noop}
-                    withInput={false}/>
+                    onTagClick={Util.noop}/>
           </div>
         );
       }
@@ -172,8 +171,7 @@ var Tagger = React.createClass({
         <div>
             <Subheader text={title}/>
             <Tags tags={this.props.suggestions}
-                  onTagClick={Util.noop}
-                  withInput={false}/>
+                  onTagClick={Util.noop}/>
         </div>
       );
     }

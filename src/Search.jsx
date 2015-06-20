@@ -91,8 +91,7 @@ var Search = React.createClass({
             <Subheader text={this.props.suggestionsTitle}/>
             <Tags tags={this.props.suggestionsTags}
                   onTagClick={this.props.onSearchTagAdd}
-                  style={style.suggestions} 
-                  withInput={false}/>
+                  style={style.suggestions}/>
         </div>
       );
     }
