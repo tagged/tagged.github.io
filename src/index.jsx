@@ -65,7 +65,8 @@ var App = React.createClass({
       tagger: {
         files: Immutable.List(),
         isShowingFiles: false,
-        nextPage: Page.CLOUD
+        nextPage: Page.CLOUD,
+        value: ""
       },
       snackbarVisible: false,
       snackbarMessage: "",
@@ -248,6 +249,15 @@ var App = React.createClass({
           tags: {$set: suggestions.tags},
           title: {$set: suggestions.title}
         }
+      })
+    });
+  },
+
+  handleTaggerValueChange: function(event) {
+    var newValue = this.refs.tagger.refs.tagsOnAllFiles.getInputValue();
+    this.setState({
+      tagger: Update(this.state.tagger, {
+        value: {$set: newValue}
       })
     });
   },
@@ -564,6 +574,19 @@ var App = React.createClass({
   closeTagger: function() {
     this.navigate(this.state.tagger.nextPage);
   },
+
+  getTaggerProps: function() {
+    return {
+      files: this.state.tagger.files,
+      isShowingFiles: this.state.tagger.isShowingFiles,
+      onToggle: this.handleTaggerToggle,
+      onClose: this.closeTagger,
+
+      taggerValue: this.state.tagger.value,
+      onTaggerValueChange: this.handleTaggerValueChange,
+      onTaggerFocus: Util.noop,
+    };
+  },
   
   getPage: function() {
     var page;
@@ -575,10 +598,7 @@ var App = React.createClass({
         page = <Cloud {...this.getCloudProps()}/>;
         break;
       case Page.TAGGER:
-        page = <Tagger files={this.state.tagger.files}
-                       isShowingFiles={this.state.tagger.isShowingFiles}
-                       onToggle={this.handleTaggerToggle}
-                       onClose={this.closeTagger}/>;
+        page = <Tagger ref="tagger" {...this.getTaggerProps()}/>;
         break;
       case Page.SCRATCH:
         page = <Scratchwork/>;

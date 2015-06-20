@@ -1,8 +1,7 @@
 var React = require('react');
 var Collapsible = require('./Collapsible');
 var ExpandCollapse = require('./ExpandCollapse');
-var Tag = require('./Tag');
-var TagInput = require('./TagInput');
+var Tags = require('./Tags');
 var Subheader = require('./Subheader');
 
 var R = require('./res/index');
@@ -10,6 +9,8 @@ var Color = R.color;
 var Dimension = R.dimension;
 var Typography = R.typography;
 var Util = require('./util/util');
+
+var Immutable = require('immutable');
 
 
 
@@ -20,6 +21,10 @@ var Tagger = React.createClass({
     isShowingFiles: React.PropTypes.bool,
     onToggle: React.PropTypes.func,
     onClose: React.PropTypes.func,
+
+    taggerValue: React.PropTypes.string,
+    onTaggerValueChange: React.PropTypes.func,
+    onTaggerFocus: React.PropTypes.func,
   },
 
   getStyle: function() {
@@ -65,6 +70,11 @@ var Tagger = React.createClass({
         svg: {
           marginLeft: Dimension.quantum
         }
+      },
+      body: {
+        paddingLeft: Dimension.marginMobile,
+        paddingRight: Dimension.marginMobile,
+        paddingTop: Dimension.space,
       }
     };
   },
@@ -82,6 +92,66 @@ var Tagger = React.createClass({
 
     var plural = files.size === 1 ? "" : "s";
 
+    //Tags on all files
+    
+    //Keep a count of each tag
+    var tags = {};
+    this.props.files.forEach(function(file) {
+      for (var i=0; i < file.tags.length; i++) {
+        var tag = file.tags[i];
+        if (!tags.hasOwnProperty(tag)) {
+          tags[tag] = 0;
+        }
+        tags[tag]++;
+      }
+    });
+
+    var tagsOnAllFiles = [];
+    var tagsOnSomeFiles = [];
+    for (var tag in tags) {
+      var count = tags[tag];
+      if (count === files.size) {
+        tagsOnAllFiles.push(tag);
+      }
+      else {
+        tagsOnSomeFiles.push(tag);
+      }
+    }
+    
+    tagsOnAllFiles = Immutable.OrderedSet(tagsOnAllFiles).sort();
+    tagsOnSomeFiles = Immutable.OrderedSet(tagsOnSomeFiles).sort();
+
+    var suffix = "";
+    if (files.size === 2) {
+      suffix = " on both files";
+    }
+    else if (files.size > 2) {
+      suffix = " on all files";
+    }
+    var tagsTitle = "Tags" + suffix;
+    
+
+    var suggestionsTitle;
+    if (files.size === 2) {
+      suggestionsTitle = "Tags on one file";
+    }
+    else if (files.size > 2) {
+      suggestionsTitle = "Tags on some files";
+    }
+    
+    var suggestions = null;
+    if (files.size > 1) {
+      suggestions = (
+        <div>
+            <Subheader text={suggestionsTitle}/>
+            <Tags ref="tagsOnSomeFiles"
+                  tags={tagsOnSomeFiles}
+                  onTagClick={Util.noop}
+                  withInput={false}/>
+        </div>
+      );
+    }
+
     return (
       <div style={style.tagger}>
           <div style={style.header}>
@@ -97,6 +167,19 @@ var Tagger = React.createClass({
                   </div>
                   {files}
               </Collapsible>
+          </div>
+          <div style={style.body}>
+              <Subheader text={tagsTitle}/>
+              <Tags ref="tagsOnAllFiles"
+                    tags={tagsOnAllFiles}
+                    onTagClick={Util.noop}
+                    withInput={true}
+                    value={this.props.taggerValue}
+                    onValueChange={this.props.onTaggerValueChange}
+                    placeholder={"Add tag"}
+                    onSubmit={Util.noop}
+                    onFocus={this.props.onTaggerFocus}/>
+              {suggestions}
           </div>
       </div>
     );

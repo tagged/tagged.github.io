@@ -17,7 +17,11 @@ var Immutable = require('immutable');
 var Tags = React.createClass({
   
   propTypes: {
-    tags: React.PropTypes.instanceOf(Immutable.OrderedSet),
+    tags: React.PropTypes.oneOfType([
+      React.PropTypes.array, 
+      React.PropTypes.instanceOf(Immutable.OrderedSet),
+      React.PropTypes.instanceOf(Immutable.List)
+    ]),
     onTagClick: React.PropTypes.func,
     style: React.PropTypes.object,
 
