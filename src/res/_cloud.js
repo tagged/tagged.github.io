@@ -22,7 +22,7 @@ module.exports = [
         contents: [
           {
             isFolder: false,
-                id: '20123',
+            id: '20123',
             name: 'Getting Started With a really really really really really Long Title',
             path: ['Dropbox','Samples'],
             modified: '2015 Feb 28',

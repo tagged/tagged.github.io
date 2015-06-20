@@ -419,19 +419,29 @@ var App = React.createClass({
       return;
     }
 
+    var filesBeforeDelete = this.state[page].files.files;
+    var filesSelectedBeforeDelete = this.state[page].files.selected;
+    
     //Hide snackbar and delete files after delay
     var snackbarDelay = 6000;
     var snackbarTimeoutId = window.setTimeout(function() {
+
       //Delete files in database
       console.log('delete files in database');
+      var files = filesBeforeDelete.filter(function(file) {
+        return filesSelectedBeforeDelete.includes(file.id);
+      }, this);
+      var paths = files.map(function(file) {
+        return file.path.concat([file.name]);
+      });
+      _Database.deleteFiles(paths);
+
       this.setState({
         snackbarVisible: false
       });
     }.bind(this), snackbarDelay);
 
     //Cancel snackbar
-    var filesBeforeDelete = this.state[page].files.files;
-    var filesSelectedBeforeDelete = this.state[page].files.selected;
     var undoDelete = function() {
       window.clearTimeout(snackbarTimeoutId);
       //Reset files.files, files.selected to their states before delete

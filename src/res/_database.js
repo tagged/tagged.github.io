@@ -23,6 +23,54 @@ module.exports = {
   },
 
   /**
+   * Deletes files at specified paths.
+   * Returns true if file is deleted,
+   * or false if file is not found at path.
+   * 
+   * @param paths An array of file paths to be deleted
+   *              Each path should be an array
+   */
+  deleteFiles: function(paths) {
+    paths.forEach(function(path) {
+      //Modify global
+      _cloud = this._deleteFile(_cloud, path);
+    }, this);
+    return true;
+  },
+
+  /** 
+   * Delete the file in array contents at the specified path
+   * Recursive helper to deleteFiles
+   * 
+   * @param contents An array of folders and file items
+   * @param path     The path to traverse as an array
+   * 
+   * @throws "File does not exist"
+   */
+  _deleteFile: function(contents, path) {
+    if (path.length === 1) {
+      //No more folders to traverse
+      //Return contents with filename removed
+      var contentsMinusFile = contents.filter(function(item) {
+        return item.isFolder || item.name !== path[0];
+      });
+      if (contents.length === contentsMinusFile.length) {
+        throw "File does not exist";
+      }
+      return contentsMinusFile;
+    }
+    else {
+      var modifiedContents = contents.map(function(item) {
+        if (item.isFolder && item.name === path[0]) {
+          item.contents = this._deleteFile(item.contents, path.slice(1));
+        }
+        return item;
+      }, this);
+      return modifiedContents;
+    }
+  },
+
+  /**
    * Returns Immutable.List of files containing the specified tags
    *
    * @param tags Immutable.Set of tags guiding the file search
