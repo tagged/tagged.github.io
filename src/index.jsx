@@ -65,6 +65,7 @@ var App = React.createClass({
       tagger: {
         files: Immutable.List(),
         isShowingFiles: false,
+        nextPage: Page.CLOUD
       },
       snackbarVisible: false,
       snackbarMessage: "",
@@ -546,7 +547,8 @@ var App = React.createClass({
     }, this);
     this.setState({
       tagger: Update(this.state.tagger, {
-        files: {$set: files}
+        files: {$set: files},
+        nextPage: {$set: page}
       })
     }, this.navigate.bind(this, Page.TAGGER));
   },
@@ -557,6 +559,10 @@ var App = React.createClass({
         isShowingFiles: {$set: !this.state.tagger.isShowingFiles}
       })
     });
+  },
+
+  closeTagger: function() {
+    this.navigate(this.state.tagger.nextPage);
   },
   
   getPage: function() {
@@ -571,7 +577,8 @@ var App = React.createClass({
       case Page.TAGGER:
         page = <Tagger files={this.state.tagger.files}
                        isShowingFiles={this.state.tagger.isShowingFiles}
-                       onToggle={this.handleTaggerToggle}/>;
+                       onToggle={this.handleTaggerToggle}
+                       onClose={this.closeTagger}/>;
         break;
       case Page.SCRATCH:
         page = <Scratchwork/>;

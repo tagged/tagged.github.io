@@ -19,6 +19,7 @@ var Tagger = React.createClass({
     files: React.PropTypes.object,
     isShowingFiles: React.PropTypes.bool,
     onToggle: React.PropTypes.func,
+    onClose: React.PropTypes.func,
   },
 
   getStyle: function() {
@@ -29,26 +30,36 @@ var Tagger = React.createClass({
       header: {
         backgroundColor: Color.blue500,
         color: Color.whitePrimary,
-        paddingTop: 16,
-        paddingBottom: 16,
-        paddingLeft: Dimension.marginMobile,
-        paddingRight: Dimension.marginMobile,
+      },
+      closeButton: {
+        float: 'right',
+        color: Color.whitePrimary,
+        fontSize: Typography.fontSizeSmall,
+        lineHeight: Typography.lineHeightSmall,
+        fontWeight: Typography.fontWeightMedium,
+        padding: (Dimension.touchTarget - Typography.lineHeightPx) / 2,
+        cursor: 'pointer',
+        marginTop: Dimension.quantum
+      },
+      collapsible: {
+        component: {
+          padding: Dimension.marginMobile,
+        }
       },
       fileCount: {
+        float: 'left',
         fontSize: Typography.fontSizeLarge,
-        lineHeight: 1.2,
+        lineHeight: Typography.lineHeightLarge,
         fontWeight: Typography.fontWeightMedium,
-        paddingBottom: this.props.isShowingFiles ? Dimension.quantum : 0,
+        paddingBottom: this.props.isShowingFiles ? Dimension.space : 0,
       },
       file: {
+        clear: 'both',//clear earlier float (fileCount)
         whiteSpace: 'nowrap',
         overflow: 'hidden',
         textOverflow: 'ellipsis',
         fontSize: Typography.fontSizeSmall,
         lineHeight: Typography.lineHeightSmall,
-      },
-      fileName: {
-        fontWeight: Typography.fontWeightMedium,
       },
       expandCollapse: {
         svg: {
@@ -64,7 +75,7 @@ var Tagger = React.createClass({
     var files = this.props.files.map(function(file) {
       return (
         <div style={style.file} key={file.id}>
-            <span>{file.path.join("/") + "/"}</span><span style={style.fileName}>{file.name}</span>
+            {file.name}
         </div>
       );
     });
@@ -74,8 +85,13 @@ var Tagger = React.createClass({
     return (
       <div style={style.tagger}>
           <div style={style.header}>
+              <div style={style.closeButton}
+                   onClick={this.props.onClose}>
+                  {"DONE"}
+              </div>
               <Collapsible isOpen={this.props.isShowingFiles}
-                           onToggle={this.props.onToggle}>
+                           onToggle={this.props.onToggle}
+                           style={style.collapsible}>
                   <div isController={true} style={style.fileCount}>
                       {files.size + " file" + plural}
                       <ExpandCollapse isExpanded={this.props.isShowingFiles}
