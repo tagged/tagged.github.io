@@ -93,7 +93,7 @@ var Search = React.createClass({
   render: function() {
     var style = this.getStyle();
 
-    var searchTags = this.props.searchTags.map(function(tag, tagIndex) {
+    var searchTags = this.props.searchTags.map(function(tag) {
 
       var onMouseDown = function(event) {
         //Don't hide suggestions yet
@@ -101,12 +101,12 @@ var Search = React.createClass({
       };
       
       var onClick = function(event) {
-        this.props.onSearchTagDelete(tagIndex);
+        this.props.onSearchTagDelete(tag);
       }.bind(this);
 
       var onKeyDown = function(event) {
         if (event.key === 'Enter') {
-          this.props.onSearchTagDelete(tagIndex);
+          this.props.onSearchTagDelete(tag);
         }
       }.bind(this);
 

@@ -13,18 +13,16 @@ module.exports = {
   /**
    * Returns Immutable.List of files containing the specified tags
    *
-   * @param tags Immutable.List of tags guiding the file search
+   * @param tags Immutable.Set of tags guiding the file search
    */
   getFiles: function(tags) {
     if (tags.isEmpty()) {
       return Immutable.List();
     }
     
-    var tagSet = tags.toSet();
-    
     //Keep files that contain all tags
     var files = _files.filter(function(file) {
-      return tagSet.intersect(file.tags).size === tagSet.size;
+      return tags.intersect(file.tags).size === tags.size;
     });
 
     return files.toList();
@@ -32,24 +30,23 @@ module.exports = {
 
 
   /**
-   * Returns tags from all files. Return type is Immutable.List.
+   * Returns tags from all files. Return type is Immutable.OrderedSet.
    */
   getTags: function() {
     var tags = Immutable.Set();
     _files.forEach(function(file) {
       tags = tags.union(file.tags);
     });
-    return tags.toList().sort();
+    return tags.sort();
   },
   
   
   /**
-   * Returns tags suggestions based on specified search tags and search value
-   * Return type is Immutable.List
-   *
-   * @param searchValue The string with which all returned tags should start.
-   * @param searchTags  The tags with which all returned tags should share a 
-   *                    file. Immutable.List
+   * Returns Immutable.OrderedSet of tag suggestions based on 
+   * specified search tags and search value
+   * 
+   * @param searchValue a string with which all returned tags should start
+   * @param searchTags  Immutable.Set of tags with which all returned tags should share a file
    */
   makeSuggestion: function(searchValue, searchTags) {
 
@@ -69,7 +66,7 @@ module.exports = {
 
     } else {
 
-      //Tags on files containing all search tags AND start with search value 
+      //Tags on files that contain all search tags AND start with search value
       //(empty string starts every string)
       suggestedTags = Immutable.Set();
       searchTagSet = Immutable.Set(searchTags);
@@ -87,7 +84,7 @@ module.exports = {
           suggestedTags = suggestedTags.union(matchingFileTags);
         }
       });
-      suggestedTags = suggestedTags.toList().sort();
+      suggestedTags = suggestedTags.sort();
 
     }
     
@@ -98,13 +95,11 @@ module.exports = {
 
 
   /**
-   * Returns tags suggestions based on specified search tags and search value
-   * Return type is Immutable.List
+   * Returns an appropriate title for the given search value, search tags, and suggested tags.
    *
-   * @param searchValue   The string with which all returned tags should start.
-   * @param searchTags    The tags with which all returned tags should share a 
-   *                      file. Immutable.List
-   * @param suggestedTags The tags returned from makeSuggestion. Immutable.List
+   * @param searchValue   the search value
+   * @param searchTags    Immutable.Set of search tags
+   * @param suggestedTags Immutable.Set of tags returned from makeSuggestion
    */
   labelSuggestion: function(searchValue, searchTags, suggestedTags) {
     //Determine subheader label from search tags, input value, and number of suggested tags

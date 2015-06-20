@@ -38,9 +38,9 @@ var App = React.createClass({
         'Dropbox': "j.doe@gmail.com",
         'Google Drive': null
       },
-      page: Page.CLOUD,
+      page: Page.SEARCH,
       search: {
-        tags: Immutable.List(),
+        tags: Immutable.OrderedSet(),
         value: "",
         files: {
           files: Immutable.List(),
@@ -76,7 +76,7 @@ var App = React.createClass({
 
   _setStateFromHistory: function(event) {
     var page = event.state.page;
-    var searchTags = Immutable.List(event.state.searchTags);
+    var searchTags = Immutable.OrderedSet(event.state.searchTags);
     var path = Immutable.List(event.state.path);
 
     var value = "";
@@ -181,7 +181,7 @@ var App = React.createClass({
       return;
     }
     
-    var newSearchTags = this.state.search.tags.push(tag);
+    var newSearchTags = this.state.search.tags.add(tag);
     var files = this.updateFiles(newSearchTags);
 
     //Keep suggestions visible if input is focused
@@ -206,12 +206,12 @@ var App = React.createClass({
     }, this.pushState);
   },
 
-  deleteSearchTag: function(tagIndex) {
+  deleteSearchTag: function(tag) {
     //Remove tag from search tags
     //Update files, based on new search tags
     //Filter files.selected and files.open, based on files
 
-    var newSearchTags = this.state.search.tags.delete(tagIndex);
+    var newSearchTags = this.state.search.tags.delete(tag);
     var files = this.updateFiles(newSearchTags);
 
     //Show suggestions if there are no search tags
