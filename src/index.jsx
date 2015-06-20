@@ -72,7 +72,7 @@ var App = React.createClass({
       snackbarVisible: false,
       snackbarMessage: "",
       snackbarAction: "",
-      snackbarAct: Util.noop     
+      snackbarCancel: Util.noop     
     };
   },
 
@@ -116,7 +116,7 @@ var App = React.createClass({
       snackbarVisible: false,
       snackbarMessage: "",
       snackbarAction: "",
-      snackbarAct: Util.noop
+      snackbarCancel: Util.noop
     });
   },
 
@@ -479,7 +479,7 @@ var App = React.createClass({
       snackbarVisible: true,
       snackbarMessage: "Deleted " + numberSelected + " file" + plural,
       snackbarAction: "UNDO",
-      snackbarAct: undoDelete
+      snackbarCancel: undoDelete
     });
   },
   
@@ -714,7 +714,7 @@ var App = React.createClass({
       snackbar = (
         <Snackbar message={this.state.snackbarMessage}
                   action={this.state.snackbarAction}
-                  onAction={this.state.snackbarAct}
+                  onCancel={this.state.snackbarCancel}
                   style={style.snackbar}/>
       );
     }

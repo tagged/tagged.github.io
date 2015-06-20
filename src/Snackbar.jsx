@@ -11,7 +11,7 @@ var Snackbar = React.createClass({
   propTypes: {
     message: React.PropTypes.string,
     action: React.PropTypes.string,
-    onAction: React.PropTypes.func,
+    onCancel: React.PropTypes.func,
     style: React.PropTypes.object
   },
 
@@ -67,7 +67,7 @@ var Snackbar = React.createClass({
           <div style={style.message} ref="message">
               {this.props.message}
           </div>
-          <div style={style.action} ref="action" onClick={this.props.onAction}>
+          <div style={style.action} ref="action" onClick={this.props.onCancel}>
               {this.props.action}
           </div>
       </div>
