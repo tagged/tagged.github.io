@@ -31,7 +31,7 @@ var Tagger = React.createClass({
         backgroundColor: Color.blue500,
         color: Color.whitePrimary,
       },
-      closeButton: {
+      close: {
         float: 'right',
         color: Color.whitePrimary,
         fontSize: Typography.fontSizeSmall,
@@ -85,10 +85,7 @@ var Tagger = React.createClass({
     return (
       <div style={style.tagger}>
           <div style={style.header}>
-              <div style={style.closeButton}
-                   onClick={this.props.onClose}>
-                  {"DONE"}
-              </div>
+              <div style={style.close} onClick={this.props.onClose}>DONE</div>
               <Collapsible isOpen={this.props.isShowingFiles}
                            onToggle={this.props.onToggle}
                            style={style.collapsible}>
@@ -98,9 +95,7 @@ var Tagger = React.createClass({
                                       fill={Color.whitePrimary}
                                       style={style.expandCollapse}/>
                   </div>
-                  <div>
-                      {files}
-                  </div>
+                  {files}
               </Collapsible>
           </div>
       </div>
