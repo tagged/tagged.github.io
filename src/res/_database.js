@@ -48,7 +48,7 @@ module.exports = {
    * @param searchValue a string with which all returned tags should start
    * @param searchTags  Immutable.Set of tags with which all returned tags should share a file
    */
-  makeSuggestion: function(searchValue, searchTags) {
+  makeSearchSuggestion: function(searchTags, searchValue) {
 
     var suggestedTags;
 
@@ -88,7 +88,10 @@ module.exports = {
 
     }
     
-    return suggestedTags;
+    return {
+      tags: suggestedTags,
+      title: this.labelSuggestion(searchTags, searchValue, suggestedTags)
+    };
 
   },
   
@@ -101,7 +104,7 @@ module.exports = {
    * @param searchTags    Immutable.Set of search tags
    * @param suggestedTags Immutable.Set of tags returned from makeSuggestion
    */
-  labelSuggestion: function(searchValue, searchTags, suggestedTags) {
+  labelSuggestion: function(searchTags, searchValue, suggestedTags) {
     //Determine subheader label from search tags, input value, and number of suggested tags
     var haveSuggestedTags = suggestedTags.size > 0;
     var label;

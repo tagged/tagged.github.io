@@ -83,7 +83,7 @@ var App = React.createClass({
     var value = "";
     var files = this.updateFiles(searchTags);
     var suggestionsVisible = searchTags.isEmpty() || this.searchInputIsFocused();
-    var suggestions = this.updateSuggestions(searchTags, value);
+    var suggestions = this.updateSearchSuggestions(searchTags, value);
 
     var contents = this.getContents(path);
         
@@ -141,7 +141,7 @@ var App = React.createClass({
     window.addEventListener('popstate', this._setStateFromHistory);
 
     //Initial tag suggestions
-    var suggestions = this.updateSuggestions(
+    var suggestions = this.updateSearchSuggestions(
       this.state.search.tags, 
       this.state.search.value
     );
@@ -187,7 +187,7 @@ var App = React.createClass({
 
     //Keep suggestions visible if input is focused
     var suggestionsVisible = this.searchInputIsFocused();
-    var suggestions = this.updateSuggestions(newSearchTags, "");
+    var suggestions = this.updateSearchSuggestions(newSearchTags, "");
     
     this.setState({
       search: Update(this.state.search, {
@@ -217,7 +217,7 @@ var App = React.createClass({
 
     //Show suggestions if there are no search tags
     var suggestionsVisible = newSearchTags.isEmpty();
-    var suggestions = this.updateSuggestions(newSearchTags, this.state.search.value);
+    var suggestions = this.updateSearchSuggestions(newSearchTags, this.state.search.value);
 
     this.setState({
       search: Update(this.state.search, {
@@ -238,7 +238,7 @@ var App = React.createClass({
 
   handleSearchValueChange: function(event) {
     var newValue = this.refs.search.refs.searchTags.getInputValue();
-    var suggestions = this.updateSuggestions(
+    var suggestions = this.updateSearchSuggestions(
       this.state.search.tags, 
       newValue
     );
@@ -285,16 +285,16 @@ var App = React.createClass({
     });
   },
 
-  updateSuggestions: function(searchTags, searchValue) {
+  updateSearchSuggestions: function(searchTags, searchValue) {
     //Returns suggested tags for the given search tags and search value
     
     console.log('hit db for tag suggestions');
 
-    var tags = _Database.makeSuggestion(searchValue, searchTags);
-    var title = _Database.labelSuggestion(searchValue, searchTags, tags);
+    var suggestion = _Database.makeSearchSuggestion(searchTags, searchValue);
+
     return {
-      tags: tags,
-      title: title
+      tags: suggestion.tags,
+      title: suggestion.title
     };
   },
 
