@@ -417,7 +417,7 @@ var App = React.createClass({
     }
 
     //Hide snackbar and delete files after delay
-    var snackbarDelay = 2000;
+    var snackbarDelay = 6000;
     var snackbarTimeoutId = window.setTimeout(function() {
       //Delete files in database
       console.log('delete files in database');
