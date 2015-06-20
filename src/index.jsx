@@ -585,10 +585,11 @@ var App = React.createClass({
   },
 
   closeTagger: function() {
-    //Collapse header when closing Tagger
+    //Collapse header and clear value when closing Tagger
     this.setState({
       tagger: Update(this.state.tagger, {
-        isShowingFiles: {$set: false}
+        isShowingFiles: {$set: false},
+        value: {$set: ""}
       })
     });
     this.navigate(this.state.tagger.nextPage);
