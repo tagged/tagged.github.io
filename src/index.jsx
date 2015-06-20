@@ -49,7 +49,7 @@ var App = React.createClass({
         },
         suggestions: {
           visible: true,
-          tags: Immutable.List(),
+          tags: Immutable.OrderedSet(),
           title: ""
         }
       },
