@@ -85,8 +85,6 @@ var App = React.createClass({
     var value = "";
     var files = this.updateFiles(searchTags);
     var suggestionsVisible = searchTags.isEmpty() || this.searchInputIsFocused();
-    var suggestions = this.updateSearchSuggestions(searchTags, value);
-
     var contents = this.getContents(path);
         
     this.setState({
@@ -98,11 +96,6 @@ var App = React.createClass({
           files: {$set: files.files},
           open: {$set: Immutable.Set()},
           selected: {$set: Immutable.Set()}
-        },
-        suggestions: {
-          visible: {$set: suggestionsVisible},
-          tags: {$set: suggestions.tags},
-          title: {$set: suggestions.title}
         }
       }),
       cloud: Update(this.state.cloud, {
@@ -118,6 +111,8 @@ var App = React.createClass({
       snackbarMessage: "",
       snackbarAction: "",
       snackbarCancel: Util.noop
+    }, function() {
+      this.showSearchSuggestions(suggestionsVisible);
     });
   },
 
@@ -142,19 +137,8 @@ var App = React.createClass({
     //Listen for page changes
     window.addEventListener('popstate', this._setStateFromHistory);
 
-    //Initial tag suggestions
-    var suggestions = this.updateSearchSuggestions(
-      this.state.search.tags, 
-      this.state.search.value
-    );
-    this.setState({
-      search: Update(this.state.search, {
-        suggestions: {
-          tags: {$set: suggestions.tags},
-          title: {$set: suggestions.title}
-        }
-      })
-    });
+    //Set initial search suggestions
+    this.showSearchSuggestions(true);
   },
 
   componentWillUnmount: function() {
@@ -191,7 +175,6 @@ var App = React.createClass({
 
     //Keep suggestions visible if input is focused
     var suggestionsVisible = this.searchInputIsFocused();
-    var suggestions = this.updateSearchSuggestions(newSearchTags, "");
     
     this.setState({
       search: Update(this.state.search, {
@@ -201,14 +184,12 @@ var App = React.createClass({
           files: {$set: files.files},
           open: {$set: files.open},
           selected: {$set: files.selected}
-        },
-        suggestions: {
-          visible: {$set: suggestionsVisible},
-          tags: {$set: suggestions.tags},
-          title: {$set: suggestions.title}
         }
       }),
-    }, this.pushState);
+    }, function() {
+      this.showSearchSuggestions(suggestionsVisible);
+      this.pushState();
+    });
   },
 
   deleteSearchTag: function(tag) {
@@ -223,8 +204,7 @@ var App = React.createClass({
 
     //Show suggestions if there are no search tags
     var suggestionsVisible = newSearchTags.isEmpty();
-    var suggestions = this.updateSearchSuggestions(newSearchTags, this.state.search.value);
-
+    
     this.setState({
       search: Update(this.state.search, {
         tags: {$set: newSearchTags},
@@ -232,14 +212,12 @@ var App = React.createClass({
           files: {$set: files.files},
           open: {$set: files.open},
           selected: {$set: files.selected}
-        },
-        suggestions: {
-          visible: {$set: suggestionsVisible},
-          tags: {$set: suggestions.tags},
-          title: {$set: suggestions.title}
         }
       }),
-    }, this.pushState);
+    }, function() {
+      this.showSearchSuggestions(suggestionsVisible);
+      this.pushState();
+    });
   },
 
   handleSearchFocus: function() {
@@ -249,18 +227,13 @@ var App = React.createClass({
 
   handleSearchValueChange: function(event) {
     var newValue = this.refs.search.refs.searchTags.getInputValue();
-    var suggestions = this.updateSearchSuggestions(
-      this.state.search.tags, 
-      newValue
-    );
     this.setState({
       search: Update(this.state.search, {
-        value: {$set: newValue},
-        suggestions: {
-          tags: {$set: suggestions.tags},
-          title: {$set: suggestions.title}
-        }
+        value: {$set: newValue}
       })
+    }, function() {
+      //Update search suggestions based on new search value
+      this.showSearchSuggestions(true);
     });
   },
 
@@ -275,40 +248,42 @@ var App = React.createClass({
     });
   },
 
-  showSearchSuggestions: function(condition) {
-    //Show suggestions if condition is true
-    //Hide suggestions otherwise
+  showSearchSuggestions: function(visible) {
+    //Show suggestions if visible is true
+    //Hide suggestions if visible is false
 
-    var visible;
-
-    //Exception
+    //Exception: if no search tags, force suggestions to be shown
     if (this.state.search.tags.isEmpty()) {
       visible = true;
     }
-    else {
-      visible = condition;
+
+    //Update suggestions if showing them,
+    //because search tags may have changed 
+    //after they were last shown
+
+    var suggestions;
+    if (visible) {
+      console.log('hit db for tag suggestions');
+      suggestions = _Database.makeSearchSuggestion(
+        this.state.search.tags, 
+        this.state.search.value
+      );
+    } else {
+      suggestions = {
+        tags: this.state.search.suggestions.tags,
+        title: this.state.search.suggestions.title
+      };
     }
 
     this.setState({
       search: Update(this.state.search, {
         suggestions: {
-          visible: {$set: visible}
+          visible: {$set: visible},
+          tags: {$set: suggestions.tags},
+          title: {$set: suggestions.title}
         }
       })
     });
-  },
-
-  updateSearchSuggestions: function(searchTags, searchValue) {
-    //Returns suggested tags for the given search tags and search value
-    
-    console.log('hit db for tag suggestions');
-
-    var suggestion = _Database.makeSearchSuggestion(searchTags, searchValue);
-
-    return {
-      tags: suggestion.tags,
-      title: suggestion.title
-    };
   },
 
   updateTaggerSuggestions: function(value) {
