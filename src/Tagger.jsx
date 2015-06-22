@@ -91,11 +91,7 @@ var Tagger = React.createClass({
       );
     });
 
-    var plural = files.size === 1 ? "" : "s";
-
-    //Tags on all files
-    
-    //Keep a count of each tag
+    //Count each tag
     var tags = {};
     this.props.files.forEach(function(file) {
       for (var i=0; i < file.tags.length; i++) {
@@ -107,6 +103,10 @@ var Tagger = React.createClass({
       }
     });
 
+    //If a tag's count is equal to the number of files,
+    //then that tag must belong to all files. Otherwise
+    //that tag is only on some files.
+    
     var tagsOnAllFiles = [];
     var tagsOnSomeFiles = [];
     for (var tag in tags) {
@@ -122,16 +122,16 @@ var Tagger = React.createClass({
     tagsOnAllFiles = Immutable.OrderedSet(tagsOnAllFiles).sort();
     tagsOnSomeFiles = Immutable.OrderedSet(tagsOnSomeFiles).sort();
 
-    var suffix = "";
-    if (files.size === 2) {
-      suffix = " on both files";
+    var tagsTitle;
+    if (files.size === 1) {
+      tagsTitle = "Tags";
+    }
+    else if (files.size === 2) {
+      tagsTitle = "Tags on both files";
     }
     else if (files.size > 2) {
-      suffix = " on all files";
+      tagsTitle = "Tags on all files";
     }
-    var tagsTitle = "Tags" + suffix;
-    
-
 
     var suggestions;
     //No value. Show:
@@ -187,7 +187,7 @@ var Tagger = React.createClass({
                            onToggle={this.props.onToggle}
                            style={style.collapsible}>
                   <div isController={true} style={style.fileCount}>
-                      {files.size + " file" + plural}
+                      {files.size + " file" + (files.size === 1 ? "" : "s")}
                       <ExpandCollapse isExpanded={this.props.isShowingFiles}
                                       fill={Color.whitePrimary}
                                       style={style.expandCollapse}/>
