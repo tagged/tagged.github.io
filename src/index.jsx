@@ -78,15 +78,17 @@ var App = React.createClass({
   },
 
   _setStateFromHistory: function(event) {
+    this.state.snackbarComplete();
+    
     var page = event.state.page;
     var searchTags = Immutable.OrderedSet(event.state.searchTags);
     var path = Immutable.List(event.state.path);
-
+    
     var value = "";
     var files = this.updateFiles(searchTags);
     var suggestionsVisible = searchTags.isEmpty() || this.searchInputIsFocused();
     var contents = this.getContents(path);
-        
+    
     this.setState({
       page: page,
       search: Update(this.state.search, {
@@ -106,11 +108,7 @@ var App = React.createClass({
           open: {$set: Immutable.Set()},
           selected: {$set: Immutable.Set()}
         }
-      }),
-      snackbarVisible: false,
-      snackbarMessage: "",
-      snackbarAction: "",
-      snackbarCancel: Util.noop
+      })
     }, function() {
       this.showSearchSuggestions(suggestionsVisible);
     });
