@@ -398,8 +398,11 @@ var App = React.createClass({
   handleFileDelete: function() {
     var page = this.state.page;
 
+    //Files selected on the current page
+    var selected = this.state[page].files.selected;
+
     //If no files selected, do nothing
-    if (this.state[page].files.selected.size === 0) {
+    if (selected.size === 0) {
       return;
     }
 
@@ -414,8 +417,6 @@ var App = React.createClass({
 
     //Optimistically set new file states on all pages
     //according to files selected current page
-
-    var selected = this.state[page].files.selected;
 
     //files.files - remove files with ids in files.selected
     var searchFilesFiles = searchFiles.files.filter(function(file) {
