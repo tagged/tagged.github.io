@@ -72,7 +72,8 @@ var App = React.createClass({
       snackbarVisible: false,
       snackbarMessage: "",
       snackbarAction: "",
-      snackbarCancel: Util.noop     
+      snackbarCancel: Util.noop,
+      snackbarComplete: Util.noop,
     };
   },
 
@@ -173,6 +174,8 @@ var App = React.createClass({
   },
 
   addSearchTag: function(tag) {
+    this.state.snackbarComplete();
+
     //Add tag to search tags
     //Update files, based on new search tags
     //Filter files.selected and files.open, based on files
@@ -209,6 +212,8 @@ var App = React.createClass({
   },
 
   deleteSearchTag: function(tag) {
+    this.state.snackbarComplete();
+
     //Remove tag from search tags
     //Update files, based on new search tags
     //Filter files.selected and files.open, based on files
@@ -235,6 +240,11 @@ var App = React.createClass({
         }
       }),
     }, this.pushState);
+  },
+
+  handleSearchFocus: function() {
+    this.state.snackbarComplete();
+    this.showSearchSuggestions(true);
   },
 
   handleSearchValueChange: function(event) {
@@ -363,6 +373,8 @@ var App = React.createClass({
   },
 
   handleFileToggle: function(fileId) {
+    this.state.snackbarComplete();
+    
     var page = this.state.page;
     var filesOpen = this.state[page].files.open.includes(fileId) ?
                     this.state[page].files.open.delete(fileId) :
@@ -375,6 +387,8 @@ var App = React.createClass({
   },
 
   handleFileSelect: function(fileId) {
+    this.state.snackbarComplete();
+
     var page = this.state.page;
     var filesSelected = this.state[page].files.selected.includes(fileId) ?
                         this.state[page].files.selected.delete(fileId) :
@@ -383,9 +397,6 @@ var App = React.createClass({
       files: {
         selected: {$set: filesSelected}
       }
-    });
-    this.setState({
-      snackbarVisible: false
     });
   },
 
@@ -418,68 +429,112 @@ var App = React.createClass({
     if (this.state[page].files.selected.size === 0) {
       return;
     }
+    
+    //Save previous file state
 
     var filesBeforeDelete = this.state[page].files.files;
     var filesSelectedBeforeDelete = this.state[page].files.selected;
-    
-    //Hide snackbar and delete files after delay
-    var snackbarDelay = 6000;
-    var snackbarTimeoutId = window.setTimeout(function() {
+    var filesOpenBeforeDelete = this.state[page].files.open;
 
-      //Delete files in database
-      console.log('delete files in database');
-      var files = filesBeforeDelete.filter(function(file) {
-        return filesSelectedBeforeDelete.includes(file.id);
-      }, this);
-      var paths = files.map(function(file) {
-        return file.path.concat([file.name]);
-      });
-      _Database.deleteFiles(paths);
+    //Optimistically set new file state
 
-      this.setState({
-        snackbarVisible: false
-      });
-    }.bind(this), snackbarDelay);
-
-    //Cancel snackbar
-    var undoDelete = function() {
-      window.clearTimeout(snackbarTimeoutId);
-      //Reset files.files, files.selected to their states before delete
-      this.setFileState(page, {
-        files: {
-          files: {$set: filesBeforeDelete},
-          selected: {$set: filesSelectedBeforeDelete}
-        }
-      });
-      this.setState({
-        snackbarVisible: false
-      });
-    }.bind(this);
-    
-    //Optimistically set file state
-
-    //Update files - remove files with ids in files.selected
+    //files.files - remove files with ids in files.selected
     var files = this.state[page].files.files.filter(function(file) {
-      return !this.state[page].files.selected.includes(file.id);
+      return !filesSelectedBeforeDelete.includes(file.id);
     }, this);
 
-    //Clear files.selected
+    //files.open - remove ids in files.selected
+    var filesOpen = this.state[page].files.open.filter(function(fileId) {
+      return !filesSelectedBeforeDelete.includes(fileId);
+    }, this);
+
+    //files.selected - remove all
     var filesSelected = Immutable.Set();
 
-    //Show snackbar
-    var numberSelected = this.state[page].files.selected.size
-    var plural = numberSelected !== 1 ? "s" : "";
     this.setFileState(page, {
       files: {
         files: {$set: files},
-        selected: {$set: filesSelected}
+        selected: {$set: filesSelected},
+        open: {$set: filesOpen}
       }
     });
+
+    //Set snackbar state
+
+    var numberSelected = filesSelectedBeforeDelete.size;
+    var plural = numberSelected !== 1 ? "s" : "";
+
+    var message = "Deleted " + numberSelected + " file" + plural;
+
+    var action = "UNDO";
+
+    var deleteFiles = function() {
+      var filesToDelete = filesBeforeDelete.filter(function(file) {
+        return filesSelectedBeforeDelete.includes(file.id);
+      });
+      var paths = filesToDelete.map(function(file) {
+        return file.path.concat([file.name]);
+      });
+      //Delete files in database
+      console.log('delete files in database');
+      _Database.deleteFiles(paths);
+      //TODO: Reconcile UI file state (search, cloud) with updated database file state
+      //this.setFileState({});
+    }.bind(this);
+
+    var undoDelete = function() {
+      //Ensure file state does not change between
+      //the point snackbar is shown and the point
+      //this method is called.
+
+      //Reset file state
+      this.setFileState(page, {
+        files: {
+          files: {$set: filesBeforeDelete},
+          selected: {$set: filesSelectedBeforeDelete},
+          open: {$set: filesOpenBeforeDelete}
+        }
+      });
+    }.bind(this);
+    
+    this.showSnackbar({
+      snackbarMessage: message,
+      snackbarAction: action,
+      snackbarCancel: undoDelete,
+      snackbarComplete: deleteFiles,
+    });
+  },
+
+  showSnackbar: function(snackbarState) {
+    //After delay, hide snackbar and call snackbarComplete
+    var snackbarDelay = 6000;
+    var snackbarTimeoutId = window.setTimeout(function() {
+      snackbarComplete();
+    }, snackbarDelay);
+    var snackbarCancel = function() {
+      window.clearTimeout(snackbarTimeoutId);
+      snackbarState.snackbarCancel();
+      this.setState({
+        snackbarVisible: false,
+        snackbarCancel: Util.noop,
+        snackbarComplete: Util.noop
+      });
+    }.bind(this);
+    var snackbarComplete = function() {
+      window.clearTimeout(snackbarTimeoutId);
+      snackbarState.snackbarComplete();
+      this.setState({
+        snackbarVisible: false,
+        snackbarCancel: Util.noop,
+        snackbarComplete: Util.noop
+      });
+    }.bind(this);
     this.setState({
       snackbarVisible: true,
-      snackbarMessage: "Deleted " + numberSelected + " file" + plural,
-      snackbarAction: "UNDO",
-      snackbarCancel: undoDelete
+      snackbarMessage: snackbarState.snackbarMessage,
+      snackbarAction: snackbarState.snackbarAction,
+      snackbarCancel: snackbarCancel,
+      snackbarComplete: snackbarComplete,
     });
   },
   
@@ -499,7 +554,7 @@ var App = React.createClass({
       onSearchTagAdd: this.addSearchTag,
       onSearchTagDelete: this.deleteSearchTag,
 
-      onSearchFocus: this.showSearchSuggestions.bind(this, true),
+      onSearchFocus: this.handleSearchFocus,
       onSearchValueChange: this.handleSearchValueChange,
       
       onFileToggle: this.handleFileToggle,
@@ -512,6 +567,8 @@ var App = React.createClass({
   },
 
   handlePathShorten: function(index) {
+    this.state.snackbarComplete();
+    
     var path = this.state.cloud.path.slice(0, index + 1);
     var contents = this.getContents(path);
     var folders = contents.folders;
@@ -530,6 +587,8 @@ var App = React.createClass({
   },
 
   handlePathLengthen: function(folder) {
+    this.state.snackbarComplete();
+    
     var path = this.state.cloud.path.push(folder);
     var contents = this.getContents(path);
     var folders = contents.folders;
@@ -648,6 +707,7 @@ var App = React.createClass({
     if (page === this.state.page) {
       return;
     }
+    this.state.snackbarComplete();
     this.setState({
       page: page
     }, this.pushState);
