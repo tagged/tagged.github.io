@@ -429,39 +429,65 @@ var App = React.createClass({
     if (this.state[page].files.selected.size === 0) {
       return;
     }
+
+    //Unlike other file-handling methods, 
+    //deletion affects more than the current page
     
-    //Save previous file state
+    //Save previous file states
 
-    var filesBeforeDelete = this.state[page].files.files;
-    var filesSelectedBeforeDelete = this.state[page].files.selected;
-    var filesOpenBeforeDelete = this.state[page].files.open;
+    var prevState = this.state;
+    var searchFiles = this.state.search.files;
+    var cloudFiles = this.state.cloud.files;
 
-    //Optimistically set new file state
+    //Optimistically set new file states on all pages
+    //according to files selected current page
+
+    var selected = this.state[page].files.selected;
 
     //files.files - remove files with ids in files.selected
-    var files = this.state[page].files.files.filter(function(file) {
-      return !filesSelectedBeforeDelete.includes(file.id);
-    }, this);
+    var searchFilesFiles = searchFiles.files.filter(function(file) {
+      return !selected.includes(file.id);
+    });
+    var cloudFilesFiles = cloudFiles.files.filter(function(file) {
+      return !selected.includes(file.id);
+    });
 
     //files.open - remove ids in files.selected
-    var filesOpen = this.state[page].files.open.filter(function(fileId) {
-      return !filesSelectedBeforeDelete.includes(fileId);
-    }, this);
+    var searchFilesOpen = searchFiles.open.filter(function(fileId) {
+      return !selected.includes(fileId);
+    });
+    var cloudFilesOpen = cloudFiles.open.filter(function(fileId) {
+      return !selected.includes(fileId);
+    });
 
-    //files.selected - remove all
-    var filesSelected = Immutable.Set();
+    //files.selected - remove ids in files.selected
+    var searchFilesSelected = searchFiles.selected.filter(function(fileId) {
+      return !selected.includes(fileId);
+    });
+    var cloudFilesSelected = cloudFiles.selected.filter(function(fileId) {
+      return !selected.includes(fileId);
+    });
 
-    this.setFileState(page, {
-      files: {
-        files: {$set: files},
-        selected: {$set: filesSelected},
-        open: {$set: filesOpen}
-      }
+    this.setState({
+      search: Update(this.state.search, {
+        files: {
+          files: {$set: searchFilesFiles},
+          open: {$set: searchFilesOpen},
+          selected: {$set: searchFilesSelected}
+        }
+      }),
+      cloud: Update(this.state.cloud, {
+        files: {
+          files: {$set: cloudFilesFiles},
+          open: {$set: cloudFilesOpen},
+          selected: {$set: cloudFilesSelected}
+        }
+      })
     });
 
     //Set snackbar state
 
-    var numberSelected = filesSelectedBeforeDelete.size;
+    var numberSelected = selected.size;
     var plural = numberSelected !== 1 ? "s" : "";
 
     var message = "Deleted " + numberSelected + " file" + plural;
@@ -469,8 +495,8 @@ var App = React.createClass({
     var action = "UNDO";
 
     var deleteFiles = function() {
-      var filesToDelete = filesBeforeDelete.filter(function(file) {
-        return filesSelectedBeforeDelete.includes(file.id);
+      var filesToDelete = prevState[page].files.files.filter(function(file) {
+        return selected.includes(file.id);
       });
       var paths = filesToDelete.map(function(file) {
         return file.path.concat([file.name]);
@@ -478,8 +504,7 @@ var App = React.createClass({
       //Delete files in database
       console.log('delete files in database');
       _Database.deleteFiles(paths);
-      //TODO: Reconcile UI file state (search, cloud) with updated database file state
-      //this.setFileState({});
+      //TODO: Update search suggestions
     }.bind(this);
 
     var undoDelete = function() {
@@ -488,12 +513,21 @@ var App = React.createClass({
       //this method is called.
 
       //Reset file state
-      this.setFileState(page, {
-        files: {
-          files: {$set: filesBeforeDelete},
-          selected: {$set: filesSelectedBeforeDelete},
-          open: {$set: filesOpenBeforeDelete}
-        }
+      this.setState({
+        search: Update(this.state.search, {
+          files: {
+            files: {$set: searchFiles.files},
+            open: {$set: searchFiles.open},
+            selected: {$set: searchFiles.selected}
+          }
+        }),
+        cloud: Update(this.state.cloud, {
+          files: {
+            files: {$set: cloudFiles.files},
+            open: {$set: cloudFiles.open},
+            selected: {$set: cloudFiles.selected}
+          }
+        })
       });
     }.bind(this);
     
