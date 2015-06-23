@@ -68,16 +68,18 @@ var App = React.createClass({
         value: "",
         suggestions: Immutable.OrderedSet()
       },
-      snackbarVisible: false,
-      snackbarMessage: "",
-      snackbarAction: "",
-      snackbarCancel: Util.noop,
-      snackbarComplete: Util.call,
+      snackbar: {
+        visible: false,
+        message: "",
+        action: "",
+        cancel: Util.noop,
+        complete: Util.call,
+      }
     };
   },
 
   _setStateFromHistory: function(event) {
-    this.state.snackbarComplete();
+    this.state.snackbar.complete();
     
     var page = event.state.page;
     var searchTags = Immutable.OrderedSet(event.state.searchTags);
@@ -155,7 +157,7 @@ var App = React.createClass({
   },
 
   addSearchTag: function(tag) {
-    this.state.snackbarComplete();
+    this.state.snackbar.complete();
 
     //Add tag to search tags
     //Update files, based on new search tags
@@ -190,7 +192,7 @@ var App = React.createClass({
   },
 
   deleteSearchTag: function(tag) {
-    this.state.snackbarComplete();
+    this.state.snackbar.complete();
 
     //Remove tag from search tags
     //Update files, based on new search tags
@@ -218,7 +220,7 @@ var App = React.createClass({
   },
 
   handleSearchFocus: function() {
-    this.state.snackbarComplete();
+    this.state.snackbar.complete();
     this.showSearchSuggestions(true);
   },
 
@@ -345,7 +347,7 @@ var App = React.createClass({
   },
 
   handleFileToggle: function(fileId) {
-    this.state.snackbarComplete();
+    this.state.snackbar.complete();
     
     var page = this.state.page;
     var filesOpen = this.state[page].files.open.includes(fileId) ?
@@ -359,7 +361,7 @@ var App = React.createClass({
   },
 
   handleFileSelect: function(fileId) {
-    this.state.snackbarComplete();
+    this.state.snackbar.complete();
 
     var page = this.state.page;
     var filesSelected = this.state[page].files.selected.includes(fileId) ?
@@ -506,10 +508,10 @@ var App = React.createClass({
     }.bind(this);
     
     this.showSnackbar({
-      snackbarMessage: message,
-      snackbarAction: action,
-      snackbarCancel: undoDelete,
-      snackbarComplete: deleteFiles,
+      message: message,
+      action: action,
+      cancel: undoDelete,
+      complete: deleteFiles,
     });
   },
 
@@ -647,15 +649,15 @@ var App = React.createClass({
       }.bind(this);
 
       this.showSnackbar({
-        snackbarMessage: message,
-        snackbarAction: action,
-        snackbarCancel: undoDetach,
-        snackbarComplete: detachTag,
+        message: message,
+        action: action,
+        cancel: undoDetach,
+        complete: detachTag,
       });
     
     }.bind(this);
 
-    this.state.snackbarComplete(_handleTagDetach);
+    this.state.snackbar.complete(_handleTagDetach);
 
   },
 
@@ -667,28 +669,34 @@ var App = React.createClass({
     }, snackbarDelay);
     var snackbarCancel = function() {
       window.clearTimeout(snackbarTimeoutId);
-      snackbarState.snackbarCancel();
+      snackbarState.cancel();
       this.setState({
-        snackbarVisible: false,
-        snackbarCancel: Util.noop,
-        snackbarComplete: Util.call
+        snackbar: Update(this.state.snackbar, {
+          visible: {$set: false},
+          cancel: {$set: Util.noop},
+          complete: {$set: Util.call}
+        })
       });
     }.bind(this);
     var snackbarComplete = function(callback) {
       window.clearTimeout(snackbarTimeoutId);
-      snackbarState.snackbarComplete();
+      snackbarState.complete();
       this.setState({
-        snackbarVisible: false,
-        snackbarCancel: Util.noop,
-        snackbarComplete: Util.call
+        snackbar: Update(this.state.snackbar, {
+          visible: {$set: false},
+          cancel: {$set: Util.noop},
+          complete: {$set: Util.call}
+        })
       }, callback);
     }.bind(this);
     this.setState({
-      snackbarVisible: true,
-      snackbarMessage: snackbarState.snackbarMessage,
-      snackbarAction: snackbarState.snackbarAction,
-      snackbarCancel: snackbarCancel,
-      snackbarComplete: snackbarComplete,
+      snackbar: Update(this.state.snackbar, {
+        visible: {$set: true},
+        message: {$set: snackbarState.message},
+        action: {$set: snackbarState.action},
+        cancel: {$set: snackbarCancel},
+        complete: {$set: snackbarComplete}
+      })
     });
   },
   
@@ -721,7 +729,7 @@ var App = React.createClass({
   },
 
   handlePathShorten: function(index) {
-    this.state.snackbarComplete();
+    this.state.snackbar.complete();
     
     var path = this.state.cloud.path.slice(0, index + 1);
     var contents = this.getContents(path);
@@ -741,7 +749,7 @@ var App = React.createClass({
   },
 
   handlePathLengthen: function(folder) {
-    this.state.snackbarComplete();
+    this.state.snackbar.complete();
     
     var path = this.state.cloud.path.push(folder);
     var contents = this.getContents(path);
@@ -863,7 +871,7 @@ var App = React.createClass({
     if (page === this.state.page) {
       return;
     }
-    this.state.snackbarComplete();
+    this.state.snackbar.complete();
     this.setState({
       page: page
     }, this.pushState);
@@ -884,8 +892,7 @@ var App = React.createClass({
           boxShadow: Shadow.zDepth[this.props.zDepth],
           padding: Dimension.quantum,
         }
-      },
-      snackbar: {}
+      }
     };
   },
 
@@ -926,12 +933,11 @@ var App = React.createClass({
     }
 
     var snackbar = null;
-    if(this.state.snackbarVisible) {
+    if(this.state.snackbar.visible) {
       snackbar = (
-        <Snackbar message={this.state.snackbarMessage}
-                  action={this.state.snackbarAction}
-                  onCancel={this.state.snackbarCancel}
-                  style={style.snackbar}/>
+        <Snackbar message={this.state.snackbar.message}
+                  action={this.state.snackbar.action}
+                  onCancel={this.state.snackbar.cancel}/>
       );
     }
 
