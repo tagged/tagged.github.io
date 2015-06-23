@@ -86,7 +86,7 @@ var App = React.createClass({
     var path = Immutable.List(event.state.path);
     
     var value = "";
-    var files = this.updateFiles(searchTags);
+    var files = this.updateSearchFiles(searchTags);
     var suggestionsVisible = searchTags.isEmpty() || this.searchInputIsFocused();
     var contents = this.getContents(path);
     
@@ -145,6 +145,10 @@ var App = React.createClass({
     window.removeEventListener('popstate', this._setStateFromHistory);
   },
 
+
+  // SEARCH
+
+
   searchInputIsFocused: function() {
     //Return false if not in SEARCH mode
 
@@ -170,7 +174,7 @@ var App = React.createClass({
     }
     
     var newSearchTags = this.state.search.tags.add(tag);
-    var files = this.updateFiles(newSearchTags);
+    var files = this.updateSearchFiles(newSearchTags);
 
     //Keep suggestions visible if input is focused
     var suggestionsVisible = this.searchInputIsFocused();
@@ -199,7 +203,7 @@ var App = React.createClass({
     //Filter files.selected and files.open, based on files
 
     var newSearchTags = this.state.search.tags.delete(tag);
-    var files = this.updateFiles(newSearchTags);
+    var files = this.updateSearchFiles(newSearchTags);
 
     //Show suggestions if there are no search tags
     var suggestionsVisible = newSearchTags.isEmpty();
@@ -233,17 +237,6 @@ var App = React.createClass({
     }, function() {
       //Update search suggestions based on new search value
       this.showSearchSuggestions(true);
-    });
-  },
-
-  handleTaggerValueChange: function(event) {
-    var newValue = this.refs.tagger.refs.tagsOnAllFiles.getInputValue();
-    var suggestions = this.updateTaggerSuggestions(newValue);
-    this.setState({
-      tagger: Update(this.state.tagger, {
-        value: {$set: newValue},
-        suggestions: {$set: suggestions}
-      })
     });
   },
 
@@ -285,17 +278,7 @@ var App = React.createClass({
     });
   },
 
-  updateTaggerSuggestions: function(value) {
-    //Returns tags starting with the given search value
-    
-    console.log('hit db for tags starting with ' + value);
-
-    var suggestion = _Database.makeTaggerSuggestion(value);
-
-    return suggestion;
-  },
-
-  updateFiles: function(searchTags) {
+  updateSearchFiles: function(searchTags) {
     //Returns what the next state of files, files selected, and files open
     //would look like, given the search tags
 
@@ -321,6 +304,10 @@ var App = React.createClass({
       open: open
     };
   },
+
+
+  // FILES (Search, Cloud)
+
  
   /**
    * Setting nested file state is identical for search and cloud states.
@@ -515,6 +502,114 @@ var App = React.createClass({
     });
   },
 
+
+  // CLOUD
+
+
+  handlePathShorten: function(index) {
+    this.state.snackbar.complete();
+    
+    var path = this.state.cloud.path.slice(0, index + 1);
+    var contents = this.getContents(path);
+    var folders = contents.folders;
+    var files = contents.files;
+    this.setState({
+      cloud: Update(this.state.cloud, {
+        path: {$set: path},
+        folders: {$set: folders},
+        files: {
+          files: {$set: files},
+          selected: {$set: Immutable.Set()},
+          open: {$set: Immutable.Set()}
+        }
+      })
+    }, this.pushState);
+  },
+
+  handlePathLengthen: function(folder) {
+    this.state.snackbar.complete();
+    
+    var path = this.state.cloud.path.push(folder);
+    var contents = this.getContents(path);
+    var folders = contents.folders;
+    var files = contents.files;
+    this.setState({
+      cloud: Update(this.state.cloud, {
+        path: {$set: path},
+        folders: {$set: folders},
+        files: {
+          files: {$set: files},
+          selected: {$set: Immutable.Set()},
+          open: {$set: Immutable.Set()}
+        }
+      })
+    }, this.pushState);
+  },
+
+  getContents: function(path) {
+    //Use all but first item of path
+    return _Database.getContents(path.rest());
+  },
+
+
+  // TAGGER
+
+
+  openTagger: function() {
+    //Set Tagger files to selected files on current page, 
+    //then navigate to Tagger page.
+    var page = this.state.page;
+    var files = this.state[page].files.files.filter(function(file) {
+      return this.state[page].files.selected.includes(file.id);
+    }, this);
+    this.setState({
+      tagger: Update(this.state.tagger, {
+        files: {$set: files},
+        nextPage: {$set: page}
+      })
+    }, this.navigate.bind(this, Page.TAGGER));
+  },
+
+  handleTaggerToggle: function() {
+    this.setState({
+      tagger: Update(this.state.tagger, {
+        isShowingFiles: {$set: !this.state.tagger.isShowingFiles}
+      })
+    });
+  },
+
+  closeTagger: function() {
+    //Collapse header and clear value when closing Tagger
+    this.setState({
+      tagger: Update(this.state.tagger, {
+        isShowingFiles: {$set: false},
+        value: {$set: ""}
+      })
+    });
+    this.navigate(this.state.tagger.nextPage);
+  },
+
+  handleTaggerValueChange: function(event) {
+    var newValue = this.refs.tagger.refs.tagsOnAllFiles.getInputValue();
+    var suggestions = this.updateTaggerSuggestions(newValue);
+    this.setState({
+      tagger: Update(this.state.tagger, {
+        value: {$set: newValue},
+        suggestions: {$set: suggestions}
+      })
+    });
+  },
+
+  updateTaggerSuggestions: function(value) {
+    //Returns tags starting with the given search value
+    
+    console.log('hit db for tags starting with ' + value);
+
+    var suggestion = _Database.makeTaggerSuggestion(value);
+
+    return suggestion;
+  },
+
   handleTagDetach: function(tag) {
     
     var _handleTagDetach = function() {
@@ -661,6 +756,10 @@ var App = React.createClass({
 
   },
 
+
+  // SNACKBAR
+
+
   showSnackbar: function(snackbarState) {
     //After delay, hide snackbar and call snackbarComplete
     var snackbarDelay = 6000;
@@ -699,7 +798,11 @@ var App = React.createClass({
       })
     });
   },
-  
+
+
+  // App pages
+
+
   getSearchProps: function() {
     return {
       searchTags: this.state.search.tags,
@@ -728,51 +831,6 @@ var App = React.createClass({
     };
   },
 
-  handlePathShorten: function(index) {
-    this.state.snackbar.complete();
-    
-    var path = this.state.cloud.path.slice(0, index + 1);
-    var contents = this.getContents(path);
-    var folders = contents.folders;
-    var files = contents.files;
-    this.setState({
-      cloud: Update(this.state.cloud, {
-        path: {$set: path},
-        folders: {$set: folders},
-        files: {
-          files: {$set: files},
-          selected: {$set: Immutable.Set()},
-          open: {$set: Immutable.Set()}
-        }
-      })
-    }, this.pushState);
-  },
-
-  handlePathLengthen: function(folder) {
-    this.state.snackbar.complete();
-    
-    var path = this.state.cloud.path.push(folder);
-    var contents = this.getContents(path);
-    var folders = contents.folders;
-    var files = contents.files;
-    this.setState({
-      cloud: Update(this.state.cloud, {
-        path: {$set: path},
-        folders: {$set: folders},
-        files: {
-          files: {$set: files},
-          selected: {$set: Immutable.Set()},
-          open: {$set: Immutable.Set()}
-        }
-      })
-    }, this.pushState);
-  },
-
-  getContents: function(path) {
-    //Use all but first item of path
-    return _Database.getContents(path.rest());
-  },
-
   getCloudProps: function() {
     return {
       accounts: this.state.accounts,
@@ -793,40 +851,6 @@ var App = React.createClass({
       onFileDelete: this.handleFileDelete,
       onFileTag: this.openTagger,
     };
-  },
-
-  openTagger: function() {
-    //Set Tagger files to selected files on current page, 
-    //then navigate to Tagger page.
-    var page = this.state.page;
-    var files = this.state[page].files.files.filter(function(file) {
-      return this.state[page].files.selected.includes(file.id);
-    }, this);
-    this.setState({
-      tagger: Update(this.state.tagger, {
-        files: {$set: files},
-        nextPage: {$set: page}
-      })
-    }, this.navigate.bind(this, Page.TAGGER));
-  },
-
-  handleTaggerToggle: function() {
-    this.setState({
-      tagger: Update(this.state.tagger, {
-        isShowingFiles: {$set: !this.state.tagger.isShowingFiles}
-      })
-    });
-  },
-
-  closeTagger: function() {
-    //Collapse header and clear value when closing Tagger
-    this.setState({
-      tagger: Update(this.state.tagger, {
-        isShowingFiles: {$set: false},
-        value: {$set: ""}
-      })
-    });
-    this.navigate(this.state.tagger.nextPage);
   },
 
   getTaggerProps: function() {
