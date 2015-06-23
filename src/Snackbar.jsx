@@ -78,7 +78,6 @@ var Snackbar = React.createClass({
     var snackbar = React.findDOMNode(this);
     var message = React.findDOMNode(this.refs.message);
     var action = React.findDOMNode(this.refs.action);
-
     var snackbarHeight = Util.getDOMNodeComputedStyle(this, 'height');
     //Initialize
     Velocity({
@@ -112,11 +111,26 @@ var Snackbar = React.createClass({
   
   componentWillLeave: function(callback) {
     var snackbar = React.findDOMNode(this);
+    var message = React.findDOMNode(this.refs.message);
+    var action = React.findDOMNode(this.refs.action);
     var snackbarHeight = Util.getDOMNodeComputedStyle(this, 'height');
+    Velocity({
+      elements: [message, action],
+      properties: {opacity: 0},
+      options: {
+        duration: 0,
+        easing: 'easeInOutSine',
+      }
+    });
     Velocity({
       elements: snackbar,
       properties: {bottom: -snackbarHeight},
-      options: {duration: 200, easing: 'ease', complete: callback} 
+      options: {
+        duration: 200, 
+        easing: 'ease', 
+        queue: false, 
+        complete: callback
+      } 
     });
   }
 
