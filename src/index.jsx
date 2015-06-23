@@ -445,22 +445,22 @@ var App = React.createClass({
       return !selected.includes(fileId);
     });
 
-    this.setState(Update(this.state, {
-      search: {
+    this.setState({
+      search: Update(this.state.search, {
         files: {
           files: {$set: searchFilesFiles},
           open: {$set: searchFilesOpen},
           selected: {$set: searchFilesSelected}
         }
-      },
-      cloud: {
+      }),
+      cloud: Update(this.state.cloud, {
         files: {
           files: {$set: cloudFilesFiles},
           open: {$set: cloudFilesOpen},
           selected: {$set: cloudFilesSelected}
         }
-      }
-    }));
+      })
+    });
 
     //Set snackbar state
 
@@ -489,22 +489,22 @@ var App = React.createClass({
       //this method is called.
 
       //Reset file state
-      this.setState(Update(this.state, {
-        search: {
+      this.setState({
+        search: Update(this.state.search, {
           files: {
             files: {$set: searchFiles.files},
             open: {$set: searchFiles.open},
             selected: {$set: searchFiles.selected}
           }
-        },
-        cloud: {
+        }),
+        cloud: Update(this.state.cloud, {
           files: {
             files: {$set: cloudFiles.files},
             open: {$set: cloudFiles.open},
             selected: {$set: cloudFiles.selected}
           }
-        }
-      }));
+        })
+      });
     }.bind(this);
     
     this.showSnackbar({
@@ -589,23 +589,23 @@ var App = React.createClass({
         }
       });
       
-      this.setState(Update(this.state, {
-        tagger: {
+      this.setState({
+        tagger: Update(this.state.tagger, {
           files: {$set: newTaggerFiles}
-        },
-        search: {
+        }),
+        search: Update(this.state.search, {
           files: {
             files: {$set: newSearchFiles},
             open: {$set: searchFilesOpen},
             selected: {$set: searchFilesSelected}
           }
-        },
-        cloud: {
+        }),
+        cloud: Update(this.state.cloud, {
           files: {
             files: {$set: newCloudFiles}
           }
-        }
-      }));
+        })
+      });
 
       //Set snackbar state
       var fileCount = this.state.tagger.files.size;
@@ -629,23 +629,23 @@ var App = React.createClass({
         //this method is called.
 
         //Reset file state
-        this.setState(Update(this.state, {
-          tagger: {
+        this.setState({
+          tagger: Update(this.state.tagger, {
             files: {$set: taggerFiles}
-          },
-          search: {
+          }),
+          search: Update(this.state.search, {
             files: {
               files: {$set: searchFiles.files},
               open: {$set: searchFiles.open},
               selected: {$set: searchFiles.selected}
             }
-          },
-          cloud: {
+          }),
+          cloud: Update(this.state.cloud, {
             files: {
               files: {$set: cloudFiles.files}
             }
-          }
-        }));
+          })
+        });
       }.bind(this);
 
       this.showSnackbar({
