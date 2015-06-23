@@ -397,8 +397,11 @@ var App = React.createClass({
   handleFileDelete: function() {
     var page = this.state.page;
 
+    //Files on the current page
+    var pageFiles = this.state[page].files;
+    
     //Files selected on the current page
-    var selected = this.state[page].files.selected;
+    var selected = pageFiles.selected;
 
     //If no files selected, do nothing
     if (selected.size === 0) {
@@ -410,7 +413,6 @@ var App = React.createClass({
     
     //Save previous file states
 
-    var prevState = this.state;
     var searchFiles = this.state.search.files;
     var cloudFiles = this.state.cloud.files;
 
@@ -441,22 +443,22 @@ var App = React.createClass({
       return !selected.includes(fileId);
     });
 
-    this.setState({
-      search: Update(this.state.search, {
+    this.setState(Update(this.state, {
+      search: {
         files: {
           files: {$set: searchFilesFiles},
           open: {$set: searchFilesOpen},
           selected: {$set: searchFilesSelected}
         }
-      }),
-      cloud: Update(this.state.cloud, {
+      },
+      cloud: {
         files: {
           files: {$set: cloudFilesFiles},
           open: {$set: cloudFilesOpen},
           selected: {$set: cloudFilesSelected}
         }
-      })
-    });
+      }
+    }));
 
     //Set snackbar state
 
@@ -468,7 +470,7 @@ var App = React.createClass({
     var action = "UNDO";
 
     var deleteFiles = function() {
-      var filesToDelete = prevState[page].files.files.filter(function(file) {
+      var filesToDelete = pageFiles.files.filter(function(file) {
         return selected.includes(file.id);
       });
       var paths = filesToDelete.map(function(file) {
@@ -485,22 +487,22 @@ var App = React.createClass({
       //this method is called.
 
       //Reset file state
-      this.setState({
-        search: Update(this.state.search, {
+      this.setState(Update(this.state, {
+        search: {
           files: {
             files: {$set: searchFiles.files},
             open: {$set: searchFiles.open},
             selected: {$set: searchFiles.selected}
           }
-        }),
-        cloud: Update(this.state.cloud, {
+        },
+        cloud: {
           files: {
             files: {$set: cloudFiles.files},
             open: {$set: cloudFiles.open},
             selected: {$set: cloudFiles.selected}
           }
-        })
-      });
+        }
+      }));
     }.bind(this);
     
     this.showSnackbar({
