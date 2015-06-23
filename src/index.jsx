@@ -529,20 +529,25 @@ var App = React.createClass({
 
       //Optimistically update search file state
       
-      //Get files selected on the current (next) page
+      //Get ids of tagger files
       var page = this.state.tagger.nextPage;
-      var selected = this.state[page].files.selected;
+      var taggerFileIds = this.state[page].files.selected;
       
       //Save previous search file state
       var searchFiles = this.state.search.files;
       
       var searchTags = this.state.search.tags;
 
-      //Remove tag from search files
+      //Remove tag from search files that are also tagger files
       var newSearchFiles = searchFiles.files.map(function(file) {
-        var newFile = Immutable.Map(file).toObject();
-        newFile.tags = Immutable.OrderedSet(newFile.tags).delete(tag).toArray();
-        return newFile;
+        if (taggerFileIds.includes(file.id)) {
+          var newFile = Immutable.Map(file).toObject();
+          newFile.tags = Immutable.OrderedSet(newFile.tags).delete(tag).toArray();
+          return newFile;
+        }
+        else {
+          return file;
+        }
       })
       //Remove search files that no longer match all search tags
       .filter(function(file) {
@@ -568,11 +573,16 @@ var App = React.createClass({
       //Save previous cloud file state
       var cloudFiles = this.state.cloud.files;
       
-      //Remove tag from cloud files
+      //Remove tag from cloud files that are also tagger files
       var newCloudFiles = cloudFiles.files.map(function(file) {
-        var newFile = Immutable.Map(file).toObject();
-        newFile.tags = Immutable.OrderedSet(newFile.tags).delete(tag).toArray();
-        return newFile;
+        if (taggerFileIds.includes(file.id)) {
+          var newFile = Immutable.Map(file).toObject();
+          newFile.tags = Immutable.OrderedSet(newFile.tags).delete(tag).toArray();
+          return newFile;
+        }
+        else {
+          return file;
+        }
       });
       
       this.setState(Update(this.state, {
