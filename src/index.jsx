@@ -2,6 +2,7 @@ var React = require('react/addons');
 //var injectTapEventPlugin = require("react-tap-event-plugin");
 //injectTapEventPlugin();
 var ReactTransitionGroup = React.addons.TransitionGroup;
+var Update = React.addons.update;
 
 var Search = require('./Search');
 var Cloud = require('./Cloud');
@@ -75,10 +76,6 @@ var App = React.createClass({
     };
   },
 
-  setDeepState: function(nextState, callback) {
-    this.setState(React.addons.update(this.state, nextState), callback);
-  },
-
   _setStateFromHistory: function(event) {
     this.state.snackbarComplete();
     
@@ -91,9 +88,9 @@ var App = React.createClass({
     var suggestionsVisible = searchTags.isEmpty() || this.searchInputIsFocused();
     var contents = this.getContents(path);
     
-    this.setDeepState({
-      page: {$set: page},
-      search: {
+    this.setState({
+      page: page,
+      search: Update(this.state.search, {
         tags: {$set: searchTags},
         value: {$set: value},
         files: {
@@ -101,8 +98,8 @@ var App = React.createClass({
           open: {$set: Immutable.Set()},
           selected: {$set: Immutable.Set()}
         }
-      },
-      cloud: {
+      }),
+      cloud: Update(this.state.cloud, {
         path: {$set: path},
         folders: {$set: contents.folders},
         files: {
@@ -110,7 +107,7 @@ var App = React.createClass({
           open: {$set: Immutable.Set()},
           selected: {$set: Immutable.Set()}
         }
-      }
+      })
     }, function() {
       this.showSearchSuggestions(suggestionsVisible);
     });
@@ -176,8 +173,8 @@ var App = React.createClass({
     //Keep suggestions visible if input is focused
     var suggestionsVisible = this.searchInputIsFocused();
     
-    this.setDeepState({
-      search: {
+    this.setState({
+      search: Update(this.state.search, {
         tags: {$set: newSearchTags},
         value: {$set: ""},
         files: {
@@ -185,7 +182,7 @@ var App = React.createClass({
           open: {$set: files.open},
           selected: {$set: files.selected}
         }
-      },
+      }),
     }, function() {
       this.showSearchSuggestions(suggestionsVisible);
       this.pushState();
@@ -205,15 +202,15 @@ var App = React.createClass({
     //Show suggestions if there are no search tags
     var suggestionsVisible = newSearchTags.isEmpty();
     
-    this.setDeepState({
-      search: {
+    this.setState({
+      search: Update(this.state.search, {
         tags: {$set: newSearchTags},
         files: {
           files: {$set: files.files},
           open: {$set: files.open},
           selected: {$set: files.selected}
         }
-      },
+      }),
     }, function() {
       this.showSearchSuggestions(suggestionsVisible);
       this.pushState();
@@ -227,10 +224,10 @@ var App = React.createClass({
 
   handleSearchValueChange: function(event) {
     var newValue = this.refs.search.refs.searchTags.getInputValue();
-    this.setDeepState({
-      search: {
+    this.setState({
+      search: Update(this.state.search, {
         value: {$set: newValue}
-      }
+      })
     }, function() {
       //Update search suggestions based on new search value
       this.showSearchSuggestions(true);
@@ -240,11 +237,11 @@ var App = React.createClass({
   handleTaggerValueChange: function(event) {
     var newValue = this.refs.tagger.refs.tagsOnAllFiles.getInputValue();
     var suggestions = this.updateTaggerSuggestions(newValue);
-    this.setDeepState({
-      tagger: {
+    this.setState({
+      tagger: Update(this.state.tagger, {
         value: {$set: newValue},
         suggestions: {$set: suggestions}
-      }
+      })
     });
   },
 
@@ -275,14 +272,14 @@ var App = React.createClass({
       };
     }
 
-    this.setDeepState({
-      search: {
+    this.setState({
+      search: Update(this.state.search, {
         suggestions: {
           visible: {$set: visible},
           tags: {$set: suggestions.tags},
           title: {$set: suggestions.title}
         }
-      }
+      })
     });
   },
 
@@ -336,10 +333,14 @@ var App = React.createClass({
    */
   setFileState: function(page, fileUpdate) {
     if (page === Page.SEARCH) {
-      this.setDeepState({search: fileUpdate});
+      this.setState({
+        search: Update(this.state.search, fileUpdate)
+      });
     }
     else if (page === Page.CLOUD) {
-      this.setDeepState({cloud: fileUpdate});
+      this.setState({
+        cloud: Update(this.state.cloud, fileUpdate)
+      });
     }
   },
 
@@ -442,7 +443,7 @@ var App = React.createClass({
       return !selected.includes(fileId);
     });
 
-    this.setDeepState({
+    this.setState(Update(this.state, {
       search: {
         files: {
           files: {$set: searchFilesFiles},
@@ -457,7 +458,7 @@ var App = React.createClass({
           selected: {$set: cloudFilesSelected}
         }
       }
-    });
+    }));
 
     //Set snackbar state
 
@@ -486,7 +487,7 @@ var App = React.createClass({
       //this method is called.
 
       //Reset file state
-      this.setDeepState({
+      this.setState(Update(this.state, {
         search: {
           files: {
             files: {$set: searchFiles.files},
@@ -501,7 +502,7 @@ var App = React.createClass({
             selected: {$set: cloudFiles.selected}
           }
         }
-      });
+      }));
     }.bind(this);
     
     this.showSnackbar({
@@ -586,7 +587,7 @@ var App = React.createClass({
         }
       });
       
-      this.setDeepState({
+      this.setState(Update(this.state, {
         tagger: {
           files: {$set: newTaggerFiles}
         },
@@ -602,7 +603,7 @@ var App = React.createClass({
             files: {$set: newCloudFiles}
           }
         }
-      });
+      }));
 
       //Set snackbar state
       var fileCount = this.state.tagger.files.size;
@@ -626,7 +627,7 @@ var App = React.createClass({
         //this method is called.
 
         //Reset file state
-        this.setDeepState({
+        this.setState(Update(this.state, {
           tagger: {
             files: {$set: taggerFiles}
           },
@@ -642,7 +643,7 @@ var App = React.createClass({
               files: {$set: cloudFiles.files}
             }
           }
-        });
+        }));
       }.bind(this);
 
       this.showSnackbar({
@@ -726,8 +727,8 @@ var App = React.createClass({
     var contents = this.getContents(path);
     var folders = contents.folders;
     var files = contents.files;
-    this.setDeepState({
-      cloud: {
+    this.setState({
+      cloud: Update(this.state.cloud, {
         path: {$set: path},
         folders: {$set: folders},
         files: {
@@ -735,7 +736,7 @@ var App = React.createClass({
           selected: {$set: Immutable.Set()},
           open: {$set: Immutable.Set()}
         }
-      }
+      })
     }, this.pushState);
   },
 
@@ -746,8 +747,8 @@ var App = React.createClass({
     var contents = this.getContents(path);
     var folders = contents.folders;
     var files = contents.files;
-    this.setDeepState({
-      cloud: {
+    this.setState({
+      cloud: Update(this.state.cloud, {
         path: {$set: path},
         folders: {$set: folders},
         files: {
@@ -755,7 +756,7 @@ var App = React.createClass({
           selected: {$set: Immutable.Set()},
           open: {$set: Immutable.Set()}
         }
-      }
+      })
     }, this.pushState);
   },
 
@@ -793,29 +794,29 @@ var App = React.createClass({
     var files = this.state[page].files.files.filter(function(file) {
       return this.state[page].files.selected.includes(file.id);
     }, this);
-    this.setDeepState({
-      tagger: {
+    this.setState({
+      tagger: Update(this.state.tagger, {
         files: {$set: files},
         nextPage: {$set: page}
-      }
+      })
     }, this.navigate.bind(this, Page.TAGGER));
   },
 
   handleTaggerToggle: function() {
-    this.setDeepState({
-      tagger: {
+    this.setState({
+      tagger: Update(this.state.tagger, {
         isShowingFiles: {$set: !this.state.tagger.isShowingFiles}
-      }
+      })
     });
   },
 
   closeTagger: function() {
     //Collapse header and clear value when closing Tagger
-    this.setDeepState({
-      tagger: {
+    this.setState({
+      tagger: Update(this.state.tagger, {
         isShowingFiles: {$set: false},
         value: {$set: ""}
-      }
+      })
     });
     this.navigate(this.state.tagger.nextPage);
   },
