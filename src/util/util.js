@@ -21,6 +21,12 @@ module.exports = {
 
   noop: function() {},
 
+  call: function(func) {
+    if (typeof func === 'function') {
+      func();
+    }
+  },
+
   getDOMNodeComputedStyle: function(ref, property) {
     //Of a rendered React element
     var node = React.findDOMNode(ref);
