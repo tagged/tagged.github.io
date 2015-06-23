@@ -43,7 +43,7 @@ module.exports = {
    * Recursive helper to deleteFiles
    * 
    * @param contents An array of folders and file items
-   * @param path     The path to traverse as an array
+   * @param path     An array representing the path to traverse
    * 
    * @throws "File does not exist"
    */
@@ -63,6 +63,53 @@ module.exports = {
       var modifiedContents = contents.map(function(item) {
         if (item.isFolder && item.name === path[0]) {
           item.contents = this._deleteFile(item.contents, path.slice(1));
+        }
+        return item;
+      }, this);
+      return modifiedContents;
+    }
+  },
+
+  /**
+   * Detaches specified tag from files at specified paths.
+   * 
+   * @param tag   The tag to detach from all files
+   * @param paths An array of file paths
+   *              Each path should be an array
+   */
+  detachTag: function(paths, tag) {
+    paths.forEach(function(path) {
+      //Modify global
+      _cloud = this._detachTagFromFile(_cloud, path, tag);
+    }, this);
+  },
+
+  /** 
+   * Detach the specified tag from the file at the specified path.
+   * Recursive helper to detachTag.
+   * 
+   * @param contents An array of folders and file items
+   * @param path     An array of the path to traverse
+   * @param tag      The tag to detach from the file at the end of the path
+   */
+  _detachTagFromFile: function(contents, path, tag) {
+    if (path.length === 1) {
+      //No more folders to traverse
+      //Return contents with tag removed from file
+      var contentsMinusFileTag = contents.map(function(item) {
+        if (!item.isFolder && item.name === path[0]) {
+          var newFile = Immutable.Map(item).toObject();
+          newFile.tags = Immutable.OrderedSet(newFile.tags).delete(tag).toArray();
+          return newFile;
+        }
+        return item;
+      });
+      return contentsMinusFileTag;
+    }
+    else {
+      var modifiedContents = contents.map(function(item) {
+        if (item.isFolder && item.name === path[0]) {
+          item.contents = this._detachTagFromFile(item.contents, path.slice(1), tag);
         }
         return item;
       }, this);

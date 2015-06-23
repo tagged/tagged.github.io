@@ -26,6 +26,8 @@ var Tagger = React.createClass({
     onTaggerValueChange: React.PropTypes.func,
     suggestions: React.PropTypes.object,
     onTaggerFocus: React.PropTypes.func,
+
+    onTagDetach: React.PropTypes.func,
   },
 
   getStyle: function() {
@@ -199,7 +201,7 @@ var Tagger = React.createClass({
               <Subheader text={tagsTitle}/>
               <Tags ref="tagsOnAllFiles"
                     tags={tagsOnAllFiles}
-                    onTagClick={Util.noop}
+                    onTagClick={this.props.onTagDetach}
                     withInput={true}
                     value={this.props.taggerValue}
                     onValueChange={this.props.onTaggerValueChange}
