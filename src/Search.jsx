@@ -125,7 +125,7 @@ var Search = React.createClass({
                     value={this.props.searchValue}
                     onValueChange={this.props.onSearchValueChange}
                     placeholder={placeholder}
-                    onSubmit={this.props.onSearchTagAdd.bind(null, this.props.searchValue)}
+                    onSubmit={this.props.onSearchTagAdd}
                     onFocus={this.props.onSearchFocus}/>
               {suggestions}
           </div>

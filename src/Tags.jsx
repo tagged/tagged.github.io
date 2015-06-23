@@ -128,7 +128,7 @@ var Tags = React.createClass({
       var onKeyDown = function(event) {
         if (event.key === 'Enter') {
           if (this.props.value.length > 0) {
-            this.props.onSubmit();
+            this.props.onSubmit(this.props.value);
           }
         }
       }.bind(this);

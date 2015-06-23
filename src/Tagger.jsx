@@ -27,6 +27,7 @@ var Tagger = React.createClass({
     suggestions: React.PropTypes.object,
     onTaggerFocus: React.PropTypes.func,
 
+    onTagAttach: React.PropTypes.func,
     onTagDetach: React.PropTypes.func,
   },
 
@@ -154,7 +155,7 @@ var Tagger = React.createClass({
               <Subheader text={title}/>
               <Tags ref="tagsOnSomeFiles"
                     tags={tagsOnSomeFiles}
-                    onTagClick={Util.noop}/>
+                    onTagClick={this.props.onTagAttach}/>
           </div>
         );
       }
@@ -174,7 +175,7 @@ var Tagger = React.createClass({
             <Subheader text={title}/>
             <Tags tags={this.props.suggestions}
                   disabledTags={tagsOnAllFiles}
-                  onTagClick={Util.noop}/>
+                  onTagClick={this.props.onTagAttach}/>
         </div>
       );
     }
@@ -206,7 +207,7 @@ var Tagger = React.createClass({
                     value={this.props.taggerValue}
                     onValueChange={this.props.onTaggerValueChange}
                     placeholder={"Add tag"}
-                    onSubmit={Util.noop}
+                    onSubmit={this.props.onTagAttach}
                     onFocus={this.props.onTaggerFocus}/>
               {suggestions}
           </div>

@@ -71,6 +71,53 @@ module.exports = {
   },
 
   /**
+   * Attaches specified tag from files at specified paths.
+   * 
+   * @param tag   The tag to attach to all files
+   * @param paths An array of file paths
+   *              Each path should be an array
+   */
+  attachTag: function(paths, tag) {
+    paths.forEach(function(path) {
+      //Modify global
+      _cloud = this._attachTagToFile(_cloud, path, tag);
+    }, this);
+  },
+
+  /** 
+   * Attach the specified tag to the file at the specified path.
+   * Recursive helper to attachTag.
+   * 
+   * @param contents An array of folders and file items
+   * @param path     An array of the path to traverse
+   * @param tag      The tag to attach to the file at the end of the path
+   */
+  _attachTagToFile: function(contents, path, tag) {
+    if (path.length === 1) {
+      //No more folders to traverse
+      //Return contents with tag added to file
+      var contentsPlusFileTag = contents.map(function(item) {
+        if (!item.isFolder && item.name === path[0]) {
+          var newFile = Immutable.Map(item).toObject();
+          newFile.tags = Immutable.OrderedSet(newFile.tags).add(tag).toArray();
+          return newFile;
+        }
+        return item;
+      });
+      return contentsPlusFileTag;
+    }
+    else {
+      var modifiedContents = contents.map(function(item) {
+        if (item.isFolder && item.name === path[0]) {
+          item.contents = this._attachTagToFile(item.contents, path.slice(1), tag);
+        }
+        return item;
+      }, this);
+      return modifiedContents;
+    }
+  },
+
+  /**
    * Detaches specified tag from files at specified paths.
    * 
    * @param tag   The tag to detach from all files
