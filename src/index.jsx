@@ -623,6 +623,7 @@ var App = React.createClass({
    */
   attachTagToFile: function(tag, file) {
     var newFile = Object.create(file);
+    //Duplicate tags not allowed on a file
     newFile.tags = Immutable.OrderedSet(newFile.tags).add(tag).toArray();
     return newFile;
   },

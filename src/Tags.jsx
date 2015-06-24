@@ -122,10 +122,15 @@ var Tags = React.createClass({
       };
 
       var onKeyDown = function(event) {
-        if (event.key === 'Enter') {
-          if (this.props.value.length > 0) {
-            this.props.onSubmit(this.props.value);
-          }
+        if (
+          //pressed enter
+          event.key === 'Enter'
+          //value not empty string
+          && this.props.value.length > 0
+          //value is not already a tag
+          && !this.props.tags.includes(this.props.value)
+        ) {
+          this.props.onSubmit(this.props.value);
         }
       }.bind(this);
 
