@@ -595,23 +595,13 @@ var App = React.createClass({
 
   handleTaggerValueChange: function(event) {
     var newValue = this.refs.tagger.refs.tagsOnAllFiles.getInputValue();
-    var suggestions = this.updateTaggerSuggestions(newValue);
+    var suggestions = _Database.makeTaggerSuggestion(newValue);
     this.setState({
       tagger: Update(this.state.tagger, {
         value: {$set: newValue},
         suggestions: {$set: suggestions}
       })
     });
-  },
-
-  updateTaggerSuggestions: function(value) {
-    //Returns tags starting with the given search value
-    
-    console.log('hit db for tags starting with ' + value);
-
-    var suggestion = _Database.makeTaggerSuggestion(value);
-
-    return suggestion;
   },
 
   handleTagAttach: function(tag) {

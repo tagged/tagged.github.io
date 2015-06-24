@@ -280,6 +280,7 @@ module.exports = {
 
   //Return Immutable.OrderedSet of tags starting with given value
   makeTaggerSuggestion: function(value) {
+    console.log('hit db for tags starting with ' + value);
     var tags = this.getTags().filter(function(tag) {
       return tag.indexOf(value) === 0;
     });
