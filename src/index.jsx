@@ -604,6 +604,12 @@ var App = React.createClass({
   },
 
   handleTaggerValueChange: function(event) {
+    this.state.snackbar.complete();
+
+    //May need to call the rest of this method as part of the
+    //snackbar.complete callback, if the database-read below 
+    //can happen before the database-write in snackbar.complete
+
     var newValue = this.refs.tagger.refs.tagsOnAllFiles.getInputValue();
     var suggestions = _Database.makeTaggerSuggestion(newValue);
     this.setState({
