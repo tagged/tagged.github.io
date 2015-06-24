@@ -98,7 +98,7 @@ module.exports = {
       //Return contents with tag added to file
       var contentsPlusFileTag = contents.map(function(item) {
         if (!item.isFolder && item.name === path[0]) {
-          var newFile = Immutable.Map(item).toObject();
+          var newFile = Object.create(item);
           newFile.tags = Immutable.OrderedSet(newFile.tags).add(tag).toArray();
           return newFile;
         }

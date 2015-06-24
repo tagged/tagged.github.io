@@ -614,6 +614,19 @@ var App = React.createClass({
     });
   },
 
+  /**
+   * Return a copy of the specified file object 
+   * with the specified tag added.
+   *
+   * @param tag  The tag to attach
+   * @param file The file to which the tag will attach
+   */
+  attachTagToFile: function(tag, file) {
+    var newFile = Object.create(file);
+    newFile.tags = Immutable.OrderedSet(newFile.tags).add(tag).toArray();
+    return newFile;
+  },
+
   handleTagAttach: function(tag) {
 
     var _handleTagAttach = function() {
@@ -625,10 +638,8 @@ var App = React.createClass({
       
       //Add tag to tagger files
       var newTaggerFiles = taggerFiles.map(function(file) {
-        var newFile = Immutable.Map(file).toObject();
-        newFile.tags = Immutable.OrderedSet(newFile.tags).add(tag).toArray();
-        return newFile;
-      });
+        return this.attachTagToFile(tag, file);
+      }, this);
 
       //Optimistically update search file state
       
@@ -644,14 +655,12 @@ var App = React.createClass({
       //Add tag to search files that are also tagger files
       var newSearchFiles = searchFiles.files.map(function(file) {
         if (taggerFileIds.includes(file.id)) {
-          var newFile = Immutable.Map(file).toObject();
-          newFile.tags = Immutable.OrderedSet(newFile.tags).add(tag).toArray();
-          return newFile;
+          return this.attachTagToFile(tag, file);
         }
         else {
           return file;
         }
-      });
+      }, this);
       //Add tagger files to search files if tag is in search tags
       if (searchTags.includes(tag)) {
         newTaggerFiles.forEach(function(file) {
@@ -673,14 +682,12 @@ var App = React.createClass({
       //Add tag to cloud files that are also tagger files
       var newCloudFiles = cloudFiles.files.map(function(file) {
         if (taggerFileIds.includes(file.id)) {
-          var newFile = Immutable.Map(file).toObject();
-          newFile.tags = Immutable.OrderedSet(newFile.tags).add(tag).toArray();
-          return newFile;
+          return this.attachTagToFile(tag, file);
         }
         else {
           return file;
         }
-      });
+      }, this);
       
       this.setState({
         tagger: Update(this.state.tagger, {
@@ -763,7 +770,7 @@ var App = React.createClass({
    * without the specified tag.
    *
    * @param tag  The tag to detach
-   * @param file The file from which to detach the tag
+   * @param file The file from which the tag will detach
    */
   detachTagFromFile: function(tag, file) {
     var newFile = Object.create(file);
