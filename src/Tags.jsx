@@ -22,7 +22,7 @@ var Tags = React.createClass({
       React.PropTypes.instanceOf(Immutable.OrderedSet),
       React.PropTypes.instanceOf(Immutable.List)
     ]),
-    disabledTags: React.PropTypes.object,
+    disabledTags: React.PropTypes.instanceOf(Immutable.Set),
     onTagClick: React.PropTypes.func,
     style: React.PropTypes.object,
 

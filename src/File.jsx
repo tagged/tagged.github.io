@@ -10,6 +10,7 @@ var Dimension = R.dimension;
 var Image = R.image;
 var Typography = R.typography;
 var Util = require('./util/util');
+var Immutable = require('immutable');
 
 var TRUE = R.constant.ternary.TRUE;
 var FALSE = R.constant.ternary.FALSE;
@@ -25,7 +26,7 @@ var File = React.createClass({
     cloud: React.PropTypes.string,
     link: React.PropTypes.string,
     tags: React.PropTypes.array,
-    disabledTags: React.PropTypes.object,
+    disabledTags: React.PropTypes.instanceOf(Immutable.Set),
     onTagClick: React.PropTypes.func,
     isSelected: React.PropTypes.bool,
     isOpen: React.PropTypes.bool,
