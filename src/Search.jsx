@@ -8,21 +8,21 @@ var R = require('./res/index');
 var Color = R.color;
 var Dimension = R.dimension;
 var Util = require('./util/util');
-
+var Immutable = require('immutable');
 
 
 var Search = React.createClass({
   
   propTypes: {
-    searchTags: React.PropTypes.object,
+    searchTags: React.PropTypes.instanceOf(Immutable.Set),
     searchValue: React.PropTypes.string,
     
     files: React.PropTypes.object,
-    filesSelected: React.PropTypes.object,
-    filesOpen: React.PropTypes.object,
+    filesSelected: React.PropTypes.instanceOf(Immutable.Set),
+    filesOpen: React.PropTypes.instanceOf(Immutable.Set),
 
     suggestionsVisible: React.PropTypes.bool,
-    suggestionsTags: React.PropTypes.object,
+    suggestionsTags: React.PropTypes.instanceOf(Immutable.Set),
     suggestionsTitle: React.PropTypes.string,
 
     onSearchTagAdd: React.PropTypes.func,
@@ -67,7 +67,7 @@ var Search = React.createClass({
       type: file.type,
       cloud: file.cloud,
       link: file.link,
-      tags: file.tags,
+      tags: Immutable.OrderedSet(file.tags),
       disabledTags: this.props.searchTags,
       onTagClick: this.props.onSearchTagAdd,
       isSelected: this.props.filesSelected.includes(file.id),

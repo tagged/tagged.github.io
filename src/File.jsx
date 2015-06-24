@@ -25,7 +25,7 @@ var File = React.createClass({
     type: React.PropTypes.string,
     cloud: React.PropTypes.string,
     link: React.PropTypes.string,
-    tags: React.PropTypes.array,
+    tags: React.PropTypes.instanceOf(Immutable.OrderedSet),
     disabledTags: React.PropTypes.instanceOf(Immutable.Set),
     onTagClick: React.PropTypes.func,
     isSelected: React.PropTypes.bool,
@@ -103,11 +103,11 @@ var File = React.createClass({
       );
     }
     
-    var plural = this.props.tags.length !== 1;
+    var plural = this.props.tags.size !== 1;
 
     var tagCount = (
       <div style={style.metadata}>
-          {this.props.tags.length + (plural ? " tags" : " tag")}
+          {this.props.tags.size + (plural ? " tags" : " tag")}
       </div>
     );
 

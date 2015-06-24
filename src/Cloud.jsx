@@ -54,7 +54,7 @@ var Cloud = React.createClass({
       type: file.type,
       cloud: file.cloud,
       link: file.link,
-      tags: file.tags,
+      tags: Immutable.OrderedSet(file.tags),
       disabledTags: Immutable.Set(file.tags), //all
       onTagClick: Util.noop, //nothing
       isSelected: this.props.filesSelected.includes(file.id),

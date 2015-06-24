@@ -9,9 +9,7 @@ var Color = R.color;
 var Dimension = R.dimension;
 var Typography = R.typography;
 var Util = require('./util/util');
-
 var Immutable = require('immutable');
-
 
 
 var Tagger = React.createClass({
@@ -24,7 +22,7 @@ var Tagger = React.createClass({
 
     taggerValue: React.PropTypes.string,
     onTaggerValueChange: React.PropTypes.func,
-    suggestions: React.PropTypes.object,
+    suggestions: React.PropTypes.instanceOf(Immutable.OrderedSet),
     onTaggerFocus: React.PropTypes.func,
 
     onTagAttach: React.PropTypes.func,
