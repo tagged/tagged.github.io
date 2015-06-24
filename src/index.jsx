@@ -758,6 +758,21 @@ var App = React.createClass({
 
   },
 
+  /**
+   * Return a copy of the specified file object 
+   * without the specified tag.
+   *
+   * @param tag  The tag to detach
+   * @param file The file from which to detach the tag
+   */
+  detachTagFromFile: function(tag, file) {
+    var newFile = Object.create(file);
+    newFile.tags = newFile.tags.filter(function(newTag) {
+      return newTag !== tag;
+    });
+    return newFile;
+  },
+
   handleTagDetach: function(tag) {
     
     var _handleTagDetach = function() {
@@ -769,10 +784,8 @@ var App = React.createClass({
       
       //Remove tag from tagger files
       var newTaggerFiles = taggerFiles.map(function(file) {
-        var newFile = Immutable.Map(file).toObject();
-        newFile.tags = Immutable.OrderedSet(newFile.tags).delete(tag).toArray();
-        return newFile;
-      });
+        return this.detachTagFromFile(tag, file);
+      }, this);
 
       //Optimistically update search file state
       
@@ -788,14 +801,12 @@ var App = React.createClass({
       //Remove tag from search files that are also tagger files
       var newSearchFiles = searchFiles.files.map(function(file) {
         if (taggerFileIds.includes(file.id)) {
-          var newFile = Immutable.Map(file).toObject();
-          newFile.tags = Immutable.OrderedSet(newFile.tags).delete(tag).toArray();
-          return newFile;
+          return this.detachTagFromFile(tag, file);
         }
         else {
           return file;
         }
-      })
+      }, this)
       //Remove search files that no longer match all search tags
       .filter(function(file) {
         return searchTags.intersect(file.tags).size === searchTags.size;
@@ -823,14 +834,12 @@ var App = React.createClass({
       //Remove tag from cloud files that are also tagger files
       var newCloudFiles = cloudFiles.files.map(function(file) {
         if (taggerFileIds.includes(file.id)) {
-          var newFile = Immutable.Map(file).toObject();
-          newFile.tags = Immutable.OrderedSet(newFile.tags).delete(tag).toArray();
-          return newFile;
+          return this.detachTagFromFile(tag, file);
         }
         else {
           return file;
         }
-      });
+      }, this);
       
       this.setState({
         tagger: Update(this.state.tagger, {

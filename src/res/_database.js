@@ -145,8 +145,10 @@ module.exports = {
       //Return contents with tag removed from file
       var contentsMinusFileTag = contents.map(function(item) {
         if (!item.isFolder && item.name === path[0]) {
-          var newFile = Immutable.Map(item).toObject();
-          newFile.tags = Immutable.OrderedSet(newFile.tags).delete(tag).toArray();
+          var newFile = Object.create(item);
+          newFile.tags = newFile.tags.filter(function(newTag) {
+            return newTag !== tag;
+          });
           return newFile;
         }
         return item;
