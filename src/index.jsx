@@ -115,14 +115,24 @@ var App = React.createClass({
     });
   },
 
-  pushState: function() {
-    //Add a browser history entry
-    //Note: cannot push Immutable.List to history, so convert to array
-    window.history.pushState({
+  setBrowserState: function(replace) {
+    //Add or replace browser history entry.
+    //Specify `true` to replace browser history state 
+    //instead of adding a new one.
+    
+    //Note: cannot store Immutable.List in history, 
+    //so convert to array
+    var browserState = {
       page: this.state.page,
       searchTags: this.state.search.tags.toArray(),
       path: this.state.cloud.path.toArray()
-    }, '');
+    };
+    if (replace) {
+      window.history.replaceState(browserState, '');
+    }
+    else {
+      window.history.pushState(browserState, '');
+    }
   },
 
   componentDidMount: function() {
@@ -191,7 +201,7 @@ var App = React.createClass({
       }),
     }, function() {
       this.showSearchSuggestions(suggestionsVisible);
-      this.pushState();
+      this.setBrowserState();
     });
   },
 
@@ -219,7 +229,7 @@ var App = React.createClass({
       }),
     }, function() {
       this.showSearchSuggestions(suggestionsVisible);
-      this.pushState();
+      this.setBrowserState();
     });
   },
 
@@ -523,7 +533,7 @@ var App = React.createClass({
           open: {$set: Immutable.Set()}
         }
       })
-    }, this.pushState);
+    }, this.setBrowserState);
   },
 
   handlePathLengthen: function(folder) {
@@ -543,7 +553,7 @@ var App = React.createClass({
           open: {$set: Immutable.Set()}
         }
       })
-    }, this.pushState);
+    }, this.setBrowserState);
   },
 
   getContents: function(path) {
@@ -1032,13 +1042,17 @@ var App = React.createClass({
   },
 
   navigate: function(page) {
-    if (page === this.state.page) {
+    var currentPage = this.state.page;
+    if (page === currentPage) {
       return;
     }
     this.state.snackbar.complete();
     this.setState({
       page: page
-    }, this.pushState);
+    }, function() {
+      var replace = currentPage === Page.TAGGER;
+      this.setBrowserState(replace);
+    });
   },
 
   getStyle: function() {
