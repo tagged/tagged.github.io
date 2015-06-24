@@ -589,6 +589,10 @@ var App = React.createClass({
     this.navigate(this.state.tagger.nextPage);
   },
 
+  handleTaggerFocus: function() {
+    this.state.snackbar.complete();
+  },
+
   handleTaggerValueChange: function(event) {
     var newValue = this.refs.tagger.refs.tagsOnAllFiles.getInputValue();
     var suggestions = this.updateTaggerSuggestions(newValue);
@@ -1008,7 +1012,7 @@ var App = React.createClass({
       taggerValue: this.state.tagger.value,
       onTaggerValueChange: this.handleTaggerValueChange,
       suggestions: this.state.tagger.suggestions,
-      onTaggerFocus: Util.noop,
+      onTaggerFocus: this.handleTaggerFocus,
 
       onTagAttach: this.handleTagAttach,
       onTagDetach: this.handleTagDetach,
