@@ -1,5 +1,6 @@
 var React = require('react/addons');
 var R = require('./res/index');
+var Animation = R.animation;
 var Color = R.color;
 var Dimension = R.dimension;
 var Typography = R.typography;
@@ -94,15 +95,18 @@ var Snackbar = React.createClass({
     Velocity({
       elements: snackbar,
       properties: {bottom: 0},
-      options: {duration: 350, easing: 'ease'}
+      options: {
+        duration: Animation.snackbar.enter.duration,
+        easing: Animation.snackbar.enter.easing,
+      }
     });
     Velocity({
       elements: [message, action],
       properties: {opacity: 1},
       options: {
-        delay: 60,
-        duration: 290,
-        easing: 'easeInOutSine',
+        delay: Animation.snackbar.enter.textDelay,
+        duration: Animation.snackbar.enter.textDuration,
+        easing: Animation.snackbar.enter.easing,
         queue: false,
         complete: callback
       }
@@ -118,16 +122,15 @@ var Snackbar = React.createClass({
       elements: [message, action],
       properties: {opacity: 0},
       options: {
-        duration: 0,
-        easing: 'easeInOutSine',
+        delay: Animation.snackbar.leave.duration,
       }
     });
     Velocity({
       elements: snackbar,
       properties: {bottom: -snackbarHeight},
       options: {
-        duration: 200, 
-        easing: 'ease', 
+        duration: Animation.snackbar.leave.duration, 
+        easing: Animation.snackbar.leave.easing,
         queue: false, 
         complete: callback
       } 

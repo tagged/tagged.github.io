@@ -2,13 +2,13 @@ module.exports = {
   
   snackbar: {
     enter: {
-      duration: 3500,
+      duration: 350,
       easing: 'ease',
-      textDelay: 600,
-      textDuration: 2900,
+      textDelay: 60,
+      textDuration: 290,
     },
     leave: {
-      duration: 2000,
+      duration: 200,
       easing: 'ease',
     }
   }
