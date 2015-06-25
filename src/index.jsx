@@ -265,7 +265,6 @@ var App = React.createClass({
 
     var suggestions;
     if (visible) {
-      console.log('hit db for tag suggestions');
       suggestions = _Database.makeSearchSuggestion(
         this.state.search.tags, 
         this.state.search.value
@@ -291,9 +290,6 @@ var App = React.createClass({
   updateSearchFiles: function(searchTags) {
     //Returns what the next state of files, files selected, and files open
     //would look like, given the search tags
-
-    console.log('ask database for files');
-
     var files = _Database.filterFiles(searchTags);
     var fileIds = files.map(function(file) {
       return file.id;
@@ -476,7 +472,6 @@ var App = React.createClass({
         return file.path.concat([file.name]);
       });
       //Delete files in database
-      console.log('delete files in database');
       _Database.deleteFiles(paths);
     };
 
@@ -732,7 +727,6 @@ var App = React.createClass({
           return file.path.concat([file.name]);
         });
         //Attach tag in database
-        console.log('attach tag in database');
         _Database.attachTag(paths, tag);
       };
 
@@ -885,8 +879,7 @@ var App = React.createClass({
         var paths = taggerFiles.map(function(file) {
           return file.path.concat([file.name]);
         });
-        //Detach tags in database
-        console.log('detach tag in database');
+        //Detach tag in database
         _Database.detachTag(paths, tag);
       };
 

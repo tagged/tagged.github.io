@@ -31,6 +31,7 @@ module.exports = {
    *              Each path should be an array
    */
   deleteFiles: function(paths) {
+    console.log('delete files in database');
     paths.forEach(function(path) {
       //Modify global
       _cloud = this._deleteFile(_cloud, path);
@@ -78,6 +79,7 @@ module.exports = {
    *              Each path should be an array
    */
   attachTag: function(paths, tag) {
+    console.log('attach tag in database');
     paths.forEach(function(path) {
       //Modify global
       _cloud = this._attachTagToFile(_cloud, path, tag);
@@ -125,6 +127,7 @@ module.exports = {
    *              Each path should be an array
    */
   detachTag: function(paths, tag) {
+    console.log('detach tag in database');
     paths.forEach(function(path) {
       //Modify global
       _cloud = this._detachTagFromFile(_cloud, path, tag);
@@ -172,6 +175,9 @@ module.exports = {
    * @param tags Immutable.Set of tags guiding the file search
    */
   filterFiles: function(tags) {
+
+    console.log('ask database for files');
+
     if (tags.isEmpty()) {
       return Immutable.List();
     }
@@ -206,6 +212,8 @@ module.exports = {
    */
   makeSearchSuggestion: function(searchTags, searchValue) {
 
+    console.log('hit db for tag suggestions');
+    
     var suggestedTags;
 
     if (searchTags.isEmpty()) {
