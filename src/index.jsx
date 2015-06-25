@@ -660,14 +660,16 @@ var App = React.createClass({
           return file;
         }
       }, this);
-      //Add tagger files to search files if tag is in search tags
+      //Add tagger file to search files if file has all search tags
+      //Only need to check to add any tagger files if tag is in search tags
       if (searchTags.includes(tag)) {
         newTaggerFiles.forEach(function(file) {
           //Only tagger files not already in search files
           var fileAlreadyInSearchFiles = newSearchFiles.some(function(f) {
             return f.id === file.id;
           });
-          if (!fileAlreadyInSearchFiles) {
+          var fileHasAllSearchTags = searchTags.intersect(file.tags).size === searchTags.size;
+          if (!fileAlreadyInSearchFiles && fileHasAllSearchTags) {
             newSearchFiles = newSearchFiles.push(file);
           }
         });
