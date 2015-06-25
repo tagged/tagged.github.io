@@ -1071,7 +1071,8 @@ var App = React.createClass({
     return {
       app: {
         color: Color.blackPrimary,
-        fontFamily: 'Roboto, sans-serif',
+        fontSize: Typography.fontSize,
+        fontFamily: Typography.fontFamily,
         WebkitTapHighlightColor: 'rgba(0,0,0,0)',
         paddingBottom: Dimension.heightAppBarMobile,
         height: '100%'
