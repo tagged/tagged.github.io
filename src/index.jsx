@@ -55,7 +55,7 @@ var App = React.createClass({
         }
       },
       cloud: {
-        path: Immutable.List(["Tagged Clouds"]),
+        path: Immutable.List(["Home"]),
         folders: Immutable.List(),
         files: {
           files: Immutable.List(),
