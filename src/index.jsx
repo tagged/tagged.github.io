@@ -6,7 +6,6 @@ var Update = React.addons.update;
 
 var Search = require('./Search');
 var Cloud = require('./Cloud');
-var Scratchwork = require('./Scratchwork');
 
 var MaterialIcon = require('./MaterialIcon');
 var ActionBar = require('./ActionBar');
@@ -1047,9 +1046,6 @@ var App = React.createClass({
       case Page.TAGGER:
         page = <Tagger ref="tagger" {...this.getTaggerProps()}/>;
         break;
-      case Page.SCRATCH:
-        page = <Scratchwork/>;
-        break;
       default:
         //Invariant: this.state.page should always be defined
         throw "NOT A VALID PAGE";
@@ -1095,12 +1091,6 @@ var App = React.createClass({
     var page = this.getPage();
 
     var iconProps = {
-      scratchwork: {
-        d: Icon.trash,
-        fill: this.state.page === Page.SCRATCH ? Color.white : Color.black,
-        fillOpacity: this.state.page === Page.SCRATCH ? Color.whitePrimaryOpacity : Color.blackSecondaryOpacity,
-        onClick: this.navigate.bind(this, Page.SCRATCH)
-      },
       search: {
         d: Icon.search,
         fill: this.state.page === Page.SEARCH ? Color.white : Color.black,
@@ -1119,7 +1109,6 @@ var App = React.createClass({
     if (this.state.page === Page.SEARCH || this.state.page === Page.CLOUD) {
       appBar = (
         <ActionBar style={style.appBar}>
-            <MaterialIcon action="Scratch" {...iconProps.scratchwork}/>
             <MaterialIcon action="Search" {...iconProps.search}/>
             <MaterialIcon action="Cloud" {...iconProps.cloud}/>
         </ActionBar>
