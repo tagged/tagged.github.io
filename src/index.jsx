@@ -1079,7 +1079,7 @@ var App = React.createClass({
       appBar: {
         actionBar: {
           backgroundColor: Color.blue500,
-          boxShadow: Shadow.zDepth[this.props.zDepth],
+          boxShadow: Shadow.zDepth[1],
           padding: Dimension.quantum,
         }
       }
