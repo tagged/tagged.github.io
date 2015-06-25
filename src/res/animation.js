@@ -4,8 +4,8 @@ module.exports = {
     enter: {
       duration: 350,
       easing: 'ease',
-      textDelay: 60,
-      textDuration: 290,
+      textDelay: 100,
+      textDuration: 250,
     },
     leave: {
       duration: 200,
