@@ -1,4 +1,5 @@
 module.exports = {
+  animation: require('./animation'),
   color: require('./color'),
   constant: require('./constant'),
   dimension: require('./dimension'),
