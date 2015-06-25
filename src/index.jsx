@@ -1089,11 +1089,11 @@ var App = React.createClass({
         float: 'left',
         marginLeft: Dimension.marginMobile,
         marginTop: (Dimension.heightActionBar - Dimension.logoHeight) / 2,
-        cursor: 'pointer',
+        //cursor: 'pointer',
         //put logo above action bar, 
         //to show pointer-cursor
-        position: 'relative',
-        zIndex: 1,
+        //position: 'relative',
+        //zIndex: 1,
       },
       logoIcon: {
         svg: {
