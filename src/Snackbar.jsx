@@ -122,7 +122,7 @@ var Snackbar = React.createClass({
       elements: [message, action],
       properties: {opacity: 0},
       options: {
-        delay: Animation.snackbar.leave.duration,
+        duration: Animation.snackbar.leave.duration,
       }
     });
     Velocity({

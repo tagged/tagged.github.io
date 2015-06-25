@@ -629,141 +629,135 @@ var App = React.createClass({
 
   handleTagAttach: function(tag) {
 
-    var _handleTagAttach = function() {
+    //Optimistically update tagger file state
 
-      //Optimistically update tagger file state
+    //Save previous tagger file state
+    var taggerFiles = this.state.tagger.files;
+    
+    //Add tag to tagger files
+    var newTaggerFiles = taggerFiles.map(function(file) {
+      return this.attachTagToFile(tag, file);
+    }, this);
 
-      //Save previous tagger file state
-      var taggerFiles = this.state.tagger.files;
-      
-      //Add tag to tagger files
-      var newTaggerFiles = taggerFiles.map(function(file) {
+    //Optimistically update search file state
+    
+    //Get ids of tagger files
+    var page = this.state.tagger.nextPage;
+    var taggerFileIds = this.state[page].files.selected;
+    
+    //Save previous search file state
+    var searchFiles = this.state.search.files;
+    
+    var searchTags = this.state.search.tags;
+
+    //Add tag to search files that are also tagger files
+    var newSearchFiles = searchFiles.files.map(function(file) {
+      if (taggerFileIds.includes(file.id)) {
         return this.attachTagToFile(tag, file);
-      }, this);
-
-      //Optimistically update search file state
-      
-      //Get ids of tagger files
-      var page = this.state.tagger.nextPage;
-      var taggerFileIds = this.state[page].files.selected;
-      
-      //Save previous search file state
-      var searchFiles = this.state.search.files;
-      
-      var searchTags = this.state.search.tags;
-
-      //Add tag to search files that are also tagger files
-      var newSearchFiles = searchFiles.files.map(function(file) {
-        if (taggerFileIds.includes(file.id)) {
-          return this.attachTagToFile(tag, file);
-        }
-        else {
-          return file;
-        }
-      }, this);
-      //Add tagger file to search files if file has all search tags
-      //Only need to check to add any tagger files if tag is in search tags
-      if (searchTags.includes(tag)) {
-        newTaggerFiles.forEach(function(file) {
-          //Only tagger files not already in search files
-          var fileAlreadyInSearchFiles = newSearchFiles.some(function(f) {
-            return f.id === file.id;
-          });
-          var fileHasAllSearchTags = searchTags.intersect(file.tags).size === searchTags.size;
-          if (!fileAlreadyInSearchFiles && fileHasAllSearchTags) {
-            newSearchFiles = newSearchFiles.push(file);
-          }
-        });
       }
-      
-      //Optimistically update cloud file state
-      
-      //Save previous cloud file state
-      var cloudFiles = this.state.cloud.files;
-      
-      //Add tag to cloud files that are also tagger files
-      var newCloudFiles = cloudFiles.files.map(function(file) {
-        if (taggerFileIds.includes(file.id)) {
-          return this.attachTagToFile(tag, file);
+      else {
+        return file;
+      }
+    }, this);
+    //Add tagger file to search files if file has all search tags
+    //Only need to check to add any tagger files if tag is in search tags
+    if (searchTags.includes(tag)) {
+      newTaggerFiles.forEach(function(file) {
+        //Only tagger files not already in search files
+        var fileAlreadyInSearchFiles = newSearchFiles.some(function(f) {
+          return f.id === file.id;
+        });
+        var fileHasAllSearchTags = searchTags.intersect(file.tags).size === searchTags.size;
+        if (!fileAlreadyInSearchFiles && fileHasAllSearchTags) {
+          newSearchFiles = newSearchFiles.push(file);
         }
-        else {
-          return file;
+      });
+    }
+    
+    //Optimistically update cloud file state
+    
+    //Save previous cloud file state
+    var cloudFiles = this.state.cloud.files;
+    
+    //Add tag to cloud files that are also tagger files
+    var newCloudFiles = cloudFiles.files.map(function(file) {
+      if (taggerFileIds.includes(file.id)) {
+        return this.attachTagToFile(tag, file);
+      }
+      else {
+        return file;
+      }
+    }, this);
+    
+    this.setState({
+      tagger: Update(this.state.tagger, {
+        files: {$set: newTaggerFiles},
+        value: {$set: ""}
+      }),
+      search: Update(this.state.search, {
+        files: {
+          files: {$set: newSearchFiles},
         }
-      }, this);
-      
+      }),
+      cloud: Update(this.state.cloud, {
+        files: {
+          files: {$set: newCloudFiles}
+        }
+      })
+    });
+
+    //Set snackbar state
+    
+    //Count the number of tagger files that had the tag 
+    //before it was attached to all tagger files
+    var beforeCount = taggerFiles.count(function(file) {
+      return Immutable.Set(file.tags).includes(tag);
+    });
+    
+    var fileCount = newTaggerFiles.size - beforeCount;
+
+    var message = "Added " + '"' + tag + '"' + " to " + fileCount + " file" + (fileCount === 1 ? "" : "s");
+
+    var action = "UNDO";
+
+    var attachTag = function() {
+      var paths = taggerFiles.map(function(file) {
+        return file.path.concat([file.name]);
+      });
+      //Attach tag in database
+      _Database.attachTag(paths, tag);
+    };
+
+    var undoAttach = function() {
+      //Ensure file state does not change between
+      //the point snackbar is shown and the point
+      //this method is called.
+
+      //Reset file state
       this.setState({
         tagger: Update(this.state.tagger, {
-          files: {$set: newTaggerFiles},
-          value: {$set: ""}
+          files: {$set: taggerFiles}
         }),
         search: Update(this.state.search, {
           files: {
-            files: {$set: newSearchFiles},
+            files: {$set: searchFiles.files},
           }
         }),
         cloud: Update(this.state.cloud, {
           files: {
-            files: {$set: newCloudFiles}
+            files: {$set: cloudFiles.files}
           }
         })
       });
-
-      //Set snackbar state
-      
-      //Count the number of tagger files that had the tag 
-      //before it was attached to all tagger files
-      var beforeCount = taggerFiles.count(function(file) {
-        return Immutable.Set(file.tags).includes(tag);
-      });
-      
-      var fileCount = newTaggerFiles.size - beforeCount;
-
-      var message = "Added " + '"' + tag + '"' + " to " + fileCount + " file" + (fileCount === 1 ? "" : "s");
-
-      var action = "UNDO";
-
-      var attachTag = function() {
-        var paths = taggerFiles.map(function(file) {
-          return file.path.concat([file.name]);
-        });
-        //Attach tag in database
-        _Database.attachTag(paths, tag);
-      };
-
-      var undoAttach = function() {
-        //Ensure file state does not change between
-        //the point snackbar is shown and the point
-        //this method is called.
-
-        //Reset file state
-        this.setState({
-          tagger: Update(this.state.tagger, {
-            files: {$set: taggerFiles}
-          }),
-          search: Update(this.state.search, {
-            files: {
-              files: {$set: searchFiles.files},
-            }
-          }),
-          cloud: Update(this.state.cloud, {
-            files: {
-              files: {$set: cloudFiles.files}
-            }
-          })
-        });
-      }.bind(this);
-
-      this.showSnackbar({
-        message: message,
-        action: action,
-        cancel: undoAttach,
-        complete: attachTag,
-      });
-    
     }.bind(this);
 
-    this.state.snackbar.complete(_handleTagAttach);
-
+    this.showSnackbar({
+      message: message,
+      action: action,
+      cancel: undoAttach,
+      complete: attachTag,
+    });
+      
   },
 
   /**
@@ -783,142 +777,137 @@ var App = React.createClass({
 
   handleTagDetach: function(tag) {
     
-    var _handleTagDetach = function() {
+    //Optimistically update tagger file state
 
-      //Optimistically update tagger file state
+    //Save previous tagger file state
+    var taggerFiles = this.state.tagger.files;
+    
+    //Remove tag from tagger files
+    var newTaggerFiles = taggerFiles.map(function(file) {
+      return this.detachTagFromFile(tag, file);
+    }, this);
 
-      //Save previous tagger file state
-      var taggerFiles = this.state.tagger.files;
-      
-      //Remove tag from tagger files
-      var newTaggerFiles = taggerFiles.map(function(file) {
+    //Optimistically update search file state
+    
+    //Get ids of tagger files
+    var page = this.state.tagger.nextPage;
+    var taggerFileIds = this.state[page].files.selected;
+    
+    //Save previous search file state
+    var searchFiles = this.state.search.files;
+    
+    var searchTags = this.state.search.tags;
+
+    //Remove tag from search files that are also tagger files
+    var newSearchFiles = searchFiles.files.map(function(file) {
+      if (taggerFileIds.includes(file.id)) {
         return this.detachTagFromFile(tag, file);
-      }, this);
+      }
+      else {
+        return file;
+      }
+    }, this);
 
-      //Optimistically update search file state
-      
-      //Get ids of tagger files
-      var page = this.state.tagger.nextPage;
-      var taggerFileIds = this.state[page].files.selected;
-      
-      //Save previous search file state
-      var searchFiles = this.state.search.files;
-      
-      var searchTags = this.state.search.tags;
+    //Remove search files that no longer match all search tags
+    newSearchFiles = newSearchFiles.filter(function(file) {
+      return searchTags.intersect(file.tags).size === searchTags.size;
+    });
+    
+    //Remove files ids no longer in search files
+    var searchFilesOpen = searchFiles.open.filter(function(fileId) {
+      return newSearchFiles.some(function(file) {
+        return file.id === fileId;
+      });
+    });
+    
+    //Remove file ids no longer in search files
+    var searchFilesSelected = searchFiles.selected.filter(function(fileId) {
+      return newSearchFiles.some(function(file) {
+        return file.id === fileId;
+      });
+    });
+    
+    //Optimistically update cloud file state
+    
+    //Save previous cloud file state
+    var cloudFiles = this.state.cloud.files;
+    
+    //Remove tag from cloud files that are also tagger files
+    var newCloudFiles = cloudFiles.files.map(function(file) {
+      if (taggerFileIds.includes(file.id)) {
+        return this.detachTagFromFile(tag, file);
+      }
+      else {
+        return file;
+      }
+    }, this);
+    
+    this.setState({
+      tagger: Update(this.state.tagger, {
+        files: {$set: newTaggerFiles}
+      }),
+      search: Update(this.state.search, {
+        files: {
+          files: {$set: newSearchFiles},
+          open: {$set: searchFilesOpen},
+          selected: {$set: searchFilesSelected}
+        }
+      }),
+      cloud: Update(this.state.cloud, {
+        files: {
+          files: {$set: newCloudFiles}
+        }
+      })
+    });
 
-      //Remove tag from search files that are also tagger files
-      var newSearchFiles = searchFiles.files.map(function(file) {
-        if (taggerFileIds.includes(file.id)) {
-          return this.detachTagFromFile(tag, file);
-        }
-        else {
-          return file;
-        }
-      }, this)
-      //Remove search files that no longer match all search tags
-      .filter(function(file) {
-        return searchTags.intersect(file.tags).size === searchTags.size;
+    //Set snackbar state
+
+    var fileCount = this.state.tagger.files.size;
+
+    var message = "Removed " + '"' + tag + '"' + " from " + fileCount + " file" + (fileCount === 1 ? "" : "s");
+
+    var action = "UNDO";
+
+    var detachTag = function() {
+      var paths = taggerFiles.map(function(file) {
+        return file.path.concat([file.name]);
       });
-      
-      //Remove files ids no longer in search files
-      var searchFilesOpen = searchFiles.open.filter(function(fileId) {
-        return newSearchFiles.some(function(file) {
-          return file.id === fileId;
-        });
-      });
-      
-      //Remove file ids no longer in search files
-      var searchFilesSelected = searchFiles.selected.filter(function(fileId) {
-        return newSearchFiles.some(function(file) {
-          return file.id === fileId;
-        });
-      });
-      
-      //Optimistically update cloud file state
-      
-      //Save previous cloud file state
-      var cloudFiles = this.state.cloud.files;
-      
-      //Remove tag from cloud files that are also tagger files
-      var newCloudFiles = cloudFiles.files.map(function(file) {
-        if (taggerFileIds.includes(file.id)) {
-          return this.detachTagFromFile(tag, file);
-        }
-        else {
-          return file;
-        }
-      }, this);
-      
+      //Detach tag in database
+      _Database.detachTag(paths, tag);
+    };
+
+    var undoDetach = function() {
+      //Ensure file state does not change between
+      //the point snackbar is shown and the point
+      //this method is called.
+
+      //Reset file state
       this.setState({
         tagger: Update(this.state.tagger, {
-          files: {$set: newTaggerFiles}
+          files: {$set: taggerFiles}
         }),
         search: Update(this.state.search, {
           files: {
-            files: {$set: newSearchFiles},
-            open: {$set: searchFilesOpen},
-            selected: {$set: searchFilesSelected}
+            files: {$set: searchFiles.files},
+            open: {$set: searchFiles.open},
+            selected: {$set: searchFiles.selected}
           }
         }),
         cloud: Update(this.state.cloud, {
           files: {
-            files: {$set: newCloudFiles}
+            files: {$set: cloudFiles.files}
           }
         })
       });
-
-      //Set snackbar state
-
-      var fileCount = this.state.tagger.files.size;
-
-      var message = "Removed " + '"' + tag + '"' + " from " + fileCount + " file" + (fileCount === 1 ? "" : "s");
-
-      var action = "UNDO";
-
-      var detachTag = function() {
-        var paths = taggerFiles.map(function(file) {
-          return file.path.concat([file.name]);
-        });
-        //Detach tag in database
-        _Database.detachTag(paths, tag);
-      };
-
-      var undoDetach = function() {
-        //Ensure file state does not change between
-        //the point snackbar is shown and the point
-        //this method is called.
-
-        //Reset file state
-        this.setState({
-          tagger: Update(this.state.tagger, {
-            files: {$set: taggerFiles}
-          }),
-          search: Update(this.state.search, {
-            files: {
-              files: {$set: searchFiles.files},
-              open: {$set: searchFiles.open},
-              selected: {$set: searchFiles.selected}
-            }
-          }),
-          cloud: Update(this.state.cloud, {
-            files: {
-              files: {$set: cloudFiles.files}
-            }
-          })
-        });
-      }.bind(this);
-
-      this.showSnackbar({
-        message: message,
-        action: action,
-        cancel: undoDetach,
-        complete: detachTag,
-      });
-    
     }.bind(this);
-
-    this.state.snackbar.complete(_handleTagDetach);
-
+    
+    this.showSnackbar({
+      message: message,
+      action: action,
+      cancel: undoDetach,
+      complete: detachTag,
+    });
+    
   },
 
 
@@ -926,46 +915,53 @@ var App = React.createClass({
 
 
   showSnackbar: function(snackbarState) {
-    //After delay, hide snackbar and call snackbarComplete
-    var snackbarDelay = 6000;
-    var snackbarTimeoutId = window.setTimeout(function() {
-      snackbarComplete();
-    }, snackbarDelay);
-    var snackbarCancel = function() {
-      window.clearTimeout(snackbarTimeoutId);
-      snackbarState.cancel();
+    
+    //Complete current snackbar before showing new one
+    this.state.snackbar.complete(function() {
+      
+      //After delay, hide snackbar and call snackbarComplete
+      var snackbarDelay = 6000;
+      var snackbarTimeoutId = window.setTimeout(function() {
+        snackbarComplete();
+      }, snackbarDelay);
+      var snackbarCancel = function() {
+        window.clearTimeout(snackbarTimeoutId);
+        snackbarState.cancel();
+        this.setState({
+          snackbar: Update(this.state.snackbar, {
+            visible: {$set: false},
+            cancel: {$set: Util.noop},
+            complete: {$set: Util.call}
+          })
+        });
+      }.bind(this);
+      var snackbarComplete = function(callback) {
+        //If snackbar is showing, wait for it to animate out before calling callback
+        var callbackDelay = this.state.snackbar.visible ? Animation.snackbar.leave.duration : 0;
+        window.clearTimeout(snackbarTimeoutId);
+        snackbarState.complete();
+        this.setState({
+          snackbar: Update(this.state.snackbar, {
+            visible: {$set: false},
+            cancel: {$set: Util.noop},
+            complete: {$set: Util.call}
+          })
+        }, function() {
+          window.setTimeout(callback, callbackDelay);
+        });
+      }.bind(this);
       this.setState({
         snackbar: Update(this.state.snackbar, {
-          visible: {$set: false},
-          cancel: {$set: Util.noop},
-          complete: {$set: Util.call}
+          visible: {$set: true},
+          message: {$set: snackbarState.message},
+          action: {$set: snackbarState.action},
+          cancel: {$set: snackbarCancel},
+          complete: {$set: snackbarComplete}
         })
       });
-    }.bind(this);
-    var snackbarComplete = function(callback) {
-      //If snackbar is showing, wait for it to animate out before calling callback
-      var callbackDelay = this.state.snackbar.visible ? Animation.snackbar.leave.duration : 0;
-      window.clearTimeout(snackbarTimeoutId);
-      snackbarState.complete();
-      this.setState({
-        snackbar: Update(this.state.snackbar, {
-          visible: {$set: false},
-          cancel: {$set: Util.noop},
-          complete: {$set: Util.call}
-        })
-      }, function() {
-        window.setTimeout(callback, callbackDelay);
-      });
-    }.bind(this);
-    this.setState({
-      snackbar: Update(this.state.snackbar, {
-        visible: {$set: true},
-        message: {$set: snackbarState.message},
-        action: {$set: snackbarState.action},
-        cancel: {$set: snackbarCancel},
-        complete: {$set: snackbarComplete}
-      })
-    });
+
+    }.bind(this));
+    
   },
 
 
