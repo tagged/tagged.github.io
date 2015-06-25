@@ -126,7 +126,7 @@ var File = React.createClass({
                   {metadata}
                   {tagCount}
               </div>
-              <Tags tags={this.props.tags}
+              <Tags tags={this.props.tags.sort()}
                     disabledTags={this.props.disabledTags}
                     onTagClick={this.props.onTagClick}
                     style={style.tags}/>
