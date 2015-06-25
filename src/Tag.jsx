@@ -48,11 +48,14 @@ var Tag = React.createClass({
     //Extract props, and pass the rest down
     var {text, style, ...tagProps} = this.props;
 
+    //Show each space character
+    var nbspText = text.replace(/ /g, String.fromCharCode(160));
+
     var style = Util.merge(this.getStyle(), this.props.style);
 
     return (
       <div style={style.tag} {...tagProps}>
-          {this.props.text}
+          {nbspText}
       </div>
     );
   }  

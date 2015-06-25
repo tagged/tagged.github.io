@@ -36,9 +36,13 @@ var Subheader = React.createClass({
 
   render: function() {
     var style = this.getStyle();
+    
+    //Show each space character
+    var nbspText = this.props.text.replace(/ /g, String.fromCharCode(160));
+    
     return (
       <div style={Util.merge(style.component, this.props.style)}>
-          {this.props.text}
+          {nbspText}
       </div>
     );
   }
