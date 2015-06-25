@@ -6,11 +6,12 @@ var Update = React.addons.update;
 
 var Search = require('./Search');
 var Cloud = require('./Cloud');
+var Tagger = require('./Tagger');
+var Snackbar = require('./Snackbar');
 
 var MaterialIcon = require('./MaterialIcon');
 var ActionBar = require('./ActionBar');
-var Snackbar = require('./Snackbar');
-var Tagger = require('./Tagger');
+var Logo = require('./Logo');
 
 var R = require('./res/index');
 var Color = R.color;
@@ -1077,11 +1078,21 @@ var App = React.createClass({
         height: '100%'
       },
       appBar: {
-        actionBar: {
-          backgroundColor: Color.blue500,
-          boxShadow: Shadow.zDepth[1],
-          padding: Dimension.quantum,
-        }
+        backgroundColor: Color.blue500,
+        boxShadow: Shadow.zDepth[1],
+        paddingTop: Dimension.quantum,
+        paddingBottom: Dimension.quantum,
+        paddingRight: Dimension.quantum,
+      },
+      logo: {
+        float: 'left',
+        marginLeft: Dimension.marginMobile,
+        marginTop: (Dimension.heightActionBar - Dimension.logoHeight) / 2,
+        cursor: 'pointer',
+        //put logo above action bar, 
+        //to show pointer-cursor
+        position: 'relative',
+        zIndex: 1,
       }
     };
   },
@@ -1108,10 +1119,16 @@ var App = React.createClass({
     var appBar = null;
     if (this.state.page === Page.SEARCH || this.state.page === Page.CLOUD) {
       appBar = (
-        <ActionBar style={style.appBar}>
-            <MaterialIcon action="Search" {...iconProps.search}/>
-            <MaterialIcon action="Cloud" {...iconProps.cloud}/>
-        </ActionBar>
+        <div style={style.appBar}>
+            <div style={style.logo}>
+                <Logo cloudColor={Color.whitePrimary} 
+                      tagColor={Color.blue500}/>
+            </div>
+            <ActionBar>
+                <MaterialIcon action="Search" {...iconProps.search}/>
+                <MaterialIcon action="Cloud" {...iconProps.cloud}/>
+            </ActionBar>
+        </div>
       );
     }
 

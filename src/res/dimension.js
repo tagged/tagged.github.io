@@ -28,6 +28,9 @@ module.exports = {
   },
 
   icon: 24,
+  logoWidth: 36,
+  logoHeight: 24,
+
   borderWidth: 1,
   borderRadius: 2
 }
