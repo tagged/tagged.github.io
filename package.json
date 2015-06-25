@@ -1,6 +1,6 @@
 {
-  "name": "react-museum",
-  "description": "Sample React components",
+  "name": "tagged",
+  "description": "Web app for tagging cloud files",
   "main": "bundle.js",
   "scripts": {
     "bundle:vendor": "browserify --require react --require react/addons --require ./velocity/velocity.js --require immutable --require svg.js > ./vendor.js",
