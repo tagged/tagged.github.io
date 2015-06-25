@@ -14,6 +14,7 @@ var ActionBar = require('./ActionBar');
 var Logo = require('./Logo');
 
 var R = require('./res/index');
+var Animation = R.animation;
 var Color = R.color;
 var Dimension = R.dimension;
 var Icon = R.icon;
@@ -942,6 +943,8 @@ var App = React.createClass({
       });
     }.bind(this);
     var snackbarComplete = function(callback) {
+      //If snackbar is showing, wait for it to animate out before calling callback
+      var callbackDelay = this.state.snackbar.visible ? Animation.snackbar.leave.duration : 0;
       window.clearTimeout(snackbarTimeoutId);
       snackbarState.complete();
       this.setState({
@@ -950,7 +953,9 @@ var App = React.createClass({
           cancel: {$set: Util.noop},
           complete: {$set: Util.call}
         })
-      }, callback);
+      }, function() {
+        window.setTimeout(callback, callbackDelay);
+      });
     }.bind(this);
     this.setState({
       snackbar: Update(this.state.snackbar, {
