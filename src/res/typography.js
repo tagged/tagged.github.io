@@ -11,6 +11,8 @@ module.exports = {
 
   fontWeightThin: 300,
   fontWeightRegular: 400,
-  fontWeightMedium: 500
+  fontWeightMedium: 500,
+
+  logoFontFamily: 'Roboto Slab, serif',
 
 }

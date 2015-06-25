@@ -18,6 +18,8 @@ var Color = R.color;
 var Dimension = R.dimension;
 var Icon = R.icon;
 var Shadow = R.shadow;
+var Typography = R.typography;
+var Value = R.value;
 
 var Util = require('./util/util');
 
@@ -1093,6 +1095,19 @@ var App = React.createClass({
         //to show pointer-cursor
         position: 'relative',
         zIndex: 1,
+      },
+      logoIcon: {
+        svg: {
+          float: 'left',
+        }
+      },
+      logoText: {
+        float: 'left',
+        fontSize: Typography.fontSizeLarge,
+        lineHeight: Typography.lineHeightLarge,
+        fontFamily: Typography.logoFontFamily,
+        color: Color.whitePrimary,
+        marginLeft: Dimension.space,
       }
     };
   },
@@ -1122,7 +1137,9 @@ var App = React.createClass({
         <div style={style.appBar}>
             <div style={style.logo}>
                 <Logo cloudColor={Color.whitePrimary} 
-                      tagColor={Color.blue500}/>
+                      tagColor={Color.blue500}
+                      style={style.logoIcon}/>
+                <div style={style.logoText}>{Value.appName}</div>
             </div>
             <ActionBar>
                 <MaterialIcon action="Search" {...iconProps.search}/>

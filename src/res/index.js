@@ -7,5 +7,6 @@ module.exports = {
   providers: require('./providers'),
   shadow: require('./shadow'),
   transition: require('./transition'),
-  typography: require('./typography')
+  typography: require('./typography'),
+  value: require('./value'),
 };
