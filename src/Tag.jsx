@@ -26,6 +26,7 @@ var Tag = React.createClass({
     return {
       tag: {
         display: 'inline-block',
+        verticalAlign: 'top',
         fontSize: Typography.fontSize,
         lineHeight: Typography.lineHeight,
         paddingTop: verticalPadding,
@@ -37,7 +38,8 @@ var Tag = React.createClass({
         borderRadius: Dimension.borderRadius,
         backgroundColor: Color.blackDivider,
         outlineColor: Color.blackHint,
-        cursor: 'pointer'
+        cursor: 'pointer',
+        minHeight: Dimension.heightTag - 2 * verticalPadding,
       }
     };
   },
