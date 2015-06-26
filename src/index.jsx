@@ -1017,7 +1017,7 @@ var App = React.createClass({
       path: this.state.cloud.path,
       folders: this.state.cloud.folders,
       
-      files: this.state.cloud.files.files.valueSeq().sort(this.sortByFileName),
+      files: this.state.cloud.files.files.valueSeq(),
       filesSelected: this.state.cloud.files.selected,
       filesOpen: this.state.cloud.files.open,
       

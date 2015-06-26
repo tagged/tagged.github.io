@@ -339,15 +339,15 @@ module.exports = {
       return !item.isFolder;
     });
 
-    //Return files as a map {fileId: fileObject}
-    var fileMap = {};
+    //Return files as Immutable.OrderedMap
+    var fileMapPairs = [];
     files.forEach(function(file) {
-      fileMap[file.id] = file;      
+      fileMapPairs.push([file.id, file]);
     });
 
     return {
       folders: folders,
-      files: Immutable.OrderedMap(fileMap),
+      files: Immutable.OrderedMap(fileMapPairs),
     };
   }
 
