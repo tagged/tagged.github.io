@@ -26,4 +26,4 @@ def send_any(any):
         return static_file('google-drive-logo-128.png', root=root)
     return static_file('index.html', root=root)'''
 
-run(host='192.168.1.150', port=8080, debug=True)
+run(host='192.168.1.150', port=8000, debug=True)
