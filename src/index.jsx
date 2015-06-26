@@ -67,7 +67,7 @@ var App = React.createClass({
       tagger: {
         files: Immutable.Map(),
         isShowingFiles: false,
-        nextPage: Page.CLOUD,
+        previousPage: Page.CLOUD,
         value: "",
         suggestions: Immutable.OrderedSet()
       },
@@ -558,7 +558,7 @@ var App = React.createClass({
     this.setState({
       tagger: Update(this.state.tagger, {
         files: {$set: files},
-        nextPage: {$set: page}
+        previousPage: {$set: page}
       })
     }, this.navigate.bind(this, Page.TAGGER));
   },
@@ -579,7 +579,7 @@ var App = React.createClass({
         value: {$set: ""}
       })
     });
-    this.navigate(this.state.tagger.nextPage);
+    this.navigate(this.state.tagger.previousPage);
   },
 
   handleTaggerFocus: function() {
@@ -632,7 +632,7 @@ var App = React.createClass({
     //Optimistically update search file state
     
     //Get ids of tagger files
-    //var page = this.state.tagger.nextPage;
+    //var page = this.state.tagger.previousPage;
     //var taggerFileIds = this.state[page].files.selected;
     var taggerFileIds = Immutable.Set.fromKeys(newTaggerFiles);
     
@@ -775,7 +775,7 @@ var App = React.createClass({
     //Optimistically update search file state
     
     //Get ids of tagger files
-    //var page = this.state.tagger.nextPage;
+    //var page = this.state.tagger.previousPage;
     //var taggerFileIds = this.state[page].files.selected;
     var taggerFileIds = Immutable.Set.fromKeys(newTaggerFiles);
     
@@ -1026,7 +1026,7 @@ var App = React.createClass({
       onTagDetach: this.handleTagDetach,
     };
   },
-  
+
   getPage: function() {
     var page;
     switch(this.state.page) {
