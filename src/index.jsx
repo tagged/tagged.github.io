@@ -45,7 +45,7 @@ var App = React.createClass({
         tags: Immutable.OrderedSet(),
         value: "",
         files: {
-          files: Immutable.Map(),
+          files: Immutable.OrderedMap(),
           open: Immutable.Set(),
           selected: Immutable.Set(),
         },
@@ -59,13 +59,13 @@ var App = React.createClass({
         path: Immutable.List(["Home"]),
         folders: Immutable.List(),
         files: {
-          files: Immutable.Map(),
+          files: Immutable.OrderedMap(),
           open: Immutable.Set(),
           selected: Immutable.Set(),
         },
       },
       tagger: {
-        files: Immutable.Map(),
+        files: Immutable.OrderedMap(),
         isShowingFiles: false,
         previousPage: Page.CLOUD,
         value: "",

@@ -170,7 +170,7 @@ module.exports = {
   },
 
   /**
-   * Returns Immutable.Map of files containing the specified tags
+   * Returns Immutable.OrderedMap of files containing the specified tags
    *
    * @param tags Immutable.Set of tags guiding the file search
    */
@@ -178,7 +178,7 @@ module.exports = {
     console.log('ask database for files');
 
     if (tags.isEmpty()) {
-      return Immutable.Map();
+      return Immutable.OrderedMap();
     }
     
     //Keep files that contain all tags
@@ -198,7 +198,7 @@ module.exports = {
       fileMap[file.id] = file;
     }
 
-    return Immutable.Map(fileMap);
+    return Immutable.OrderedMap(fileMap);
   },
 
 
@@ -312,7 +312,7 @@ module.exports = {
   /**
    * Return an object of folders and files at the specified path.
    * folders is an Immutable.List of folder names
-   * files is an Immutable.Map of file objects
+   * files is an Immutable.OrderedMap of file objects
    *
    * @param path an Immutable.List of strings representing a directory path
    */
@@ -347,7 +347,7 @@ module.exports = {
 
     return {
       folders: folders,
-      files: Immutable.Map(fileMap),
+      files: Immutable.OrderedMap(fileMap),
     };
   }
 
