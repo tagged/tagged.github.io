@@ -28,7 +28,7 @@ var Page = R.constant.page;
 
 var _Database = require('./res/_database');
 var Immutable = require('immutable');
-
+Immutable.Iterable;
 
 var App = React.createClass({
 
@@ -45,7 +45,7 @@ var App = React.createClass({
         tags: Immutable.OrderedSet(),
         value: "",
         files: {
-          files: Immutable.List(),
+          files: Immutable.Map(),
           open: Immutable.Set(),
           selected: Immutable.Set(),
         },
@@ -59,13 +59,13 @@ var App = React.createClass({
         path: Immutable.List(["Home"]),
         folders: Immutable.List(),
         files: {
-          files: Immutable.List(),
+          files: Immutable.Map(),
           open: Immutable.Set(),
           selected: Immutable.Set(),
         },
       },
       tagger: {
-        files: Immutable.List(),
+        files: Immutable.Map(),
         isShowingFiles: false,
         nextPage: Page.CLOUD,
         value: "",
@@ -289,19 +289,12 @@ var App = React.createClass({
     //Returns what the next state of files, files selected, and files open
     //would look like, given the search tags
     var files = _Database.filterFiles(searchTags);
-    var fileIds = files.map(function(file) {
-      return file.id;
-    }).toSet();
-    var selected = this.state.search.files.selected.filter(
-      function(fileId) {
-        return fileIds.has(fileId);
-      }
-    );
-    var open = this.state.search.files.open.filter(
-      function(fileId) {
-        return fileIds.has(fileId);
-      }
-    );
+    var selected = this.state.search.files.selected.filter(function(fileId) {
+      return files.has(fileId);
+    });
+    var open = this.state.search.files.open.filter(function(fileId) {
+      return files.has(fileId);
+    });
     return {
       files: files,
       selected: selected,
@@ -367,10 +360,7 @@ var App = React.createClass({
 
   handleFileSelectAll: function() {
     var page = this.state.page;
-    var filesSelected = this.state[page].files.files.map(function(file) {
-      return file.id;
-    }).toSet();
-
+    var filesSelected = Immutable.Set.fromKeys(this.state[page].files.files);
     this.setFileState(page, {
       files: {
         selected: {$set: filesSelected}
@@ -410,7 +400,7 @@ var App = React.createClass({
     var cloudFiles = this.state.cloud.files;
 
     //Optimistically set new file states on all pages
-    //according to files selected current page
+    //according to files selected on current page
 
     //files.files - remove files with ids in files.selected
     var searchFilesFiles = searchFiles.files.filter(function(file) {
@@ -642,14 +632,13 @@ var App = React.createClass({
     //Optimistically update search file state
     
     //Get ids of tagger files
-    var page = this.state.tagger.nextPage;
-    var taggerFileIds = this.state[page].files.selected;
+    //var page = this.state.tagger.nextPage;
+    //var taggerFileIds = this.state[page].files.selected;
+    var taggerFileIds = Immutable.Set.fromKeys(newTaggerFiles);
     
     //Save previous search file state
     var searchFiles = this.state.search.files;
     
-    var searchTags = this.state.search.tags;
-
     //Add tag to search files that are also tagger files
     var newSearchFiles = searchFiles.files.map(function(file) {
       if (taggerFileIds.includes(file.id)) {
@@ -659,19 +648,15 @@ var App = React.createClass({
         return file;
       }
     }, this);
+
     //Add tagger file to search files if file has all search tags
     //Only need to check to add any tagger files if tag is in search tags
+    var searchTags = this.state.search.tags;
     if (searchTags.includes(tag)) {
-      newTaggerFiles.forEach(function(file) {
-        //Only tagger files not already in search files
-        var fileAlreadyInSearchFiles = newSearchFiles.some(function(f) {
-          return f.id === file.id;
-        });
-        var fileHasAllSearchTags = searchTags.intersect(file.tags).size === searchTags.size;
-        if (!fileAlreadyInSearchFiles && fileHasAllSearchTags) {
-          newSearchFiles = newSearchFiles.push(file);
-        }
+      var searchFilesFromTagger = newTaggerFiles.filter(function(file) {
+        return searchTags.intersect(file.tags).size === searchTags.size;
       });
+      newSearchFiles = newSearchFiles.merge(searchFilesFromTagger);
     }
     
     //Optimistically update cloud file state
@@ -790,14 +775,13 @@ var App = React.createClass({
     //Optimistically update search file state
     
     //Get ids of tagger files
-    var page = this.state.tagger.nextPage;
-    var taggerFileIds = this.state[page].files.selected;
+    //var page = this.state.tagger.nextPage;
+    //var taggerFileIds = this.state[page].files.selected;
+    var taggerFileIds = Immutable.Set.fromKeys(newTaggerFiles);
     
     //Save previous search file state
     var searchFiles = this.state.search.files;
     
-    var searchTags = this.state.search.tags;
-
     //Remove tag from search files that are also tagger files
     var newSearchFiles = searchFiles.files.map(function(file) {
       if (taggerFileIds.includes(file.id)) {
@@ -809,22 +793,19 @@ var App = React.createClass({
     }, this);
 
     //Remove search files that no longer match all search tags
+    var searchTags = this.state.search.tags;
     newSearchFiles = newSearchFiles.filter(function(file) {
       return searchTags.intersect(file.tags).size === searchTags.size;
     });
     
-    //Remove files ids no longer in search files
+    //Remove open searchFile ids no longer in search files
     var searchFilesOpen = searchFiles.open.filter(function(fileId) {
-      return newSearchFiles.some(function(file) {
-        return file.id === fileId;
-      });
+      return newSearchFiles.has(fileId);
     });
     
-    //Remove file ids no longer in search files
+    //Remove selected searchFile ids no longer in search files
     var searchFilesSelected = searchFiles.selected.filter(function(fileId) {
-      return newSearchFiles.some(function(file) {
-        return file.id === fileId;
-      });
+      return newSearchFiles.has(fileId);
     });
     
     //Optimistically update cloud file state
@@ -973,7 +954,7 @@ var App = React.createClass({
       searchTags: this.state.search.tags,
       searchValue: this.state.search.value,
       
-      files: this.state.search.files.files,
+      files: this.state.search.files.files.valueSeq(),
       filesSelected: this.state.search.files.selected,
       filesOpen: this.state.search.files.open,
 
@@ -1002,7 +983,7 @@ var App = React.createClass({
       path: this.state.cloud.path,
       folders: this.state.cloud.folders,
       
-      files: this.state.cloud.files.files,
+      files: this.state.cloud.files.files.valueSeq(),
       filesSelected: this.state.cloud.files.selected,
       filesOpen: this.state.cloud.files.open,
       
@@ -1020,7 +1001,7 @@ var App = React.createClass({
 
   getTaggerProps: function() {
     return {
-      files: this.state.tagger.files,
+      files: this.state.tagger.files.valueSeq(),
       isShowingFiles: this.state.tagger.isShowingFiles,
       onToggle: this.handleTaggerToggle,
       onClose: this.closeTagger,

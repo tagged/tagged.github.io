@@ -170,24 +170,35 @@ module.exports = {
   },
 
   /**
-   * Returns Immutable.List of files containing the specified tags
+   * Returns Immutable.Map of files containing the specified tags
    *
    * @param tags Immutable.Set of tags guiding the file search
    */
   filterFiles: function(tags) {
-
     console.log('ask database for files');
 
     if (tags.isEmpty()) {
-      return Immutable.List();
+      return Immutable.Map();
     }
     
     //Keep files that contain all tags
-    var files = this.getFiles(_cloud).filter(function(file) {
-      return tags.intersect(file.tags).size === tags.size;
-    });
+    var allFiles = this.getFiles(_cloud);
+    var files = [];
+    for (var i = 0; i < allFiles.length; i++) {
+      var file = allFiles[i];
+      if (tags.intersect(file.tags).size === tags.size) {
+        files.push(file);
+      }
+    }
 
-    return Immutable.List(files);
+    //Return files as a map {fileId: fileObject}
+    var fileMap = {};
+    for (var i = 0; i < files.length; i++) {
+      var file = files[i];
+      fileMap[file.id] = file;
+    }
+
+    return Immutable.Map(fileMap);
   },
 
 
@@ -301,13 +312,14 @@ module.exports = {
   /**
    * Return an object of folders and files at the specified path.
    * folders is an Immutable.List of folder names
-   * files is an Immutable.List of file objects
+   * files is an Immutable.Map of file objects
    *
    * @param path an Immutable.List of strings representing a directory path
    */
   getContents: function(path) {
     var contents = _cloud;
-    //follow folders along path
+    
+    //Follow folders along path
     path.forEach(function(folder) {
       contents = Immutable.List(contents).find(function(item) {
         return item.name === folder && item.isFolder;
@@ -327,9 +339,15 @@ module.exports = {
       return !item.isFolder;
     });
 
+    //Return files as a map {fileId: fileObject}
+    var fileMap = {};
+    files.forEach(function(file) {
+      fileMap[file.id] = file;      
+    });
+
     return {
       folders: folders,
-      files: files
+      files: Immutable.Map(fileMap),
     };
   }
 
