@@ -6,7 +6,11 @@ root = '/home/ryan/projects/react/tagged/'
 def index():
     return static_file('index.html', root=root)
 
-@route('/<any:path>')
+@route('/<filename>')
+def server_static(filename):
+    return static_file(filename, root=root)
+
+'''@route('/<any:path>')
 def send_any(any):
     if any == 'app.js':
         return static_file('app.js', root=root)
@@ -20,6 +24,6 @@ def send_any(any):
         return static_file('dropbox-logo-128.png', root=root)
     elif any == 'google-drive-logo-128.png':
         return static_file('google-drive-logo-128.png', root=root)
-    return static_file('index.html', root=root)
+    return static_file('index.html', root=root)'''
 
 run(host='192.168.1.150', port=8080, debug=True)

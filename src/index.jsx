@@ -135,7 +135,7 @@ var App = React.createClass({
       window.history.replaceState(browserState, '');
     }
     else {
-      window.history.pushState(browserState, '', url);
+      window.history.pushState(browserState, '');
     }
   },
 
