@@ -123,19 +123,42 @@ var App = React.createClass({
     //Specify `true` to replace browser history state 
     //instead of adding a new one.
     
-    //Note: cannot store Immutable.List in history, 
+    //Note: cannot store Immutable objects in history, 
     //so convert to array
     var browserState = {
       page: this.state.page,
       searchTags: this.state.search.tags.toArray(),
       path: this.state.cloud.path.toArray()
     };
+    var url = this.getURL(this.state.page);
     if (replace) {
       window.history.replaceState(browserState, '');
     }
     else {
-      window.history.pushState(browserState, '');
+      window.history.pushState(browserState, '', url);
     }
+  },
+
+  getURL: function(page) {
+    var url;
+    switch(page) {
+      case Page.SEARCH:
+        url = "/search";
+        break;
+      case Page.CLOUD:
+        url = "/home";
+        if (!this.state.cloud.path.rest().isEmpty()) {
+          url = url + "/" + this.state.cloud.path.rest().join("/");
+        }
+        break;
+      case Page.TAGGER:
+        url = this.getURL(this.state.tagger.previousPage);
+        break;
+      default:
+        //Invariant: this.state.page should always be one of the above
+        throw "NOT A VALID PAGE";
+    }
+    return url;
   },
 
   componentDidMount: function() {
@@ -1040,7 +1063,7 @@ var App = React.createClass({
         page = <Tagger ref="tagger" {...this.getTaggerProps()}/>;
         break;
       default:
-        //Invariant: this.state.page should always be defined
+        //Invariant: this.state.page should always be one of the above
         throw "NOT A VALID PAGE";
     }
     return page;
