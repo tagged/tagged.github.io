@@ -946,15 +946,26 @@ var App = React.createClass({
   },
 
 
+  // Helpers
+
+
+  sortByFileName: function(file1, file2) {
+    if (file1.name === file2.name) {
+      return 0;
+    }
+    return file1.name < file2.name ? -1 : 1;
+  },
+
+
   // App pages
 
-
+  
   getSearchProps: function() {
     return {
       searchTags: this.state.search.tags,
       searchValue: this.state.search.value,
       
-      files: this.state.search.files.files.valueSeq(),
+      files: this.state.search.files.files.valueSeq().sort(this.sortByFileName),
       filesSelected: this.state.search.files.selected,
       filesOpen: this.state.search.files.open,
 
@@ -983,7 +994,7 @@ var App = React.createClass({
       path: this.state.cloud.path,
       folders: this.state.cloud.folders,
       
-      files: this.state.cloud.files.files.valueSeq(),
+      files: this.state.cloud.files.files.valueSeq().sort(this.sortByFileName),
       filesSelected: this.state.cloud.files.selected,
       filesOpen: this.state.cloud.files.open,
       
@@ -1001,7 +1012,7 @@ var App = React.createClass({
 
   getTaggerProps: function() {
     return {
-      files: this.state.tagger.files.valueSeq(),
+      files: this.state.tagger.files.valueSeq().sort(this.sortByFileName),
       isShowingFiles: this.state.tagger.isShowingFiles,
       onToggle: this.handleTaggerToggle,
       onClose: this.closeTagger,
