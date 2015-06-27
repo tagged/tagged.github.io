@@ -36,6 +36,7 @@ var App = React.createClass({
   //Files determine which files are allowed in files.open, files.selected
   getInitialState: function() {
     return {
+      windowWidth: window.innerWidth,
       accounts: {
         'Dropbox': 'j.doe@gmail.com',
         'Google Drive': 'j.doe.2015@gmail.com',
@@ -140,6 +141,16 @@ var App = React.createClass({
     }
   },
 
+  childContextTypes: {
+    windowWidth: React.PropTypes.number,
+  },
+
+  getChildContext: function() {
+    return {
+      windowWidth: this.state.windowWidth,
+    };
+  },
+
   getURL: function(page) {
     var url;
     switch(page) {
@@ -161,6 +172,12 @@ var App = React.createClass({
     }
     return url;
   },
+  
+  handleResize: function() {
+    this.setState({
+      windowWidth: window.innerWidth
+    });
+  },
 
   componentDidMount: function() {
     //Give first page a non-null state object
@@ -173,6 +190,9 @@ var App = React.createClass({
     //Listen for page changes
     window.addEventListener('popstate', this._setStateFromHistory);
 
+    //Listen for window resize
+    window.addEventListener('resize', this.handleResize);
+
     //Set initial search suggestions
     this.showSearchSuggestions(true);
   },
@@ -180,6 +200,9 @@ var App = React.createClass({
   componentWillUnmount: function() {
     //Stop listening for page changes
     window.removeEventListener('popstate', this._setStateFromHistory);
+
+    //Stop listening for window resize
+    window.removeEventListener('resize', this.handleResize);
   },
 
 
