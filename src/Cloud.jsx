@@ -17,7 +17,7 @@ var Cloud = React.createClass({
     accounts: React.PropTypes.object,
     path: React.PropTypes.object,
     folders: React.PropTypes.object,
-    files: React.PropTypes.object,
+    files: React.PropTypes.instanceOf(Immutable.OrderedMap),
 
     onPathShorten: React.PropTypes.func,
     onPathLengthen: React.PropTypes.func,
@@ -47,7 +47,7 @@ var Cloud = React.createClass({
     };
   },
 
-  getFileProps: function(file) {
+  getFileProps: function(file, id) {
     return {
       name: file.name,
       path: Util.makePath(file.path),
@@ -59,11 +59,11 @@ var Cloud = React.createClass({
       tags: Immutable.OrderedSet(file.tags),
       disabledTags: Immutable.Set(file.tags), //all
       onTagClick: Util.noop, //nothing
-      isSelected: this.props.filesSelected.includes(file.id),
-      isOpen: this.props.filesOpen.includes(file.id),
-      onFileSelect: this.props.onFileSelect.bind(null, file.id),
-      onFileToggle: this.props.onFileToggle.bind(null, file.id),
-      key: file.id
+      isSelected: this.props.filesSelected.includes(id),
+      isOpen: this.props.filesOpen.includes(id),
+      onFileSelect: this.props.onFileSelect.bind(null, id),
+      onFileToggle: this.props.onFileToggle.bind(null, id),
+      key: id
     };
   },
 
@@ -105,11 +105,11 @@ var Cloud = React.createClass({
       }, this);
     }
 
-    var files = this.props.files.map(function(file) {
+    var files = this.props.files.map(function(file, id) {
       return (
-        <File {...this.getFileProps(file)}/>
+        <File {...this.getFileProps(file, id)}/>
       );
-    }, this);
+    }, this).valueSeq();
 
     var fileActionBar = null;
     if (this.props.path.size > 1) {

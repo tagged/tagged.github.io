@@ -426,11 +426,11 @@ var App = React.createClass({
     //according to files selected on current page
 
     //files.files - remove files with ids in files.selected
-    var searchFilesFiles = searchFiles.files.filter(function(file) {
-      return !selected.includes(file.id);
+    var searchFilesFiles = searchFiles.files.filter(function(file, id) {
+      return !selected.includes(id);
     });
-    var cloudFilesFiles = cloudFiles.files.filter(function(file) {
-      return !selected.includes(file.id);
+    var cloudFilesFiles = cloudFiles.files.filter(function(file, id) {
+      return !selected.includes(id);
     });
 
     //files.open - remove ids in files.selected
@@ -476,8 +476,8 @@ var App = React.createClass({
     var action = "UNDO";
 
     var deleteFiles = function() {
-      var filesToDelete = pageFiles.files.filter(function(file) {
-        return selected.includes(file.id);
+      var filesToDelete = pageFiles.files.filter(function(file, id) {
+        return selected.includes(id);
       });
       var paths = filesToDelete.map(function(file) {
         return file.path.concat([file.name]);
@@ -615,8 +615,8 @@ var App = React.createClass({
     //Set Tagger files to selected files on current page, 
     //then navigate to Tagger page.
     var page = this.state.page;
-    var files = this.state[page].files.files.filter(function(file) {
-      return this.state[page].files.selected.includes(file.id);
+    var files = this.state[page].files.files.filter(function(file, id) {
+      return this.state[page].files.selected.includes(id);
     }, this);
     this.setState({
       tagger: Update(this.state.tagger, {
@@ -703,8 +703,8 @@ var App = React.createClass({
     var searchFiles = this.state.search.files;
     
     //Add tag to search files that are also tagger files
-    var newSearchFiles = searchFiles.files.map(function(file) {
-      if (taggerFileIds.includes(file.id)) {
+    var newSearchFiles = searchFiles.files.map(function(file, id) {
+      if (taggerFileIds.includes(id)) {
         return this.attachTagToFile(tag, file);
       }
       else {
@@ -728,8 +728,8 @@ var App = React.createClass({
     var cloudFiles = this.state.cloud.files;
     
     //Add tag to cloud files that are also tagger files
-    var newCloudFiles = cloudFiles.files.map(function(file) {
-      if (taggerFileIds.includes(file.id)) {
+    var newCloudFiles = cloudFiles.files.map(function(file, id) {
+      if (taggerFileIds.includes(id)) {
         return this.attachTagToFile(tag, file);
       }
       else {
@@ -846,8 +846,8 @@ var App = React.createClass({
     var searchFiles = this.state.search.files;
     
     //Remove tag from search files that are also tagger files
-    var newSearchFiles = searchFiles.files.map(function(file) {
-      if (taggerFileIds.includes(file.id)) {
+    var newSearchFiles = searchFiles.files.map(function(file, id) {
+      if (taggerFileIds.includes(id)) {
         return this.detachTagFromFile(tag, file);
       }
       else {
@@ -877,8 +877,8 @@ var App = React.createClass({
     var cloudFiles = this.state.cloud.files;
     
     //Remove tag from cloud files that are also tagger files
-    var newCloudFiles = cloudFiles.files.map(function(file) {
-      if (taggerFileIds.includes(file.id)) {
+    var newCloudFiles = cloudFiles.files.map(function(file, id) {
+      if (taggerFileIds.includes(id)) {
         return this.detachTagFromFile(tag, file);
       }
       else {
@@ -1009,17 +1009,6 @@ var App = React.createClass({
   },
 
 
-  // Helpers
-
-
-  sortByFileName: function(file1, file2) {
-    if (file1.name === file2.name) {
-      return 0;
-    }
-    return file1.name < file2.name ? -1 : 1;
-  },
-
-
   // App pages
 
   
@@ -1028,7 +1017,7 @@ var App = React.createClass({
       searchTags: this.state.search.tags,
       searchValue: this.state.search.value,
       
-      files: this.state.search.files.files.valueSeq().sort(this.sortByFileName),
+      files: this.state.search.files.files,
       filesSelected: this.state.search.files.selected,
       filesOpen: this.state.search.files.open,
 
@@ -1057,7 +1046,7 @@ var App = React.createClass({
       path: this.state.cloud.path,
       folders: this.state.cloud.folders,
       
-      files: this.state.cloud.files.files.valueSeq(),
+      files: this.state.cloud.files.files,
       filesSelected: this.state.cloud.files.selected,
       filesOpen: this.state.cloud.files.open,
       
@@ -1077,7 +1066,7 @@ var App = React.createClass({
 
   getTaggerProps: function() {
     return {
-      files: this.state.tagger.files.valueSeq().sort(this.sortByFileName),
+      files: this.state.tagger.files,
       isShowingFiles: this.state.tagger.isShowingFiles,
       onToggle: this.handleTaggerToggle,
       onClose: this.closeTagger,

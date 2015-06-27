@@ -18,7 +18,9 @@ module.exports = {
     var pairs = [];
     for (var i=0; i < files.length; i++) {
       var file = files[i];
-      pairs.push([file.id, file]);
+      //Use full file path as id
+      var id = file.path.concat(file.name).join('/');
+      pairs.push([id, file]);
     }
     return Immutable.OrderedMap(pairs);
   },
@@ -386,7 +388,6 @@ module.exports = {
     for (var name in fileData) {
       var fileDatum = fileData[name];
       file = {
-        id: path.concat([fileDatum.name]).join('/'),
         name: fileDatum.name,
         path: path,
         tags: [],

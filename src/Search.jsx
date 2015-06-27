@@ -17,7 +17,7 @@ var Search = React.createClass({
     searchTags: React.PropTypes.instanceOf(Immutable.Set),
     searchValue: React.PropTypes.string,
     
-    files: React.PropTypes.object,
+    files: React.PropTypes.instanceOf(Immutable.OrderedMap),
     filesSelected: React.PropTypes.instanceOf(Immutable.Set),
     filesOpen: React.PropTypes.instanceOf(Immutable.Set),
 
@@ -58,7 +58,7 @@ var Search = React.createClass({
     };
   },
 
-  getFileProps: function(file) {
+  getFileProps: function(file, id) {
     return {
       name: file.name,
       path: Util.makePath(file.path),
@@ -70,11 +70,11 @@ var Search = React.createClass({
       tags: Immutable.OrderedSet(file.tags),
       disabledTags: this.props.searchTags,
       onTagClick: this.props.onSearchTagAdd,
-      isSelected: this.props.filesSelected.includes(file.id),
-      isOpen: this.props.filesOpen.includes(file.id),
-      onFileSelect: this.props.onFileSelect.bind(null, file.id),
-      onFileToggle: this.props.onFileToggle.bind(null, file.id),
-      key: file.id
+      isSelected: this.props.filesSelected.includes(id),
+      isOpen: this.props.filesOpen.includes(id),
+      onFileSelect: this.props.onFileSelect.bind(null, id),
+      onFileToggle: this.props.onFileToggle.bind(null, id),
+      key: id
     };
   },
 
@@ -96,11 +96,12 @@ var Search = React.createClass({
       );
     }
 
-    var files = this.props.files.map(function(file) {
+    //Sort files by name
+    var files = this.props.files.sort(Util.sortByName).map(function(file, id) {
       return (
-        <File {...this.getFileProps(file)}/>
+        <File {...this.getFileProps(file, id)}/>
       );
-    }, this);
+    }, this).valueSeq();
 
     var fileActionBar = null;
     if (!this.props.searchTags.isEmpty()) {

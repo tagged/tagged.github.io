@@ -15,7 +15,7 @@ var Immutable = require('immutable');
 var Tagger = React.createClass({
   
   propTypes: {
-    files: React.PropTypes.object,
+    files: React.PropTypes.instanceOf(Immutable.OrderedMap),
     isShowingFiles: React.PropTypes.bool,
     onToggle: React.PropTypes.func,
     onClose: React.PropTypes.func,
@@ -84,13 +84,14 @@ var Tagger = React.createClass({
   render: function() {
     var style = this.getStyle();
     
-    var files = this.props.files.map(function(file) {
+    //Sort files by name
+    var files = this.props.files.sort(Util.sortByName).map(function(file, id) {
       return (
-        <div style={style.file} key={file.id}>
+        <div style={style.file} key={id}>
             {file.name}
         </div>
       );
-    });
+    }).valueSeq();
 
     //Count each tag
     var tags = {};
