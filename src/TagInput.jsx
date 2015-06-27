@@ -26,6 +26,10 @@ var TagInput = React.createClass({
     };
   },
 
+  contextTypes: {
+    width: React.PropTypes.number.isRequired,
+  },
+
   getStyle: function() {
     var verticalPadding = (Dimension.heightTag - Typography.lineHeight * Typography.fontSize) / 2;
     
@@ -58,7 +62,9 @@ var TagInput = React.createClass({
         //Regulator width is guaranteed to be less than input width
         position: 'absolute',
         visibility: 'hidden',
-        whiteSpace: 'nowrap'
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        maxWidth: this.context.width - 2*Dimension.space - 2*Dimension.borderWidth - 2*Dimension.marginMobile,
       }
     };
   },
