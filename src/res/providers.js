@@ -6,5 +6,9 @@ module.exports = [
   {
     name: 'Google Drive',
     login: '//drive.google.com'
+  },
+  {
+    name: 'Box',
+    login: '//app.box.com'
   }
 ];

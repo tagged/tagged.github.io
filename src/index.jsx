@@ -37,8 +37,9 @@ var App = React.createClass({
   getInitialState: function() {
     return {
       accounts: {
-        'Dropbox': "j.doe@gmail.com",
-        'Google Drive': null
+        'Dropbox': 'j.doe@gmail.com',
+        'Google Drive': 'j.doe.2015@gmail.com',
+        'Box': null
       },
       page: Page.SEARCH,
       search: {
