@@ -91,7 +91,7 @@ var App = React.createClass({
     var value = "";
     var files = this.updateSearchFiles(searchTags);
     var suggestionsVisible = searchTags.isEmpty() || this.searchInputIsFocused();
-    var contents = this.getContents(path);
+    var contents = this.getContents(event.state.path);
     
     this.setState({
       page: page,
@@ -526,7 +526,7 @@ var App = React.createClass({
     this.state.snackbar.complete();
     
     var path = this.state.cloud.path.slice(0, index + 1);
-    var contents = this.getContents(path);
+    var contents = this.getContents(path.toArray());
     var folders = contents.folders;
     var files = contents.files;
     this.setState({
@@ -546,7 +546,7 @@ var App = React.createClass({
     this.state.snackbar.complete();
     
     var path = this.state.cloud.path.push(folder);
-    var contents = this.getContents(path);
+    var contents = this.getContents(path.toArray());
     var folders = contents.folders;
     var files = contents.files;
     this.setState({
@@ -564,7 +564,7 @@ var App = React.createClass({
 
   getContents: function(path) {
     //Use all but first item of path
-    return _Database.getContents(path.rest());
+    return _Database.getContents(path.slice(1));
   },
 
   upload: function(files) {

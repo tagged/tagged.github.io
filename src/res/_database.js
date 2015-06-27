@@ -324,38 +324,54 @@ module.exports = {
 
 
   /**
-   * Return an object of folders and files at the specified path.
-   * folders is an Immutable.List of folder names
-   * files is an Immutable.OrderedMap of file objects
+   * Return contents at the specified path.
    *
-   * @param path an Immutable.List of strings representing a directory path
+   * @param path An array of strings representing a directory path
+   * 
+   * @return An object of folders and files, where:
+   *   folders: Immutable.List of folder names
+   *   files: Immutable.OrderedMap of file objects
+   *
+   * @throws "Bad path"
    */
   getContents: function(path) {
+    //Point to the contents of the innermost folder of path
     var contents = _cloud;
+    for (var i=0; i < path.length; i++) {
+      var targetFolderName = path[i];
+      var foundTarget = false;
+      //Search contents for folder item with the name
+      for (var j=0; j < contents.length; j++) {
+        var item = contents[j];
+        if (item.isFolder && item.name === targetFolderName) {
+          contents = item.contents;
+          foundTarget = true;
+          break;
+        }
+      }
+      if (!foundTarget) {
+        throw "Bad path";
+      }
+    }
+
+    var folders = [];
+    var files = [];
+    for (var i=0; i < contents.length; i++) {
+      var item = contents[i];
+      if (item.isFolder) {
+        //folder names only
+        folders.push(item.name);
+      } 
+      else {
+        files.push(item);
+      }
+    }
     
-    //Follow folders along path
-    path.forEach(function(folder) {
-      contents = Immutable.List(contents).find(function(item) {
-        return item.name === folder && item.isFolder;
-      }).contents;
-    });
-
-    contents = Immutable.List(contents);
-
-    var folders = contents.filter(function(item) {
-      return item.isFolder;
-    }).map(function(folder) {
-      //Folder names only
-      return folder.name;
-    });
-
-    var files = contents.filter(function(item) {
-      return !item.isFolder;
-    });
+    folders.sort();
 
     return {
-      folders: folders,
-      files: this.mapFiles(files.toArray()),
+      folders: Immutable.List(folders),
+      files: this.mapFiles(files),
     };
   },
 
@@ -381,7 +397,7 @@ module.exports = {
   uploadFiles: function(fileData, path) {
     console.log("Uploading files to " + path.join("/"));
 
-    //Point to innermost folder of path
+    //Point to the contents of the innermost folder of path
     var contents = _cloud;
     for (var i=0; i < path.length; i++) {
       var targetFolderName = path[i];
