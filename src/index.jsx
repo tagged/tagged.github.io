@@ -286,7 +286,7 @@ var App = React.createClass({
 
     var suggestions;
     if (visible) {
-      suggestions = _Database.makeSearchSuggestion(
+      suggestions = _Database.suggestSearchTags(
         this.state.search.tags, 
         this.state.search.value
       );

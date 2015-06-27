@@ -221,7 +221,7 @@ module.exports = {
    * @param searchValue a string with which all returned tags should start
    * @param searchTags  Immutable.Set of tags with which all returned tags should share a file
    */
-  makeSearchSuggestion: function(searchTags, searchValue) {
+  suggestSearchTags: function(searchTags, searchValue) {
 
     console.log('hit db for tag suggestions');
     
