@@ -32,7 +32,7 @@ var Tagger = React.createClass({
   getStyle: function() {
     return {
       tagger: {
-        
+        paddingBottom: Dimension.heightActionBar + Dimension.space + Dimension.quantum
       },
       header: {
         backgroundColor: Color.blue500,
