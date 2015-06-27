@@ -29,7 +29,8 @@ var Subheader = React.createClass({
         fontSize: Typography.fontSizeSmall,
         lineHeight: Typography.lineHeightSmall,
         paddingTop: verticalPadding,
-        paddingBottom: verticalPadding
+        paddingBottom: verticalPadding,
+        wordWrap: 'break-word',
       }
     };
   },
@@ -37,8 +38,11 @@ var Subheader = React.createClass({
   render: function() {
     var {text, style, ...props} = this.props;
 
-    //Show each space character
-    var nbspText = this.props.text.replace(/ /g, String.fromCharCode(160));
+    //Prevent space collapse (nbsp)
+    //but let text break at spaces (zero-width space)
+    var nbspText = this.props.text.replace(
+      / /g, String.fromCharCode(160) + String.fromCharCode(8203)
+    );
     
     return (
       <div style={Util.merge(this.getStyle().component, style)} {...props}>
