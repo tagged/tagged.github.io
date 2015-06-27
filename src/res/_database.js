@@ -81,17 +81,15 @@ module.exports = {
     return tags.sort();
   },
   
-  
   /**
-   * Deletes files matching the specified paths.
+   * Calls the callback for each path specified
    * 
-   * @param paths An array of file paths to be deleted
-   *              Each path should be an array
+   * @param paths An array of file paths. Each path should be an array
+   * @param callback A function to be called for each path
    *
    * @throws "File not found"
    */
-  deleteFiles: function(paths) {
-    console.log('delete files in database');
+  forEachPath: function(paths, callback) {
     for (var i = 0 ; i < paths.length; i++) {
       //Take as path all but file name
       var path = paths[i];
@@ -100,19 +98,36 @@ module.exports = {
       var contents = this.goToFolder(basename);
       //Find index of file with filename
       var index;
+      var file;
       for (var j = 0; j < contents.length; j++) {
         var item = contents[j];
         if (!item.isFolder && item.name === filename) {
           index = j;
+          file = item;
           break;
         }
       }
       if (index === undefined) {
         throw "File not found";
       }
+      //Call callback
+      callback(file, index, contents);
+    }
+  },
+
+  
+  /**
+   * Deletes files matching the specified paths.
+   * 
+   * @param paths An array of file paths to be deleted
+   *              Each path should be an array
+   */
+  deleteFiles: function(paths) {
+    console.log('delete files in database');
+    this.forEachPath(paths, function(file, index, contents) {
       //Delete file from contents
       contents.splice(index, 1);
-    }
+    });
   },
 
 
@@ -125,27 +140,10 @@ module.exports = {
    */
   attachTag: function(paths, tag) {
     console.log('attach tag in database');
-    for (var i = 0 ; i < paths.length; i++) {
-      //Take as path all but file name
-      var path = paths[i];
-      var basename = path.slice(0,-1);
-      var filename = path[path.length - 1];
-      var contents = this.goToFolder(basename);
-      //Get file object reference
-      var file;
-      for (var j = 0; j < contents.length; j++) {
-        var item = contents[j];
-        if (!item.isFolder && item.name === filename) {
-          file = item;
-          break;
-        }
-      }
-      if (file === undefined) {
-        throw "File not found";
-      }
+    this.forEachPath(paths, function(file) {
       //Attach tag to file
       file.tags.push(tag);
-    }
+    });
   },
 
 
@@ -158,24 +156,7 @@ module.exports = {
    */
   detachTag: function(paths, tag) {
     console.log('detach tag in database');
-    for (var i = 0 ; i < paths.length; i++) {
-      //Take as path all but file name
-      var path = paths[i];
-      var basename = path.slice(0,-1);
-      var filename = path[path.length - 1];
-      var contents = this.goToFolder(basename);
-      //Get file object reference
-      var file;
-      for (var j = 0; j < contents.length; j++) {
-        var item = contents[j];
-        if (!item.isFolder && item.name === filename) {
-          file = item;
-          break;
-        }
-      }
-      if (file === undefined) {
-        throw "File not found";
-      }
+    this.forEachPath(paths, function(file) {
       //Remove tag from file
       var tags = file.tags;
 
@@ -187,8 +168,9 @@ module.exports = {
           break;
         }
       }
+
       tags.splice(index, 1);
-    }
+    });
   },
 
 
