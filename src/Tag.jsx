@@ -40,6 +40,8 @@ var Tag = React.createClass({
         outlineColor: Color.blackHint,
         cursor: 'pointer',
         minHeight: Dimension.heightTag - 2 * verticalPadding,
+        //Cannot add `word-wrap:break-word` to inline block
+        wordBreak: 'break-all'
       }
     };
   },
@@ -49,14 +51,8 @@ var Tag = React.createClass({
     var {text, style, ...tagProps} = this.props;
 
     //Prevent space collapse using nbsp;
-    //let text break at any character -- replace each character
-    //with that same character plus a zero-width space
-    //Note: cannot add style `word-wrap:break-word` because Tags are
-    //displayed as inline-block. So instead using the zero-width space
-    //trick to break a word at any character.
     var nbspText = this.props.text.
-                        replace(/ /g, String.fromCharCode(160)).
-                        replace(/(.)/g, '$1' + String.fromCharCode(8203));
+                        replace(/ /g, String.fromCharCode(160));
 
     var style = Util.merge(this.getStyle(), this.props.style);
 
