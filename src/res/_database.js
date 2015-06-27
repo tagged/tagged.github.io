@@ -180,7 +180,7 @@ module.exports = {
    * Returns Immutable.OrderedSet of tag suggestions based on 
    * specified search tags and search value
    * 
-   * @param searchValue a string with which all returned tags should start
+   * @param searchValue string with which all returned tags should start
    * @param searchTags  Immutable.Set of tags with which all returned tags should share a file
    */
   suggestSearchTags: function(searchTags, searchValue) {
@@ -205,28 +205,30 @@ module.exports = {
 
       //Tags on files that contain all search tags AND start with search value
       //(empty string starts every string)
-      suggestedTags = Immutable.Set();
-      searchTagSet = Immutable.Set(searchTags);
-      this.getFiles(_cloud).forEach(function(file) {
-        var fileTags = Immutable.Set(file.tags);
-        if (searchTagSet.intersect(fileTags).size === searchTagSet.size) { 
-          //If file contains all search tags, get all 
-          //file tags that start with search value
-          matchingFileTags = fileTags.filter(function(tag) {
-            return tag.indexOf(searchValue) === 0;
-          });
-          //Exclude existing search tags (we're refining)
-          matchingFileTags = matchingFileTags.subtract(searchTagSet);
-          //Merge into suggested tags
-          suggestedTags = suggestedTags.union(matchingFileTags);
-        }
-      });
-      suggestedTags = suggestedTags.sort();
 
+      var suggestions = [];
+      var allFiles = this.getFiles(_cloud);
+      for (var i = 0; i < allFiles.length; i++) {
+        var file = allFiles[i];
+        if (searchTags.intersect(file.tags).size === searchTags.size) { 
+          //Keep only file tags that start with search value
+          var matchingTags = [];
+          for (var j = 0; j < file.tags.length; j++) {
+            var tag = file.tags[j];
+            if (tag.indexOf(searchValue) === 0) {
+              matchingTags.push(tag);
+            }
+          }
+          //Add matching file tags to suggested tags
+          Array.prototype.push.apply(suggestions, matchingTags);
+        }
+      }
+      //Exclude existing search tags (we're refining)
+      suggestedTags = Immutable.Set(suggestions).subtract(searchTags);
     }
     
     return {
-      tags: suggestedTags,
+      tags: suggestedTags.sort(),
       title: this._labelSearchSuggestion(searchTags, searchValue, suggestedTags)
     };
   },
