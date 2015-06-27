@@ -73,11 +73,13 @@ module.exports = {
    * Returns tags from all files. Return type is Immutable.OrderedSet.
    */
   getTags: function() {
-    var tags = Immutable.Set();
-    this.getFiles(_cloud).forEach(function(file) {
-      tags = tags.union(file.tags);
-    });
-    return tags.sort();
+    var tags = [];
+    var allFiles = this.getFiles(_cloud);
+    for (var i = 0; i < allFiles.length; i++) {
+      var file = allFiles[i];
+      Array.prototype.push.apply(tags, file.tags);
+    }
+    return Immutable.Set(tags).sort();
   },
   
   
