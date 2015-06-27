@@ -39,9 +39,8 @@ var Subheader = React.createClass({
     var {text, style, ...props} = this.props;
 
     //Prevent space collapse (nbsp)
-    //but let text break at spaces (zero-width space)
     var nbspText = this.props.text.replace(
-      / /g, String.fromCharCode(160) + String.fromCharCode(8203)
+      / /g, String.fromCharCode(160)
     );
     
     return (
