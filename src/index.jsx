@@ -36,7 +36,7 @@ var App = React.createClass({
   //Files determine which files are allowed in files.open, files.selected
   getInitialState: function() {
     return {
-      windowWidth: window.innerWidth,
+      width: document.documentElement.clientWidth,//without scrollbar
       accounts: {
         'Dropbox': 'j.doe@gmail.com',
         'Google Drive': 'j.doe.2015@gmail.com',
@@ -142,13 +142,19 @@ var App = React.createClass({
   },
 
   childContextTypes: {
-    windowWidth: React.PropTypes.number,
+    width: React.PropTypes.number,
   },
 
   getChildContext: function() {
     return {
-      windowWidth: this.state.windowWidth,
+      width: this.state.width,
     };
+  },
+
+  handleResize: function() {
+    this.setState({
+      width: document.documentElement.clientWidth,
+    });
   },
 
   getURL: function(page) {
@@ -173,12 +179,6 @@ var App = React.createClass({
     return url;
   },
   
-  handleResize: function() {
-    this.setState({
-      windowWidth: window.innerWidth
-    });
-  },
-
   componentDidMount: function() {
     //Give first page a non-null state object
     window.history.replaceState({
