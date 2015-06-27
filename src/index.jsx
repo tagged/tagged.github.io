@@ -41,7 +41,7 @@ var App = React.createClass({
         'Google Drive': 'j.doe.2015@gmail.com',
         'Box': null
       },
-      page: Page.SEARCH,
+      page: Page.CLOUD,
       search: {
         tags: Immutable.OrderedSet(),
         value: "",
