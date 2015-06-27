@@ -657,7 +657,7 @@ var App = React.createClass({
     //can happen before the database-write in snackbar.complete
 
     var newValue = this.refs.tagger.refs.tagsOnAllFiles.getInputValue();
-    var suggestions = _Database.makeTaggerSuggestion(newValue);
+    var suggestions = _Database.getTags(newValue);
     this.setState({
       tagger: Update(this.state.tagger, {
         value: {$set: newValue},

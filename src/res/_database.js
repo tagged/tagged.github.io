@@ -70,16 +70,33 @@ module.exports = {
   
   
   /**
-   * Returns tags from all files. Return type is Immutable.OrderedSet.
+   * Returns Immutable.OrderedSet of tags from all files. If value 
+   * is defined, returns only tags that start with value.
+   * 
+   * @param value If provided, a string with which all tags should start
    */
-  getTags: function() {
+  getTags: function(value) {
     var tags = [];
     var allFiles = this.getFiles(_cloud);
     for (var i = 0; i < allFiles.length; i++) {
       var file = allFiles[i];
       Array.prototype.push.apply(tags, file.tags);
     }
-    return Immutable.Set(tags).sort();
+    
+    var tagSet = Immutable.Set(tags).sort();
+    
+    //Filter tags that start with value
+    if (value !== undefined) {
+      console.log('ask db for tags starting with ' + value);
+      tagSet = tagSet.filter(function(tag) {
+        return tag.indexOf(value) === 0;
+      });
+    }
+    else {
+      console.log('ask db for all tags');
+    }
+    
+    return tagSet;
   },
   
   
@@ -185,27 +202,16 @@ module.exports = {
    */
   suggestSearchTags: function(searchTags, searchValue) {
 
-    console.log('hit db for tag suggestions');
-    
     var suggestedTags;
 
     if (searchTags.isEmpty()) {
-
-      if (searchValue === "") {
-        //All tags
-        suggestedTags = this.getTags();
-      } else {
-        //All tags starting with search value
-        suggestedTags = this.getTags().filter(function(tag) {
-          return tag.indexOf(searchValue) === 0;
-        });
-      }
-
+      suggestedTags = this.getTags(searchValue);
     } else {
-
       //Tags on files that contain all search tags AND start with search value
       //(empty string starts every string)
 
+      console.log('ask db for search tag suggestions');
+    
       var suggestions = [];
       var allFiles = this.getFiles(_cloud);
       for (var i = 0; i < allFiles.length; i++) {
@@ -224,11 +230,11 @@ module.exports = {
         }
       }
       //Exclude existing search tags (we're refining)
-      suggestedTags = Immutable.Set(suggestions).subtract(searchTags);
+      suggestedTags = Immutable.Set(suggestions).subtract(searchTags).sort();
     }
     
     return {
-      tags: suggestedTags.sort(),
+      tags: suggestedTags,
       title: this._labelSearchSuggestion(searchTags, searchValue, suggestedTags)
     };
   },
@@ -258,16 +264,6 @@ module.exports = {
       }
     }
     return label;
-  },
-
-
-  //Return Immutable.OrderedSet of tags starting with given value
-  makeTaggerSuggestion: function(value) {
-    console.log('hit db for tags starting with ' + value);
-    var tags = this.getTags().filter(function(tag) {
-      return tag.indexOf(value) === 0;
-    });
-    return tags;
   },
 
 
