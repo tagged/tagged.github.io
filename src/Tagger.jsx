@@ -141,7 +141,7 @@ var Tagger = React.createClass({
     //-recent tags
     //-all tags
     if (this.props.taggerValue.length === 0) {
-      if (files.size > 1) {
+      if (files.size > 1 && !tagsOnSomeFiles.isEmpty()) {
         var title;
         if (files.size === 2) {
           title = "Tags on one file";
