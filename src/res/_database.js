@@ -349,6 +349,235 @@ module.exports = {
       folders: folders,
       files: Immutable.OrderedMap(fileMapPairs),
     };
+  },
+
+  /**
+   * At the specified path, create files from fileData objects
+   * 
+   * @param fileData A map of file data objects, where each entry 
+   *                 of the map is structured as follows:
+   * 
+   *   name: {
+   *     name: string,
+   *     size: integer,
+   *     mime: string,
+   *   }
+   *
+   * @param path An Immutable.List of strings representing a directory path
+   *
+   * @return Immutable.OrderedMap of updated cloud files
+   *
+   * @throws "Bad path"
+   */
+  uploadFiles: function(fileData, path) {
+    console.log("Uploading files to " + path.join("/"));
+
+    //Point to innermost folder of path
+    var contents = _cloud;
+    for (var i=0; i < path.length; i++) {
+      var targetFolderName = path[i];
+      var foundTarget = false;
+      //Search contents for folder item with the name
+      for (var j=0; j < contents.length; j++) {
+        var item = contents[j];
+        if (item.isFolder && item.name === targetFolderName) {
+          contents = item.contents;
+          foundTarget = true;
+          break;
+        }
+      }
+      if (!foundTarget) {
+        throw "Bad path";
+      }
+    }
+    
+    var today = new Date();
+    var year = today.getFullYear();
+    var month = this.months[today.getMonth()];
+    var day = this.pad(today.getDate(), 2);
+    
+    //Update files
+    for (var i=0; i < contents.length; i++) {
+      var item = contents[i];
+      if (item.isFolder) {
+        //Skip folders
+        continue;
+      }
+      if (!fileData.hasOwnProperty(item.name)) {
+        //Skip files with names not in upload file data
+        continue;
+      }
+      //Mutate file
+      var file = item;
+      var fileDatum = fileData[item.name];
+      file.modified = [year, month, day].join(' ');
+      file.size = this.abbreviate(fileDatum.size);
+      file.type = this.mimeTypes[fileDatum.mime] || 'FILE';
+      //Delete file data after applying each updates
+      delete fileData[item.name];
+    }
+    
+    //Create new files from remaining file data
+    var newFiles = [];
+    for (var name in fileData) {
+      var fileDatum = fileData[name];
+      file = {
+        id: path.concat([fileDatum.name]).join('/'),
+        name: fileDatum.name,
+        path: path,
+        tags: [],
+        link: this.fakeFileLinks[path[0]],
+        cloud: path[0],
+        modified: [year, month, day].join(' '),
+        size: this.abbreviate(fileDatum.size),
+        type: this.mimeTypes[fileDatum.mime] || 'FILE',
+      };
+      newFiles.push(file);
+    }
+    
+    //Push new files to contents
+    Array.prototype.push.apply(contents, newFiles);
+
+    //Return files as Immutable.OrderedMap
+    var fileMapPairs = [];
+    for (var i=0; i < contents.length; i++) {
+      var file = contents[i];
+      if (!file.isFolder) {
+        fileMapPairs.push([file.id, file]);
+      }
+    }
+    return Immutable.OrderedMap(fileMapPairs);
+  },
+
+  /**
+   * Convert number to an abbreviated form. The abbreviation
+   * will have two decimals or none, and it will have a 
+   * maximum of four combined digits and decimals.
+   *
+   * 1234 kB
+   * 123 kB
+   * 12.34 kB
+   * 1.23 kB
+   *
+   * @param number bytes Number of bytes to abbreviate
+   * @return string Abbreviated form of the specified number
+   */
+  abbreviate: function(bytes) {  
+    var size = {
+      B:  Math.pow(2,0),
+      kB: Math.pow(2,10),
+      MB: Math.pow(2,20),
+      GB: Math.pow(2,30),
+      TB: Math.pow(2,40)
+    };
+    
+    var abbr;
+    
+    if (bytes < 0) { throw "File size cannot be negative"; } 
+    else if (bytes < size.kB) { abbr = 'B'; }
+    else if (bytes < size.MB) { abbr = 'kB'; }
+    else if (bytes < size.GB) { abbr = 'MB'; }
+    else if (bytes < size.TB) { abbr = 'GB'; }
+    else { abbr = 'TB'; }
+    
+    //this string is guaranteed to have a decimal point
+    var number = (bytes/size[abbr]).toFixed(2);
+    
+    var split = number.split('.');
+    var digits = split[0];
+    
+    //No more than four digits and decimals combined
+    //No fractional bytes
+    var truncate = (digits.length === 3 || digits.length === 4) || abbr === 'B';
+    var decimals = truncate ? '' : '.' + split[1];
+    
+    return digits + decimals + ' ' + abbr;
+  },
+
+  //Pad specified number with zeros to the specified length string
+  pad: function(number, length) {
+    //(length - 1) zeros
+    var zeros = Array(length).join(0);
+    return (zeros + number).slice(-length);
+  },
+
+  mimeTypes: {
+    //Text formats
+    'text/plain': 'TXT',
+    'text/csv': 'CSV',
+    'text/css': 'CSS',
+    'text/html': 'HTML',
+    
+    //Application formats
+    'application/pdf': 'PDF',
+    'application/rtf': 'RTF',
+    'application/xml': 'XML',
+    'application/x-tex': 'TEX',
+    'application/postscript': 'AI',
+    'application/octet-stream': 'BIN',
+    'application/msword': 'DOC',
+    'application/vnd.ms-excel': 'XLS',
+    'application/vnd.ms-powerpoint': 'PPT',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'DOCX',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'XLSX',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'PPTX',
+    
+    //Image formats
+    'image/png': 'PNG',
+    'image/bmp': 'BMP',
+    'image/gif': 'GIF',
+    'image/jpeg': 'JPG',
+    'image/tiff': 'TIFF',
+    'image/x-tiff': 'TIFF',
+    'image/svg+xml': 'SVG',
+    'image/vnd.adobe.photoshop': 'PSD',
+    
+    //Audio formats
+    'audio/mpeg3': 'MP3',
+    'audio/x-mpeg-3': 'MP3',
+    'audio/wav': 'WAV',
+    'audio/x-wav': 'WAV',
+    'audio/x-ms-wma': 'WMA',
+    'audio/midi': 'MIDI',
+    'audio/x-midi': 'MIDI',
+    
+    //Video formats
+    'video/mpeg': 'MP3',
+    'video/x-mpeg': 'MP3',
+    'video/x-ms-wmv': 'WMV',
+    'video/mpeg': 'MPEG',
+    'audio/mp4': 'MP4A',
+    'video/mp4': 'MP4',
+    'application/mp4': 'MP4',
+    'video/x-m4v': 'M4V',
+    'video/x-msvideo': 'AVI',
+    'video/avi': 'AVI',
+    'video/msvideo': 'AVI',
+    'video/x-msvideo': 'AVI',
+    'video/avs-video': 'AVI',
+    'video/quicktime': 'MOV',
+    'video/jpeg': 'JPGV',
+  },
+
+  months: [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec"
+  ],
+
+  //Temporary, until cloud APIs provide real links
+  fakeFileLinks: {
+    'Dropbox': '//www.dropbox.com/home',
+    'Google Drive': '//drive.google.com',
   }
 
 };

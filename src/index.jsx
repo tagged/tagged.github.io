@@ -567,6 +567,40 @@ var App = React.createClass({
     return _Database.getContents(path.rest());
   },
 
+  upload: function(files) {
+    //Cannot optimistically update file state; must wait for database response
+    
+    var fileData = {};
+    for (var i = 0; i < files.length; i++) {
+      var file = files[i];
+      fileData[file.name] = {
+        name: file.name,
+        size: file.size,
+        mime: file.type,
+      };
+    }
+
+    var path = this.state.cloud.path.rest().toArray();
+    
+    //Upload files to database
+    var cloudFiles = _Database.uploadFiles(fileData, path);
+
+    //Update cloud files based on database response
+    this.setState({
+      cloud: Update(this.state.cloud, {
+        files: {
+          files: {$set: cloudFiles}
+        }
+      })
+    });
+  },
+
+  handleFileUpload: function(event) {
+    event.stopPropagation();
+    event.preventDefault();
+    this.upload(event.target.files);
+  },
+
 
   // TAGGER
 
@@ -1030,6 +1064,7 @@ var App = React.createClass({
       onFileUnselectAll: this.handleFileUnselectAll,
       onFileDelete: this.handleFileDelete,
       onFileTag: this.openTagger,
+      onFileUpload: this.handleFileUpload,
     };
   },
 

@@ -28,6 +28,7 @@ var Cloud = React.createClass({
     onFileUnselectAll: React.PropTypes.func,
     onFileDelete: React.PropTypes.func,
     onFileTag: React.PropTypes.func,
+    onFileUpload: React.PropTypes.func,
   },
 
   getStyle: function() {
@@ -118,7 +119,8 @@ var Cloud = React.createClass({
                        onUnselectAll={this.props.onFileUnselectAll}
                        onDelete={this.props.onFileDelete}
                        onTag={this.props.onFileTag}
-                       canUpload={true}/>
+                       canUpload={true}
+                       onFileUpload={this.props.onFileUpload}/>
       );
     }
 

@@ -28,6 +28,7 @@ var FileActionBar = React.createClass({
     onUnselectAll: React.PropTypes.func,
     onDelete: React.PropTypes.func,
     canUpload: React.PropTypes.bool,
+    onFileUpload: React.PropTypes.func,
     style: React.PropTypes.object
   },
 
@@ -73,6 +74,9 @@ var FileActionBar = React.createClass({
         cursor: 'pointer',
         paddingLeft: Dimension.marginMobile,
         paddingRight: Dimension.marginMobile,
+      },
+      fileInput: {
+        display: 'none',
       }
     };
   },
@@ -122,9 +126,15 @@ var FileActionBar = React.createClass({
     else if (this.props.canUpload) {
       actionBar = (
         <ActionBar style={style.actionBar}>
+            <input ref="fileInput"
+                   type="file" 
+                   multiple
+                   onChange={this.handleFileInputChange}
+                   style={style.fileInput}/>
             <Subheader action="Upload"
                        text="UPLOAD"
-                       style={style.upload}/>
+                       style={style.upload}
+                       onClick={this.handleUploadClick}/>
         </ActionBar>
       );
     }
@@ -135,7 +145,7 @@ var FileActionBar = React.createClass({
                     boxColor={Color.white}
                     checkColor={Color.blue500}
                     style={style.checkbox}
-                    onClick={this.handleClick.bind(this,checkStatus)}/>
+                    onClick={this.handleCheckboxClick.bind(this,checkStatus)}/>
           <Subheader text={text}
                      style={style.subheader}/>
           {actionBar}
@@ -143,14 +153,25 @@ var FileActionBar = React.createClass({
     );
   },
 
-  handleClick: function(checkStatus) {
+  handleCheckboxClick: function(checkStatus) {
     if (checkStatus === FALSE) {
       this.props.onSelectAll();
     }
     else {
       this.props.onUnselectAll();
     }
-  }
+  },
+
+  handleUploadClick: function() {
+    var fileInput = React.findDOMNode(this.refs.fileInput);
+    fileInput.click();
+  },
+
+  handleFileInputChange: function(event) {
+    this.props.onFileUpload(event);
+    var fileInput = React.findDOMNode(this.refs.fileInput);
+    fileInput.value = "";
+  },
 
 });
 
