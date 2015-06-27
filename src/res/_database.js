@@ -360,7 +360,8 @@ module.exports = {
   },
 
   /**
-   * At the specified path, create files from fileData objects
+   * Go to the specified path, and update and create files 
+   * based on the specified fileData objects.
    * 
    * @param fileData A map of file data objects, where each entry 
    *                 of the map is structured as follows:
@@ -371,9 +372,9 @@ module.exports = {
    *     mime: string,
    *   }
    *
-   * @param path An Immutable.List of strings representing a directory path
+   * @param path An array of strings representing a directory path
    *
-   * @return Immutable.OrderedMap of updated cloud files
+   * @return Immutable.OrderedMap of the files at the path after upload
    *
    * @throws "Bad path"
    */
