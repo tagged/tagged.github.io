@@ -81,6 +81,7 @@ module.exports = {
     return tags.sort();
   },
   
+  
   /**
    * Calls the callback for each path specified
    * 
@@ -225,20 +226,19 @@ module.exports = {
     
     return {
       tags: suggestedTags,
-      title: this.labelSuggestion(searchTags, searchValue, suggestedTags)
+      title: this._labelSearchSuggestion(searchTags, searchValue, suggestedTags)
     };
   },
   
 
   /**
-   * Returns an appropriate title for the given search value, search tags, and suggested tags.
+   * Returns an appropriate title for the given search value, search tags, and number of suggested tags.
    *
-   * @param searchValue   the search value
    * @param searchTags    Immutable.Set of search tags
-   * @param suggestedTags Immutable.Set of tags returned from makeSuggestion
+   * @param searchValue   the search value string
+   * @param suggestedTags Immutable.Set of tags returned from suggestSearchTags
    */
-  labelSuggestion: function(searchTags, searchValue, suggestedTags) {
-    //Determine subheader label from search tags, input value, and number of suggested tags
+  _labelSearchSuggestion: function(searchTags, searchValue, suggestedTags) {
     var haveSuggestedTags = suggestedTags.size > 0;
     var label;
     if (searchValue === "") {
