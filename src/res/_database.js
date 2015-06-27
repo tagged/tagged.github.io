@@ -7,6 +7,22 @@ var _cloud = require('./_cloud');
 module.exports = {
 
   /**
+   * Converts an array of file objects to an 
+   * Immutable.OrderedMap where keys are ids 
+   * and values are file objects.
+   *
+   * @param files An array of file objects
+   */
+  mapFiles: function(files) {
+    var pairs = [];
+    for (var i=0; i < files.length; i++) {
+      var file = files[i];
+      pairs.push([file.id, file]);
+    }
+    return Immutable.OrderedMap(pairs);
+  },
+
+  /**
    * Returns an array of all files deeply nested within given array
    */
   getFiles: function(contents) {
@@ -191,14 +207,7 @@ module.exports = {
       }
     }
 
-    //Return files as a map {fileId: fileObject}
-    var fileMap = {};
-    for (var i = 0; i < files.length; i++) {
-      var file = files[i];
-      fileMap[file.id] = file;
-    }
-
-    return Immutable.OrderedMap(fileMap);
+    return this.mapFiles(files);
   },
 
 
@@ -339,15 +348,9 @@ module.exports = {
       return !item.isFolder;
     });
 
-    //Return files as Immutable.OrderedMap
-    var fileMapPairs = [];
-    files.forEach(function(file) {
-      fileMapPairs.push([file.id, file]);
-    });
-
     return {
       folders: folders,
-      files: Immutable.OrderedMap(fileMapPairs),
+      files: this.mapFiles(files.toArray()),
     };
   },
 
@@ -438,15 +441,11 @@ module.exports = {
     //Push new files to contents
     Array.prototype.push.apply(contents, newFiles);
 
-    //Return files as Immutable.OrderedMap
-    var fileMapPairs = [];
-    for (var i=0; i < contents.length; i++) {
-      var file = contents[i];
-      if (!file.isFolder) {
-        fileMapPairs.push([file.id, file]);
-      }
-    }
-    return Immutable.OrderedMap(fileMapPairs);
+    var files = contents.filter(function(item) {
+      return !item.isFolder;
+    });
+
+    return this.mapFiles(files);
   },
 
   /**
