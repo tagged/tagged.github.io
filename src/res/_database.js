@@ -34,14 +34,15 @@ module.exports = {
    */
   getFiles: function(contents) {
     var files = [];
-    contents.forEach(function(item) {
+    for (var i = 0; i < contents.length; i++) {
+      var item = contents[i];
       if (item.isFolder) {
-        files = files.concat(this.getFiles(item.contents));
+        Array.prototype.push.apply(files, this.getFiles(item.contents));
       }
       else {
         files.push(item);
       }
-    }, this);
+    }
     return files;
   },
   
