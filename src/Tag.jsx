@@ -48,8 +48,12 @@ var Tag = React.createClass({
     //Extract props, and pass the rest down
     var {text, style, ...tagProps} = this.props;
 
-    //Show each space character
-    var nbspText = text.replace(/ /g, String.fromCharCode(160));
+    //Prevent space collapse using nbsp;
+    //let text break at any character -- replace each character
+    //with that same character plus a zero-width space
+    var nbspText = this.props.text.
+                        replace(/ /g, String.fromCharCode(160)).
+                        replace(/(.)/g, '$1' + String.fromCharCode(8203));
 
     var style = Util.merge(this.getStyle(), this.props.style);
 
