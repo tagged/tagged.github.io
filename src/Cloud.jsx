@@ -29,6 +29,7 @@ var Cloud = React.createClass({
     onFileDelete: React.PropTypes.func,
     onFileTag: React.PropTypes.func,
     onFileUpload: React.PropTypes.func,
+    onFileDrop: React.PropTypes.func,
   },
 
   getStyle: function() {
@@ -125,7 +126,9 @@ var Cloud = React.createClass({
     }
 
     return (
-      <div style={style.cloud}>
+      <div style={style.cloud} 
+           onDrop={this.handleFileDrop}
+           onDragOver={this.handleFileDragOver}>
           <Path path={this.props.path} 
                 onPathShorten={this.props.onPathShorten}
                 style={style.path}/>
@@ -134,6 +137,16 @@ var Cloud = React.createClass({
           {fileActionBar}
       </div>
     );
+  },
+
+  handleFileDrop: function(event) {
+    this.props.onFileDrop(event);
+  },
+  
+  handleFileDragOver: function(event) {
+    event.preventDefault();
+    var dropEffect = this.props.path.size > 1 ? 'copy' : 'none';
+    event.dataTransfer.dropEffect = dropEffect;
   },
 
 });

@@ -601,6 +601,12 @@ var App = React.createClass({
     this.upload(event.target.files);
   },
 
+  handleFileDrop: function(event) {
+    event.stopPropagation();
+    event.preventDefault();
+    this.upload(event.dataTransfer.files);
+  },
+
 
   // TAGGER
 
@@ -1065,6 +1071,7 @@ var App = React.createClass({
       onFileDelete: this.handleFileDelete,
       onFileTag: this.openTagger,
       onFileUpload: this.handleFileUpload,
+      onFileDrop: this.handleFileDrop,
     };
   },
 
