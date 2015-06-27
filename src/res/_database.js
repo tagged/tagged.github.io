@@ -324,17 +324,16 @@ module.exports = {
 
 
   /**
-   * Return contents at the specified path.
+   * Returns a reference to the contents array for the folder at
+   * the specified path.
    *
    * @param path An array of strings representing a directory path
    * 
-   * @return An object of folders and files, where:
-   *   folders: Immutable.List of folder names
-   *   files: Immutable.OrderedMap of file objects
+   * @return An array reference to a folders contents
    *
    * @throws "Bad path"
    */
-  getContents: function(path) {
+  goToFolder: function(path) {
     //Point to the contents of the innermost folder of path
     var contents = _cloud;
     for (var i=0; i < path.length; i++) {
@@ -353,6 +352,21 @@ module.exports = {
         throw "Bad path";
       }
     }
+    return contents;
+  },
+  
+  
+  /**
+   * Return contents at the specified path.
+   *
+   * @param path An array of strings representing a directory path
+   * 
+   * @return An object of folders and files, where:
+   *   folders: Immutable.List of folder names
+   *   files: Immutable.OrderedMap of file objects
+   */
+  getContents: function(path) {
+    var contents = this.goToFolder(path);
 
     var folders = [];
     var files = [];
@@ -391,30 +405,11 @@ module.exports = {
    * @param path An array of strings representing a directory path
    *
    * @return Immutable.OrderedMap of the files at the path after upload
-   *
-   * @throws "Bad path"
    */
   uploadFiles: function(fileData, path) {
     console.log("Uploading files to " + path.join("/"));
 
-    //Point to the contents of the innermost folder of path
-    var contents = _cloud;
-    for (var i=0; i < path.length; i++) {
-      var targetFolderName = path[i];
-      var foundTarget = false;
-      //Search contents for folder item with the name
-      for (var j=0; j < contents.length; j++) {
-        var item = contents[j];
-        if (item.isFolder && item.name === targetFolderName) {
-          contents = item.contents;
-          foundTarget = true;
-          break;
-        }
-      }
-      if (!foundTarget) {
-        throw "Bad path";
-      }
-    }
+    var contents = this.goToFolder(path);
     
     var today = new Date();
     var year = today.getFullYear();
