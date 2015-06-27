@@ -51,21 +51,20 @@ module.exports = {
    */
   filterFiles: function(tags) {
     console.log('ask database for files');
-
-    if (tags.isEmpty()) {
-      return Immutable.OrderedMap();
-    }
     
-    //Keep files that contain all tags
-    var allFiles = this.getFiles(_cloud);
     var files = [];
-    for (var i = 0; i < allFiles.length; i++) {
-      var file = allFiles[i];
-      if (tags.intersect(file.tags).size === tags.size) {
-        files.push(file);
+    
+    if (!tags.isEmpty()) {
+      //Keep files that contain all tags
+      var allFiles = this.getFiles(_cloud);
+      for (var i = 0; i < allFiles.length; i++) {
+        var file = allFiles[i];
+        if (tags.intersect(file.tags).size === tags.size) {
+          files.push(file);
+        }
       }
     }
-
+    
     return this.mapFiles(files);
   },
   
