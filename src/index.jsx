@@ -483,7 +483,7 @@ var App = React.createClass({
         return file.path.concat([file.name]);
       });
       //Delete files in database
-      _Database.deleteFiles(paths);
+      _Database.deleteFiles(paths.toArray());
     };
 
     var undoDelete = function() {

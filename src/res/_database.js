@@ -83,53 +83,38 @@ module.exports = {
   
   
   /**
-   * Deletes files at specified paths.
-   * Returns true if file is deleted,
-   * or false if file is not found at path.
+   * Deletes files matching the specified paths.
    * 
    * @param paths An array of file paths to be deleted
    *              Each path should be an array
+   *
+   * @throws "File not found"
    */
   deleteFiles: function(paths) {
     console.log('delete files in database');
-    paths.forEach(function(path) {
-      //Modify global
-      _cloud = this._deleteFile(_cloud, path);
-    }, this);
-    return true;
+    for (var i = 0 ; i < paths.length; i++) {
+      //Take as path all but file name
+      var path = paths[i];
+      var basename = path.slice(0,-1);
+      var filename = path[path.length - 1];
+      var contents = this.goToFolder(basename);
+      //Find index of file with filename
+      var index;
+      for (var j = 0; j < contents.length; j++) {
+        var item = contents[j];
+        if (!item.isFolder && item.name === filename) {
+          index = j;
+          break;
+        }
+      }
+      if (index === undefined) {
+        throw "File not found";
+      }
+      //Delete file from contents
+      contents.splice(index, 1);
+    }
   },
 
-  /** 
-   * Delete the file in array contents at the specified path
-   * Recursive helper to deleteFiles
-   * 
-   * @param contents An array of folders and file items
-   * @param path     An array representing the path to traverse
-   * 
-   * @throws "File does not exist"
-   */
-  _deleteFile: function(contents, path) {
-    if (path.length === 1) {
-      //No more folders to traverse
-      //Return contents with filename removed
-      var contentsMinusFile = contents.filter(function(item) {
-        return item.isFolder || item.name !== path[0];
-      });
-      if (contents.length === contentsMinusFile.length) {
-        throw "File does not exist";
-      }
-      return contentsMinusFile;
-    }
-    else {
-      var modifiedContents = contents.map(function(item) {
-        if (item.isFolder && item.name === path[0]) {
-          item.contents = this._deleteFile(item.contents, path.slice(1));
-        }
-        return item;
-      }, this);
-      return modifiedContents;
-    }
-  },
 
   /**
    * Attaches specified tag from files at specified paths.
@@ -327,14 +312,14 @@ module.exports = {
    * Returns a reference to the contents array for the folder at
    * the specified path.
    *
-   * @param path An array of strings representing a directory path
+   * @param path An array of strings representing a folder path
    * 
    * @return An array reference to a folders contents
    *
    * @throws "Bad path"
    */
   goToFolder: function(path) {
-    //Point to the contents of the innermost folder of path
+    //Point to the contents of folder at path
     var contents = _cloud;
     for (var i=0; i < path.length; i++) {
       var targetFolderName = path[i];
