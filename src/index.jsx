@@ -36,7 +36,7 @@ var App = React.createClass({
   //Files determine which files are allowed in files.open, files.selected
   getInitialState: function() {
     return {
-      width: document.documentElement.clientWidth,//without scrollbar
+      width: 0,
       accounts: {
         'Dropbox': 'j.doe@gmail.com',
         'Google Drive': 'j.doe.2015@gmail.com',
@@ -153,7 +153,7 @@ var App = React.createClass({
 
   handleResize: function() {
     this.setState({
-      width: document.documentElement.clientWidth,
+      width: document.documentElement.clientWidth,//excludes scrollbar
     });
   },
 
@@ -192,6 +192,9 @@ var App = React.createClass({
 
     //Listen for window resize
     window.addEventListener('resize', this.handleResize);
+
+    //Set initial window width
+    this.handleResize();
 
     //Set initial search suggestions
     this.showSearchSuggestions(true);
