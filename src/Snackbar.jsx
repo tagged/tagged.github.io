@@ -35,7 +35,7 @@ var Snackbar = React.createClass({
         fontSize: Typography.fontSizeSmall,
         lineHeight: Typography.lineHeightSmall,
         minWidth: Dimension.snackbar.minWidth,
-        maxWidth: Dimension.snackbar.maxWidth,
+        //maxWidth: Dimension.snackbar.maxWidth,
         zIndex: 4,
       },
       message: {
@@ -46,6 +46,9 @@ var Snackbar = React.createClass({
         paddingBottom: Dimension.snackbar.paddingVertical,
         paddingLeft: Dimension.snackbar.paddingHorizontal,
         paddingRight: 0,
+        //Break between words, then within words if needed
+        wordWrap: 'break-word',
+        wordBreak: 'break-all',
       },
       action: {
         display: 'table-cell',

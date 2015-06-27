@@ -24,7 +24,7 @@ module.exports = {
     paddingVertical: 14,
     paddingHorizontal: 24,
     minWidth: 288,
-    maxWidth: 'none',//568
+    maxWidth: 568
   },
 
   icon: 24,
