@@ -117,7 +117,7 @@ module.exports = {
 
 
   /**
-   * Attaches specified tag from files at specified paths.
+   * Attaches specified tag to files at specified paths.
    * 
    * @param tag   The tag to attach to all files
    * @param paths An array of file paths
@@ -125,44 +125,29 @@ module.exports = {
    */
   attachTag: function(paths, tag) {
     console.log('attach tag in database');
-    paths.forEach(function(path) {
-      //Modify global
-      _cloud = this._attachTagToFile(_cloud, path, tag);
-    }, this);
+    for (var i = 0 ; i < paths.length; i++) {
+      //Take as path all but file name
+      var path = paths[i];
+      var basename = path.slice(0,-1);
+      var filename = path[path.length - 1];
+      var contents = this.goToFolder(basename);
+      //Get file object reference
+      var file;
+      for (var j = 0; j < contents.length; j++) {
+        var item = contents[j];
+        if (!item.isFolder && item.name === filename) {
+          file = item;
+          break;
+        }
+      }
+      if (file === undefined) {
+        throw "File not found";
+      }
+      //Attach tag to file
+      file.tags.push(tag);
+    }
   },
 
-  /** 
-   * Attach the specified tag to the file at the specified path.
-   * Recursive helper to attachTag.
-   * 
-   * @param contents An array of folders and file items
-   * @param path     An array of the path to traverse
-   * @param tag      The tag to attach to the file at the end of the path
-   */
-  _attachTagToFile: function(contents, path, tag) {
-    if (path.length === 1) {
-      //No more folders to traverse
-      //Return contents with tag added to file
-      var contentsPlusFileTag = contents.map(function(item) {
-        if (!item.isFolder && item.name === path[0]) {
-          var newFile = Object.create(item);
-          newFile.tags = Immutable.OrderedSet(newFile.tags).add(tag).toArray();
-          return newFile;
-        }
-        return item;
-      });
-      return contentsPlusFileTag;
-    }
-    else {
-      var modifiedContents = contents.map(function(item) {
-        if (item.isFolder && item.name === path[0]) {
-          item.contents = this._attachTagToFile(item.contents, path.slice(1), tag);
-        }
-        return item;
-      }, this);
-      return modifiedContents;
-    }
-  },
 
   /**
    * Detaches specified tag from files at specified paths.
@@ -173,46 +158,39 @@ module.exports = {
    */
   detachTag: function(paths, tag) {
     console.log('detach tag in database');
-    paths.forEach(function(path) {
-      //Modify global
-      _cloud = this._detachTagFromFile(_cloud, path, tag);
-    }, this);
+    for (var i = 0 ; i < paths.length; i++) {
+      //Take as path all but file name
+      var path = paths[i];
+      var basename = path.slice(0,-1);
+      var filename = path[path.length - 1];
+      var contents = this.goToFolder(basename);
+      //Get file object reference
+      var file;
+      for (var j = 0; j < contents.length; j++) {
+        var item = contents[j];
+        if (!item.isFolder && item.name === filename) {
+          file = item;
+          break;
+        }
+      }
+      if (file === undefined) {
+        throw "File not found";
+      }
+      //Remove tag from file
+      var tags = file.tags;
+
+      //Find index of tag
+      var index;
+      for (var j = 0; j < tags.length; j++) {
+        if (tags[j] === tag) {
+          index = j;
+          break;
+        }
+      }
+      tags.splice(index, 1);
+    }
   },
 
-  /** 
-   * Detach the specified tag from the file at the specified path.
-   * Recursive helper to detachTag.
-   * 
-   * @param contents An array of folders and file items
-   * @param path     An array of the path to traverse
-   * @param tag      The tag to detach from the file at the end of the path
-   */
-  _detachTagFromFile: function(contents, path, tag) {
-    if (path.length === 1) {
-      //No more folders to traverse
-      //Return contents with tag removed from file
-      var contentsMinusFileTag = contents.map(function(item) {
-        if (!item.isFolder && item.name === path[0]) {
-          var newFile = Object.create(item);
-          newFile.tags = newFile.tags.filter(function(newTag) {
-            return newTag !== tag;
-          });
-          return newFile;
-        }
-        return item;
-      });
-      return contentsMinusFileTag;
-    }
-    else {
-      var modifiedContents = contents.map(function(item) {
-        if (item.isFolder && item.name === path[0]) {
-          item.contents = this._detachTagFromFile(item.contents, path.slice(1), tag);
-        }
-        return item;
-      }, this);
-      return modifiedContents;
-    }
-  },
 
   /**
    * Returns Immutable.OrderedSet of tag suggestions based on 

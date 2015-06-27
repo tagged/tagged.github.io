@@ -773,7 +773,7 @@ var App = React.createClass({
         return file.path.concat([file.name]);
       });
       //Attach tag in database
-      _Database.attachTag(paths, tag);
+      _Database.attachTag(paths.toArray(), tag);
     };
 
     var undoAttach = function() {
@@ -917,7 +917,7 @@ var App = React.createClass({
         return file.path.concat([file.name]);
       });
       //Detach tag in database
-      _Database.detachTag(paths, tag);
+      _Database.detachTag(paths.toArray(), tag);
     };
 
     var undoDetach = function() {
