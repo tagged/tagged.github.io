@@ -5,7 +5,8 @@ var Immutable = require('immutable');
 var _cloud = require('./_cloud');
 
 module.exports = {
-
+  
+  
   /**
    * Converts an array of file objects to an 
    * Immutable.OrderedMap where keys are ids 
@@ -21,23 +22,66 @@ module.exports = {
     }
     return Immutable.OrderedMap(pairs);
   },
-
+  
+  
   /**
-   * Returns an array of all files deeply nested within given array
+   * Returns an array which includes all files directly inside 
+   * the specified contents and all files nested in folders.
+   * 
+   * @param contents An array of file and folder objects
    */
   getFiles: function(contents) {
-    var _files = [];
+    var files = [];
     contents.forEach(function(item) {
       if (item.isFolder) {
-        _files = _files.concat(this.getFiles(item.contents));
+        files = files.concat(this.getFiles(item.contents));
       }
       else {
-        _files.push(item);
+        files.push(item);
       }
     }, this);
-    return _files;
+    return files;
   },
+  
+  
+  /**
+   * Returns Immutable.OrderedMap of files containing the specified tags
+   *
+   * @param tags Immutable.Set of tags guiding the file search
+   */
+  filterFiles: function(tags) {
+    console.log('ask database for files');
 
+    if (tags.isEmpty()) {
+      return Immutable.OrderedMap();
+    }
+    
+    //Keep files that contain all tags
+    var allFiles = this.getFiles(_cloud);
+    var files = [];
+    for (var i = 0; i < allFiles.length; i++) {
+      var file = allFiles[i];
+      if (tags.intersect(file.tags).size === tags.size) {
+        files.push(file);
+      }
+    }
+
+    return this.mapFiles(files);
+  },
+  
+  
+  /**
+   * Returns tags from all files. Return type is Immutable.OrderedSet.
+   */
+  getTags: function() {
+    var tags = Immutable.Set();
+    this.getFiles(_cloud).forEach(function(file) {
+      tags = tags.union(file.tags);
+    });
+    return tags.sort();
+  },
+  
+  
   /**
    * Deletes files at specified paths.
    * Returns true if file is deleted,
@@ -186,44 +230,6 @@ module.exports = {
   },
 
   /**
-   * Returns Immutable.OrderedMap of files containing the specified tags
-   *
-   * @param tags Immutable.Set of tags guiding the file search
-   */
-  filterFiles: function(tags) {
-    console.log('ask database for files');
-
-    if (tags.isEmpty()) {
-      return Immutable.OrderedMap();
-    }
-    
-    //Keep files that contain all tags
-    var allFiles = this.getFiles(_cloud);
-    var files = [];
-    for (var i = 0; i < allFiles.length; i++) {
-      var file = allFiles[i];
-      if (tags.intersect(file.tags).size === tags.size) {
-        files.push(file);
-      }
-    }
-
-    return this.mapFiles(files);
-  },
-
-
-  /**
-   * Returns tags from all files. Return type is Immutable.OrderedSet.
-   */
-  getTags: function() {
-    var tags = Immutable.Set();
-    this.getFiles(_cloud).forEach(function(file) {
-      tags = tags.union(file.tags);
-    });
-    return tags.sort();
-  },
-  
-  
-  /**
    * Returns Immutable.OrderedSet of tag suggestions based on 
    * specified search tags and search value
    * 
@@ -278,7 +284,6 @@ module.exports = {
     };
   },
   
-
 
   /**
    * Returns an appropriate title for the given search value, search tags, and suggested tags.
