@@ -69,12 +69,13 @@ var App = React.createClass({
       },
       cloud: {
         path: Immutable.List(["Home"]),
-        folders: Immutable.List(),
+        folders: Immutable.List(),//secondary state
         files: {
-          files: Immutable.OrderedMap(),
+          files: Immutable.OrderedMap(),//secondary state
           open: Immutable.Set(),
           selected: Immutable.Set(),
         },
+        requestsPending: 0,
       },
       tagger: {
         files: Immutable.OrderedMap(),
@@ -105,8 +106,7 @@ var App = React.createClass({
     
     var value = "";
     var suggestionsVisible = searchTags.isEmpty() || this.searchInputIsFocused();
-    var contents = this.getContents(event.state.path);
-    
+
     this.setState({
       page: page,
       search: Update(this.state.search, {
@@ -115,9 +115,7 @@ var App = React.createClass({
       }),
       cloud: Update(this.state.cloud, {
         path: {$set: path},
-        folders: {$set: contents.folders},
         files: {
-          files: {$set: contents.files},
           open: {$set: Immutable.Set()},
           selected: {$set: Immutable.Set()}
         }
@@ -213,15 +211,19 @@ var App = React.createClass({
   },
 
   componentDidUpdate: function(prevProps, prevState) {
-    var searchTagsChanged = !Immutable.is(this.state.search.tags, prevState.search.tags);
-    var searchValueChanged = this.state.search.value !== prevState.search.value;
+    var currState = this.state;
+
+    var searchTagsChanged = !Immutable.is(currState.search.tags, prevState.search.tags);
+    var searchValueChanged = currState.search.value !== prevState.search.value;
     var updateSuggestions = searchTagsChanged || searchValueChanged;
     var updateFiles = searchTagsChanged;
-
     this.updateSearch(updateSuggestions, updateFiles);
 
+    var pathChanged = !Immutable.is(currState.cloud.path, prevState.cloud.path);
+    this.updateCloud(pathChanged);
+
     //Update tagger suggestions after a change in tagger value
-    if (this.state.tagger.value !== prevState.tagger.value) {
+    if (currState.tagger.value !== prevState.tagger.value) {
       this.updateTaggerSuggestions();
     }
 
@@ -236,6 +238,13 @@ var App = React.createClass({
   },
 
   updateSearch: function(updateSuggestions, updateFiles) {
+    //No need to do anything?
+    if (!updateSuggestions && !updateFiles) {
+      return;
+    }
+    
+    console.log('updateSearch');
+    
     var increaseRequestsPending = {};
     if (updateSuggestions) {
       var oneMore = this.state.search.suggestions.requestsPending + 1;
@@ -248,10 +257,6 @@ var App = React.createClass({
       increaseRequestsPending.files = {
         requestsPending: {$set: oneMore},
       };
-    }
-    //No need to do anything?
-    if (!updateSuggestions && !updateFiles) {
-      return;
     }
     this.setState({
       search: Update(this.state.search, increaseRequestsPending)
@@ -305,6 +310,40 @@ var App = React.createClass({
       });
     }.bind(this));
   },
+
+  updateCloud: function(pathChanged) {
+    if(!pathChanged) {
+      return;
+    }
+    
+    console.log('updateCloud');
+    
+    var oneMore = this.state.cloud.requestsPending + 1;
+    this.setState({
+      cloud: Update(this.state.cloud, {
+        requestsPending: {$set: oneMore}
+      })
+    }, function() {
+      
+      //Use all but first item of path
+      _Database.getContents(
+        this.state.cloud.path.slice(1).toArray()
+      ).then(function(contents) {
+        var oneLess = this.state.cloud.requestsPending - 1;
+        this.setState({
+          cloud: Update(this.state.cloud, {
+            requestsPending: {$set: oneLess},
+            folders: {$set: contents.folders},
+            files: {
+              files: {$set: contents.files}
+            },
+          })
+        });
+      }.bind(this));
+
+    });
+  },
+
     
   
   updateTaggerSuggestions: function() {
@@ -639,15 +678,10 @@ var App = React.createClass({
     this.state.snackbar.complete();
     
     var path = this.state.cloud.path.slice(0, index + 1);
-    var contents = this.getContents(path.toArray());
-    var folders = contents.folders;
-    var files = contents.files;
     this.setState({
       cloud: Update(this.state.cloud, {
         path: {$set: path},
-        folders: {$set: folders},
         files: {
-          files: {$set: files},
           selected: {$set: Immutable.Set()},
           open: {$set: Immutable.Set()}
         }
@@ -659,25 +693,15 @@ var App = React.createClass({
     this.state.snackbar.complete();
     
     var path = this.state.cloud.path.push(folder);
-    var contents = this.getContents(path.toArray());
-    var folders = contents.folders;
-    var files = contents.files;
     this.setState({
       cloud: Update(this.state.cloud, {
         path: {$set: path},
-        folders: {$set: folders},
         files: {
-          files: {$set: files},
           selected: {$set: Immutable.Set()},
           open: {$set: Immutable.Set()}
         }
       })
     }, this.setBrowserState);
-  },
-
-  getContents: function(path) {
-    //Use all but first item of path
-    return _Database.getContents(path.slice(1));
   },
 
   upload: function(files) {
@@ -1162,6 +1186,8 @@ var App = React.createClass({
       files: this.state.cloud.files.files,
       filesSelected: this.state.cloud.files.selected,
       filesOpen: this.state.cloud.files.open,
+
+      loading: this.state.cloud.requestsPending > 0,
       
       onPathShorten: this.handlePathShorten,
       onPathLengthen: this.handlePathLengthen,

@@ -158,10 +158,10 @@ module.exports = {
       }
     }
     
-    return {
+    return this.delayResponse({
       folders: Immutable.List(folders),
       files: this.mapFiles(files),
-    };
+    });
   },
 
   
