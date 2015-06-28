@@ -320,6 +320,7 @@ var App = React.createClass({
     if (this.state.cloud.path.size === 1) {
       this.setState({
         cloud: Update(this.state.cloud, {
+          requestsPending: {$set: 0},//clear requestsPending
           folders: {$set: Immutable.List()},
           files: {
             files: {$set: Immutable.OrderedMap()}
@@ -342,6 +343,11 @@ var App = React.createClass({
       _Database.getContents(
         this.state.cloud.path.slice(1).toArray()
       ).then(function(contents) {
+        
+        //Check if requestsPending has been cleared
+        if (this.state.cloud.requestsPending === 0) {
+          return;
+        }
         var oneLess = this.state.cloud.requestsPending - 1;
         this.setState({
           cloud: Update(this.state.cloud, {
