@@ -152,6 +152,10 @@ var App = React.createClass({
     });
   },
 
+  handleMouseDown: function() {
+    this.showSearchSuggestions(false);
+  },
+  
   getURL: function(page) {
     var url;
     switch(page) {
@@ -1201,7 +1205,7 @@ var App = React.createClass({
     }
 
     return (
-      <div style={style.app} onMouseDown={this.showSearchSuggestions.bind(this, false)}>
+      <div style={style.app} onMouseDown={this.handleMouseDown}>
           {appBar}
           {page}
           <ReactTransitionGroup>
