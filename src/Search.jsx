@@ -42,6 +42,7 @@ var Search = React.createClass({
   getInitialState: function() {
     return {
       suggestions: Immutable.OrderedSet(),
+      suggestionRequestsOutstanding: 0,
     };
   },
 
@@ -99,14 +100,20 @@ var Search = React.createClass({
   updateSuggestions: function() {
     //Suggestions are calculated from search tags and value
     //Database should return an Immutable.OrderedSet of strings
-    _Database.suggestSearchTags(
-      this.props.searchTags, 
-      this.props.searchValue
-    ).then(function(suggestions) {
-      this.setState({
-        suggestions: suggestions
-      });
-    }.bind(this));
+    this.setState({
+      suggestionRequestsOutstanding: this.state.suggestionRequestsOutstanding + 1,
+    }, function() {
+      _Database.suggestSearchTags(
+        this.props.searchTags, 
+        this.props.searchValue
+      ).then(function(suggestions) {
+        
+        this.setState({
+          suggestions: suggestions,
+          suggestionRequestsOutstanding: this.state.suggestionRequestsOutstanding - 1,
+        });
+      }.bind(this));
+    });
   },
 
   render: function() {
@@ -117,41 +124,51 @@ var Search = React.createClass({
 
     var suggestions = null;
     if (this.props.suggestionsVisible) {
-      //Calculate suggestions label
-      var suggestedTags = this.state.suggestions;
-      var haveSuggestions = suggestedTags.size > 0;
-      var label;
-      var searchTags = this.props.searchTags;
-      var searchValue = this.props.searchValue;
-      if (searchValue === "") {
-        if (searchTags.isEmpty()) {
-          label = haveSuggestions ? 
-                  "All " + suggestedTags.size + " tags" : 
-                  "No tags exist yet";
-        } else {
-          label = haveSuggestions ? 
-                  "Refine search" : 
-                  "No tags to refine search";
-        }
-      } else {
-        if (searchTags.isEmpty()) {
-          label = haveSuggestions ? 
-                  ('"' + searchValue + '" tags') : 
-                  ('No "' + searchValue + '" tags');
-        } else {
-          label = haveSuggestions ? 
-                  ('"' + searchValue + '" tags to refine search') : 
-                  ('No "' + searchValue + '" tags to refine search');
-        }
+
+      //Don't show suggestions while there are outstanding requests for suggestions
+
+      if (this.state.suggestionRequestsOutstanding > 0) {
+        suggestions = null;//<div>LOADING...</div>;
       }
-      suggestions = (
-        <div>
-            <Subheader text={label}/>
-            <Tags tags={suggestedTags}
-                  onTagClick={this.props.onSearchTagAdd}
-                  style={style.suggestions}/>
-        </div>
-      );
+
+      //Otherwise, show suggestions
+
+      else {
+        //Calculate suggestions label
+        var haveSuggestions = this.state.suggestions.size > 0;
+        var label;
+        var searchTags = this.props.searchTags;
+        var searchValue = this.props.searchValue;
+        if (searchValue === "") {
+          if (searchTags.isEmpty()) {
+            label = haveSuggestions ? 
+                    "All " + this.state.suggestions.size + " tags" : 
+                    "No tags exist yet";
+          } else {
+            label = haveSuggestions ? 
+                    "Refine search" : 
+                    "No tags to refine search";
+          }
+        } else {
+          if (searchTags.isEmpty()) {
+            label = haveSuggestions ? 
+                    ('"' + searchValue + '" tags') : 
+                    ('No "' + searchValue + '" tags');
+          } else {
+            label = haveSuggestions ? 
+                    ('"' + searchValue + '" tags to refine search') : 
+                    ('No "' + searchValue + '" tags to refine search');
+          }
+        }
+        suggestions = (
+          <div>
+              <Subheader text={label}/>
+              <Tags tags={this.state.suggestions}
+                    onTagClick={this.props.onSearchTagAdd}
+                    style={style.suggestions}/>
+          </div>
+        );
+      }
     }
 
     //Sort files by name
