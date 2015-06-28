@@ -36,13 +36,13 @@ var App = React.createClass({
   //Files determine which files are allowed in files.open, files.selected
 
   //"Secondary state" is state that *can* be computed from other state,
-  //but is done so via a database read/GET. It would be expensive to 
-  //read the database for every render, so secondary state serves as a
-  //cache. Secondary state changes when its related primary state changes. 
-  //Secondary state is updated in post-render lifecycle methods like 
-  //componentDidMount and componentDidUpdate, so that their calculation 
-  //(database read) doesn't stall UI render.
-
+  //but is done so via a database read/GET. Secondary state updates when
+  //its primary state dependencies change, and this happens in post-render 
+  //methods like componentDidMount and componentDidUpdate, so that the
+  //calculation (database read) doesn't stall UI render. 
+  //Secondary state is stored back in state so that it can be accessed 
+  //during the next render cycle. 
+  
   getInitialState: function() {
     return {
       width: 0,
