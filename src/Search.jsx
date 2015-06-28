@@ -39,6 +39,15 @@ var Search = React.createClass({
     onFileTag: React.PropTypes.func,
   },
 
+  getInitialState: function() {
+    return {
+      suggestions: {
+        tags: Immutable.OrderedSet(),
+        title: ""
+      }
+    };
+  },
+
   getStyle: function() {
     return {
       search: {
@@ -78,6 +87,31 @@ var Search = React.createClass({
     };
   },
 
+  componentDidMount: function() {
+    this.updateSuggestions();
+  },
+  
+  componentDidUpdate: function(prevProps) {
+    //Update suggestions when search tags or value changes
+    if (!Immutable.is(this.props.searchTags, prevProps.searchTags) ||
+        this.props.searchValue !== prevProps.searchValue) {
+          this.updateSuggestions();
+    }
+  },
+
+  updateSuggestions: function() {
+    //Suggestions are calculated from search tags and value
+    //TODO: asynchronously?
+    //Database should return an object with properties tag and title
+    var suggestions = _Database.suggestSearchTags(
+      this.props.searchTags, 
+      this.props.searchValue
+    );
+    this.setState({
+      suggestions: suggestions
+    });
+  },
+
   render: function() {
     var style = this.getStyle();
 
@@ -86,19 +120,10 @@ var Search = React.createClass({
 
     var suggestions = null;
     if (this.props.suggestionsVisible) {
-      
-      //Suggestions are calculated from search tags and value
-      //Update suggestions right before showing them
-      //TODO: asynchronously?
-      var suggestion = _Database.suggestSearchTags(
-        this.props.searchTags, 
-        this.props.searchValue
-      );
-
       suggestions = (
         <div>
-            <Subheader text={suggestion.title}/>
-            <Tags tags={suggestion.tags}
+            <Subheader text={this.state.suggestions.title}/>
+            <Tags tags={this.state.suggestions.tags}
                   onTagClick={this.props.onSearchTagAdd}
                   style={style.suggestions}/>
         </div>
