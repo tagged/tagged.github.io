@@ -306,6 +306,11 @@ var App = React.createClass({
       visible = true;
     }
 
+    //Suggestion visiblility is already in the correct state
+    if (this.state.search.suggestionsVisible === visible) {
+      return;
+    }
+    
     this.setState({
       search: Update(this.state.search, {
         suggestionsVisible: {$set: visible},
