@@ -316,6 +316,19 @@ var App = React.createClass({
       return;
     }
     
+    //Path is the home page: don't need to call database
+    if (this.state.cloud.path.size === 1) {
+      this.setState({
+        cloud: Update(this.state.cloud, {
+          folders: {$set: Immutable.List()},
+          files: {
+            files: {$set: Immutable.OrderedMap()}
+          },
+        })
+      });
+      return;
+    }
+        
     console.log('updateCloud');
     
     var oneMore = this.state.cloud.requestsPending + 1;
