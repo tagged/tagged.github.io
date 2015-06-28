@@ -48,6 +48,8 @@ var App = React.createClass({
         value: "",
         suggestions: {
           visible: true,
+          requestsPending: 0,
+          tags: Immutable.OrderedSet()
         },
         files: {
           files: Immutable.OrderedMap(),
@@ -198,7 +200,16 @@ var App = React.createClass({
     this.handleResize();
 
     //Set initial search suggestions
-    this.showSearchSuggestions(true);
+    //this.showSearchSuggestions(true);
+    this.updateSearchSuggestions();
+  },
+
+  componentDidUpdate: function(prevProps, prevState) {
+    //Update search suggestions after a change in search tags or search value
+    if (!Immutable.is(this.state.search.tags, prevState.search.tags) ||
+        this.state.search.value !== prevState.search.value) {
+          this.updateSearchSuggestions();
+    }
   },
 
   componentWillUnmount: function() {
@@ -207,6 +218,34 @@ var App = React.createClass({
 
     //Stop listening for window resize
     window.removeEventListener('resize', this.handleResize);
+  },
+
+  updateSearchSuggestions: function() {
+    //Search suggestions are calculated from search tags and search value
+    //Database should return an Immutable.OrderedSet of strings
+    var oneMore = this.state.search.suggestions.requestsPending + 1;
+    this.setState({
+      search: Update(this.state.search, {
+        suggestions: {
+          requestsPending: {$set: oneMore},
+        }
+      })
+    }, function() {
+      _Database.suggestSearchTags(
+        this.state.search.tags, 
+        this.state.search.value
+      ).then(function(suggestedTags) {
+        var oneLess = this.state.search.suggestions.requestsPending - 1;
+        this.setState({
+          search: Update(this.state.search, {
+            suggestions: {
+              tags: {$set: suggestedTags},
+              requestsPending: {$set: oneLess},
+            }
+          })
+        });
+      }.bind(this));
+    });
   },
 
 
@@ -1034,7 +1073,9 @@ var App = React.createClass({
       filesSelected: this.state.search.files.selected,
       filesOpen: this.state.search.files.open,
 
+      suggestions: this.state.search.suggestions.tags,
       suggestionsVisible: this.state.search.suggestions.visible,
+      suggestionsLoading: this.state.search.suggestions.requestsPending > 0,
       
       onSearchTagAdd: this.addSearchTag,
       onSearchTagDelete: this.deleteSearchTag,

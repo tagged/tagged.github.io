@@ -39,13 +39,6 @@ var Search = React.createClass({
     onFileTag: React.PropTypes.func,
   },
 
-  getInitialState: function() {
-    return {
-      suggestions: Immutable.OrderedSet(),
-      suggestionRequestsOutstanding: 0,
-    };
-  },
-
   getStyle: function() {
     return {
       search: {
@@ -85,37 +78,6 @@ var Search = React.createClass({
     };
   },
 
-  componentDidMount: function() {
-    this.updateSuggestions();
-  },
-  
-  componentDidUpdate: function(prevProps) {
-    //Update suggestions when search tags or value changes
-    if (!Immutable.is(this.props.searchTags, prevProps.searchTags) ||
-        this.props.searchValue !== prevProps.searchValue) {
-          this.updateSuggestions();
-    }
-  },
-
-  updateSuggestions: function() {
-    //Suggestions are calculated from search tags and value
-    //Database should return an Immutable.OrderedSet of strings
-    this.setState({
-      suggestionRequestsOutstanding: this.state.suggestionRequestsOutstanding + 1,
-    }, function() {
-      _Database.suggestSearchTags(
-        this.props.searchTags, 
-        this.props.searchValue
-      ).then(function(suggestions) {
-        
-        this.setState({
-          suggestions: suggestions,
-          suggestionRequestsOutstanding: this.state.suggestionRequestsOutstanding - 1,
-        });
-      }.bind(this));
-    });
-  },
-
   render: function() {
     var style = this.getStyle();
 
@@ -125,9 +87,9 @@ var Search = React.createClass({
     var suggestions = null;
     if (this.props.suggestionsVisible) {
 
-      //Don't show suggestions while there are outstanding requests for suggestions
+      //Don't show search suggestions while they are loading
 
-      if (this.state.suggestionRequestsOutstanding > 0) {
+      if (this.props.suggestionsLoading) {
         suggestions = null;//<div>LOADING...</div>;
       }
 
@@ -135,14 +97,14 @@ var Search = React.createClass({
 
       else {
         //Calculate suggestions label
-        var haveSuggestions = this.state.suggestions.size > 0;
+        var haveSuggestions = this.props.suggestions.size > 0;
         var label;
         var searchTags = this.props.searchTags;
         var searchValue = this.props.searchValue;
         if (searchValue === "") {
           if (searchTags.isEmpty()) {
             label = haveSuggestions ? 
-                    "All " + this.state.suggestions.size + " tags" : 
+                    "All " + this.props.suggestions.size + " tags" : 
                     "No tags exist yet";
           } else {
             label = haveSuggestions ? 
@@ -163,7 +125,7 @@ var Search = React.createClass({
         suggestions = (
           <div>
               <Subheader text={label}/>
-              <Tags tags={this.state.suggestions}
+              <Tags tags={this.props.suggestions}
                     onTagClick={this.props.onSearchTagAdd}
                     style={style.suggestions}/>
           </div>
