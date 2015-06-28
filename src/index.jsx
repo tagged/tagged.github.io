@@ -53,8 +53,6 @@ var App = React.createClass({
         },
         suggestions: {
           visible: true,
-          tags: Immutable.OrderedSet(),
-          title: ""
         }
       },
       cloud: {
@@ -307,29 +305,10 @@ var App = React.createClass({
       visible = true;
     }
 
-    //Update suggestions if showing them,
-    //because search tags may have changed 
-    //after they were last shown
-
-    var suggestions;
-    if (visible) {
-      suggestions = _Database.suggestSearchTags(
-        this.state.search.tags, 
-        this.state.search.value
-      );
-    } else {
-      suggestions = {
-        tags: this.state.search.suggestions.tags,
-        title: this.state.search.suggestions.title
-      };
-    }
-
     this.setState({
       search: Update(this.state.search, {
         suggestions: {
           visible: {$set: visible},
-          tags: {$set: suggestions.tags},
-          title: {$set: suggestions.title}
         }
       })
     });
@@ -1049,8 +1028,6 @@ var App = React.createClass({
       filesOpen: this.state.search.files.open,
 
       suggestionsVisible: this.state.search.suggestions.visible,
-      suggestionsTags: this.state.search.suggestions.tags,
-      suggestionsTitle: this.state.search.suggestions.title,
       
       onSearchTagAdd: this.addSearchTag,
       onSearchTagDelete: this.deleteSearchTag,

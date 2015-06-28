@@ -9,6 +9,8 @@ var Color = R.color;
 var Dimension = R.dimension;
 var Util = require('./util/util');
 var Immutable = require('immutable');
+var _Database = require('./res/_database');
+
 
 
 var Search = React.createClass({
@@ -22,8 +24,6 @@ var Search = React.createClass({
     filesOpen: React.PropTypes.instanceOf(Immutable.Set),
 
     suggestionsVisible: React.PropTypes.bool,
-    suggestionsTags: React.PropTypes.instanceOf(Immutable.Set),
-    suggestionsTitle: React.PropTypes.string,
 
     onSearchTagAdd: React.PropTypes.func,
     onSearchTagDelete: React.PropTypes.func,
@@ -86,10 +86,19 @@ var Search = React.createClass({
 
     var suggestions = null;
     if (this.props.suggestionsVisible) {
+      
+      //Suggestions are calculated from search tags and value
+      //Update suggestions right before showing them
+      //TODO: asynchronously?
+      var suggestion = _Database.suggestSearchTags(
+        this.props.searchTags, 
+        this.props.searchValue
+      );
+
       suggestions = (
         <div>
-            <Subheader text={this.props.suggestionsTitle}/>
-            <Tags tags={this.props.suggestionsTags}
+            <Subheader text={suggestion.title}/>
+            <Tags tags={suggestion.tags}
                   onTagClick={this.props.onSearchTagAdd}
                   style={style.suggestions}/>
         </div>
