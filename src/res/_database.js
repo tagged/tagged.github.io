@@ -84,12 +84,8 @@ module.exports = {
     else {
       console.log('ask db for all tags');
     }
-    
-    return new RSVP.Promise(function(resolve, reject) {
-      window.setTimeout(function() {
-        resolve(tagSet);
-      }, databaseLatency);
-    });
+
+    return this.delayResponse(tagSet);
   },
 
 
@@ -132,12 +128,7 @@ module.exports = {
       //Exclude existing search tags (we're refining)
       suggestedTags = Immutable.Set(suggestions).subtract(searchTags).sort();
 
-      return new RSVP.Promise(function(resolve, reject) {
-        window.setTimeout(function() {
-          resolve(suggestedTags);
-        }, databaseLatency);
-      });
-
+      return this.delayResponse(suggestedTags);
     }
   },
   
@@ -402,6 +393,16 @@ module.exports = {
     }
   },
 
+  
+  //Returns a Promise that resolves after a delay
+  //Use this to simulate a delayed database response
+  delayResponse: function(response) {
+    return new RSVP.Promise(function(resolve, reject) {
+      window.setTimeout(function() {
+        resolve(response);
+      }, databaseLatency);
+    });
+  },
   
   /**
    * Convert number to an abbreviated form. The abbreviation
