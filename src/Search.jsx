@@ -41,10 +41,7 @@ var Search = React.createClass({
 
   getInitialState: function() {
     return {
-      suggestions: {
-        tags: Immutable.OrderedSet(),
-        title: ""
-      }
+      suggestions: Immutable.OrderedSet(),
     };
   },
 
@@ -101,7 +98,7 @@ var Search = React.createClass({
 
   updateSuggestions: function() {
     //Suggestions are calculated from search tags and value
-    //Database should return an object with properties tag and title
+    //Database should return an Immutable.OrderedSet of strings
     _Database.suggestSearchTags(
       this.props.searchTags, 
       this.props.searchValue
@@ -120,10 +117,37 @@ var Search = React.createClass({
 
     var suggestions = null;
     if (this.props.suggestionsVisible) {
+      //Calculate suggestions label
+      var suggestedTags = this.state.suggestions;
+      var haveSuggestions = suggestedTags.size > 0;
+      var label;
+      var searchTags = this.props.searchTags;
+      var searchValue = this.props.searchValue;
+      if (searchValue === "") {
+        if (searchTags.isEmpty()) {
+          label = haveSuggestions ? 
+                  "All " + suggestedTags.size + " tags" : 
+                  "No tags exist yet";
+        } else {
+          label = haveSuggestions ? 
+                  "Refine search" : 
+                  "No tags to refine search";
+        }
+      } else {
+        if (searchTags.isEmpty()) {
+          label = haveSuggestions ? 
+                  ('"' + searchValue + '" tags') : 
+                  ('No "' + searchValue + '" tags');
+        } else {
+          label = haveSuggestions ? 
+                  ('"' + searchValue + '" tags to refine search') : 
+                  ('No "' + searchValue + '" tags to refine search');
+        }
+      }
       suggestions = (
         <div>
-            <Subheader text={this.state.suggestions.title}/>
-            <Tags tags={this.state.suggestions.tags}
+            <Subheader text={label}/>
+            <Tags tags={suggestedTags}
                   onTagClick={this.props.onSearchTagAdd}
                   style={style.suggestions}/>
         </div>

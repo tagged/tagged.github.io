@@ -240,42 +240,11 @@ module.exports = {
     
     return new RSVP.Promise(function(resolve, reject) {
       window.setTimeout(function() {
-        var databaseResponse = {
-          tags: suggestedTags,
-          title: this._labelSearchSuggestion(searchTags, searchValue, suggestedTags)
-        };
-        resolve(databaseResponse);
+        resolve(suggestedTags);
       }.bind(this), databaseLatency);
     }.bind(this));
   },
   
-
-  /**
-   * Returns an appropriate title for the given search value, search tags, and number of suggested tags.
-   *
-   * @param searchTags    Immutable.Set of search tags
-   * @param searchValue   the search value string
-   * @param suggestedTags Immutable.Set of tags returned from suggestSearchTags
-   */
-  _labelSearchSuggestion: function(searchTags, searchValue, suggestedTags) {
-    var haveSuggestedTags = suggestedTags.size > 0;
-    var label;
-    if (searchValue === "") {
-      if (searchTags.isEmpty()) {
-        label = haveSuggestedTags ? "All " + suggestedTags.size + " tags" : "No tags exist yet";
-      } else {
-        label = haveSuggestedTags ? "Refine search" : "No tags to refine search";
-      }
-    } else {
-      if (searchTags.isEmpty()) {
-        label = haveSuggestedTags ? ('"' + searchValue + '" tags') : ('No "' + searchValue + '" tags');
-      } else {
-        label = haveSuggestedTags ? ('"' + searchValue + '" tags to refine search') : ('No "' + searchValue + '" tags to refine search');
-      }
-    }
-    return label;
-  },
-
 
   /**
    * Returns a reference to the contents array for the folder at
