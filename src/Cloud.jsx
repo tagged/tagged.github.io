@@ -18,6 +18,10 @@ var Cloud = React.createClass({
     path: React.PropTypes.object,
     folders: React.PropTypes.object,
     files: React.PropTypes.instanceOf(Immutable.OrderedMap),
+    filesSelected: React.PropTypes.instanceOf(Immutable.Set),
+    filesOpen: React.PropTypes.instanceOf(Immutable.Set),
+    
+    loading: React.PropTypes.bool,
 
     onPathShorten: React.PropTypes.func,
     onPathLengthen: React.PropTypes.func,
@@ -72,8 +76,11 @@ var Cloud = React.createClass({
     
     var folders;
 
+    if (this.props.loading) {
+      folders = null;//<Loading/>
+    }
     //Special folder for each cloud provider
-    if (this.props.path.size === 1) {
+    else if (this.props.path.size === 1) {
       folders = Providers.map(function(provider) {
         var account = this.props.accounts[provider.name];
         var onClick;
@@ -105,11 +112,18 @@ var Cloud = React.createClass({
       }, this);
     }
 
-    var files = this.props.files.map(function(file, id) {
-      return (
-        <File {...this.getFileProps(file, id)}/>
-      );
-    }, this).valueSeq();
+    var files;
+
+    if (this.props.loading) {
+      files = null;//<Loading/>
+    }
+    else {
+      files = this.props.files.map(function(file, id) {
+        return (
+          <File {...this.getFileProps(file, id)}/>
+        );
+      }, this).valueSeq();
+    }
 
     var fileActionBar = null;
     if (this.props.path.size > 1) {
