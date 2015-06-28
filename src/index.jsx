@@ -365,10 +365,21 @@ var App = React.createClass({
     
   
   updateTaggerSuggestions: function() {
-    //Don't need to call database if tagger value is empty
+    //Tagger value is empty: don't need to call database
     if (this.state.tagger.value === '') {
+      this.setState({
+        tagger: Update(this.state.tagger, {
+          suggestions: {
+            requestsPending: {$set: 0},//clear requestsPending
+            tags: {$set: Immutable.OrderedSet()},
+          }
+        })
+      });
       return;
     }
+    
+    console.log('updateTaggerSuggestions', this.state.tagger.suggestions.requestsPending);
+    
     //Tagger suggestions are calculated from tagger value
     //Database should return an Immutable.OrderedSet of strings
     var oneMore = this.state.tagger.suggestions.requestsPending + 1;
@@ -382,6 +393,11 @@ var App = React.createClass({
       _Database.getTags(
         this.state.tagger.value
       ).then(function(suggestedTags) {
+        
+        //Check if requestsPending has been cleared
+        if (this.state.tagger.suggestions.requestsPending === 0) {
+          return;
+        }
         var oneLess = this.state.tagger.suggestions.requestsPending - 1;
         this.setState({
           tagger: Update(this.state.tagger, {
