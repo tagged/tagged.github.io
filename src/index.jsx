@@ -61,7 +61,7 @@ var App = React.createClass({
           requestsPending: 0,
         },
         files: {
-          files: Immutable.OrderedMap(),
+          files: Immutable.OrderedMap(),//secondary state
           open: Immutable.Set(),
           selected: Immutable.Set(),
         },
@@ -103,7 +103,6 @@ var App = React.createClass({
     var path = Immutable.List(event.state.path);
     
     var value = "";
-    var files = this.updateSearchFiles(searchTags);
     var suggestionsVisible = searchTags.isEmpty() || this.searchInputIsFocused();
     var contents = this.getContents(event.state.path);
     
@@ -112,11 +111,6 @@ var App = React.createClass({
       search: Update(this.state.search, {
         tags: {$set: searchTags},
         value: {$set: value},
-        files: {
-          files: {$set: files.files},
-          open: {$set: Immutable.Set()},
-          selected: {$set: Immutable.Set()}
-        }
       }),
       cloud: Update(this.state.cloud, {
         path: {$set: path},
@@ -228,6 +222,11 @@ var App = React.createClass({
     if (this.state.tagger.value !== prevState.tagger.value) {
       this.updateTaggerSuggestions();
     }
+
+    //Update search files after a change in search tags
+    if (!Immutable.is(this.state.search.tags, prevState.search.tags)) {
+      this.updateSearchFiles();
+    }
   },
 
   componentWillUnmount: function() {
@@ -297,6 +296,32 @@ var App = React.createClass({
     });
   },
 
+  updateSearchFiles: function() {
+    _Database.filterFiles(
+      this.state.search.tags
+    ).then(function(files) {
+
+      var selected = this.state.search.files.selected.filter(function(fileId) {
+        return files.has(fileId);
+      });
+
+      var open = this.state.search.files.open.filter(function(fileId) {
+        return files.has(fileId);
+      });
+
+      this.setState({
+        search: Update(this.state.search, {
+          files: {
+            files: {$set: files},
+            open: {$set: open},
+            selected: {$set: selected}
+          }
+        })
+      });
+      
+    }.bind(this));
+  },
+    
   
   // SEARCH
 
@@ -321,7 +346,6 @@ var App = React.createClass({
     //Clear search value
     
     var newSearchTags = this.state.search.tags.add(tag);
-    var files = this.updateSearchFiles(newSearchTags);
 
     //Keep suggestions visible if input is focused
     var suggestionsVisible = this.searchInputIsFocused();
@@ -329,12 +353,7 @@ var App = React.createClass({
     this.setState({
       search: Update(this.state.search, {
         tags: {$set: newSearchTags},
-        value: {$set: ""},
-        files: {
-          files: {$set: files.files},
-          open: {$set: files.open},
-          selected: {$set: files.selected}
-        }
+        value: {$set: ""}
       }),
     }, function() {
       this.showSearchSuggestions(suggestionsVisible);
@@ -350,7 +369,6 @@ var App = React.createClass({
     //Filter files.selected and files.open, based on files
 
     var newSearchTags = this.state.search.tags.delete(tag);
-    var files = this.updateSearchFiles(newSearchTags);
 
     //Show suggestions if there are no search tags
     var suggestionsVisible = newSearchTags.isEmpty();
@@ -358,11 +376,6 @@ var App = React.createClass({
     this.setState({
       search: Update(this.state.search, {
         tags: {$set: newSearchTags},
-        files: {
-          files: {$set: files.files},
-          open: {$set: files.open},
-          selected: {$set: files.selected}
-        }
       }),
     }, function() {
       this.showSearchSuggestions(suggestionsVisible);
@@ -408,23 +421,6 @@ var App = React.createClass({
         }
       })
     });
-  },
-
-  updateSearchFiles: function(searchTags) {
-    //Returns what the next state of files, files selected, and files open
-    //would look like, given the search tags
-    var files = _Database.filterFiles(searchTags);
-    var selected = this.state.search.files.selected.filter(function(fileId) {
-      return files.has(fileId);
-    });
-    var open = this.state.search.files.open.filter(function(fileId) {
-      return files.has(fileId);
-    });
-    return {
-      files: files,
-      selected: selected,
-      open: open
-    };
   },
 
 

@@ -54,9 +54,9 @@ module.exports = {
       }
     }
     
-    return this.mapFiles(files);
+    return this.delayResponse(this.mapFiles(files));
   },
-  
+
   
   /**
    * Returns Immutable.OrderedSet of tags from all files. If value 
@@ -403,6 +403,7 @@ module.exports = {
       }, databaseLatency);
     });
   },
+  
   
   /**
    * Convert number to an abbreviated form. The abbreviation
