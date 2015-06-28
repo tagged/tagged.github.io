@@ -96,7 +96,7 @@ var Cloud = React.createClass({
     }
     //Normal folders
     else {
-      folders = this.props.folders.map(function(folder) {
+      folders = this.props.folders.sort().map(function(folder) {
         return (
           <Folder name={folder} 
                   onClick={this.props.onPathLengthen.bind(null, folder)}

@@ -158,8 +158,6 @@ module.exports = {
       }
     }
     
-    folders.sort();
-
     return {
       folders: Immutable.List(folders),
       files: this.mapFiles(files),
@@ -182,7 +180,6 @@ module.exports = {
         folders.push(item.name);
       } 
     }
-    //folders.sort();
     return Immutable.List(folders);
   },
 
