@@ -167,6 +167,46 @@ module.exports = {
   },
 
   
+  /**
+   * Return Immutable.List of folder names at the specified path.
+   *
+   * @param path An array of strings representing a directory path
+   */
+  getFolders: function(path) {
+    var contents = this.goToFolder(path);
+
+    var folders = [];
+    for (var i=0; i < contents.length; i++) {
+      var item = contents[i];
+      if (item.isFolder) {
+        folders.push(item.name);
+      } 
+    }
+    //folders.sort();
+    return Immutable.List(folders);
+  },
+
+  
+  /**
+   * Return Immutable.OrderedMap of files at the specified path.
+   *
+   * @param path An array of strings representing a directory path
+   */
+  getFiles: function(path) {
+    var contents = this.goToFolder(path);
+
+    var files = [];
+    for (var i=0; i < contents.length; i++) {
+      var item = contents[i];
+      if (!item.isFolder) {
+        files.push(item);
+      }
+    }
+
+    return this.mapFiles(files);
+  },
+
+
   // WRITE
   
   
