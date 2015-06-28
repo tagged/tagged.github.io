@@ -46,14 +46,12 @@ var App = React.createClass({
       search: {
         tags: Immutable.OrderedSet(),
         value: "",
+        suggestionsVisible: true,
         files: {
           files: Immutable.OrderedMap(),
           open: Immutable.Set(),
           selected: Immutable.Set(),
         },
-        suggestions: {
-          visible: true,
-        }
       },
       cloud: {
         path: Immutable.List(["Home"]),
@@ -306,9 +304,7 @@ var App = React.createClass({
 
     this.setState({
       search: Update(this.state.search, {
-        suggestions: {
-          visible: {$set: visible},
-        }
+        suggestionsVisible: {$set: visible},
       })
     });
   },
@@ -1025,7 +1021,7 @@ var App = React.createClass({
       filesSelected: this.state.search.files.selected,
       filesOpen: this.state.search.files.open,
 
-      suggestionsVisible: this.state.search.suggestions.visible,
+      suggestionsVisible: this.state.search.suggestionsVisible,
       
       onSearchTagAdd: this.addSearchTag,
       onSearchTagDelete: this.deleteSearchTag,
