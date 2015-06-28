@@ -32,9 +32,7 @@ var Tagger = React.createClass({
 
   getInitialState: function() {
     return {
-      suggestions: {
-        tags: Immutable.OrderedSet(),
-      }
+      suggestions: Immutable.OrderedSet(),
     };
   },
 
@@ -91,29 +89,30 @@ var Tagger = React.createClass({
   },
 
   componentDidMount: function() {
-    if (this.props.taggerValue !== '') {
-      this.updateSuggestions();
-    }
+    this.updateSuggestions();
   },
   
   componentDidUpdate: function(prevProps) {
     //Update suggestions when value changes
-    if (this.props.taggerValue !== prevProps.taggerValue &&
-        this.props.taggerValue !== '') {
+    if (this.props.taggerValue !== prevProps.taggerValue) {
       this.updateSuggestions();
     }
   },
 
   updateSuggestions: function() {
+    //Don't need to call database if tagger value is empty
+    if (this.props.taggerValue === '') {
+      return;
+    }
     //Suggestions are calculated from value
-    //TODO: async
     //Database should return an Immutable.OrderedSet of strings
-    var tags = _Database.getTags(this.props.taggerValue);
-    this.setState({
-      suggestions: {
-        tags: tags
-      }
-    });
+    _Database.getTags(
+      this.props.taggerValue
+    ).then(function(suggestions) {
+      this.setState({
+        suggestions: suggestions
+      });
+    }.bind(this));
   },
 
   render: function() {
@@ -198,7 +197,7 @@ var Tagger = React.createClass({
     //If no tag starting with value, offer to create it
     else {
       var title;
-      if (tags.size > 0) {
+      if (this.state.suggestions.size > 0) {
         title = '"' + this.props.taggerValue + '"' + " tags";
       }
       else {
@@ -207,7 +206,7 @@ var Tagger = React.createClass({
       suggestions = (
         <div>
             <Subheader text={title}/>
-            <Tags tags={this.state.suggestions.tags}
+            <Tags tags={this.state.suggestions}
                   disabledTags={tagsOnAllFiles}
                   onTagClick={this.props.onTagAttach}/>
         </div>

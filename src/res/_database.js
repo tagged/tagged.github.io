@@ -101,7 +101,11 @@ module.exports = {
       console.log('ask db for all tags');
     }
     
-    return tagSet;
+    return new RSVP.Promise(function(resolve, reject) {
+      window.setTimeout(function() {
+        resolve(tagSet);
+      }, databaseLatency);
+    });
   },
   
   
@@ -210,7 +214,7 @@ module.exports = {
     var suggestedTags;
 
     if (searchTags.isEmpty()) {
-      suggestedTags = this.getTags(searchValue);
+      return this.getTags(searchValue);
     } else {
       //Tags on files that contain all search tags AND start with search value
       //(empty string starts every string)
@@ -236,13 +240,14 @@ module.exports = {
       }
       //Exclude existing search tags (we're refining)
       suggestedTags = Immutable.Set(suggestions).subtract(searchTags).sort();
+
+      return new RSVP.Promise(function(resolve, reject) {
+        window.setTimeout(function() {
+          resolve(suggestedTags);
+        }, databaseLatency);
+      });
+
     }
-    
-    return new RSVP.Promise(function(resolve, reject) {
-      window.setTimeout(function() {
-        resolve(suggestedTags);
-      }.bind(this), databaseLatency);
-    }.bind(this));
   },
   
 
