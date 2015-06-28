@@ -69,7 +69,6 @@ var App = React.createClass({
         isShowingFiles: false,
         previousPage: Page.CLOUD,
         value: "",
-        suggestions: Immutable.OrderedSet()
       },
       snackbar: {
         visible: false,
@@ -659,15 +658,14 @@ var App = React.createClass({
     this.state.snackbar.complete();
 
     //May need to call the rest of this method as part of the
-    //snackbar.complete callback, if the database-read below 
-    //can happen before the database-write in snackbar.complete
+    //snackbar.complete callback, if the database-read in the
+    //Tagger re-render can happen before the database-write 
+    //in snackbar.complete
 
     var newValue = this.refs.tagger.refs.tagsOnAllFiles.getInputValue();
-    var suggestions = _Database.getTags(newValue);
     this.setState({
       tagger: Update(this.state.tagger, {
         value: {$set: newValue},
-        suggestions: {$set: suggestions}
       })
     });
   },
@@ -1077,7 +1075,6 @@ var App = React.createClass({
 
       taggerValue: this.state.tagger.value,
       onTaggerValueChange: this.handleTaggerValueChange,
-      suggestions: this.state.tagger.suggestions,
       onTaggerFocus: this.handleTaggerFocus,
 
       onTagAttach: this.handleTagAttach,

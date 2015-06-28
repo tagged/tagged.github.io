@@ -10,6 +10,8 @@ var Dimension = R.dimension;
 var Typography = R.typography;
 var Util = require('./util/util');
 var Immutable = require('immutable');
+var _Database = require('./res/_database');
+
 
 
 var Tagger = React.createClass({
@@ -22,7 +24,6 @@ var Tagger = React.createClass({
 
     taggerValue: React.PropTypes.string,
     onTaggerValueChange: React.PropTypes.func,
-    suggestions: React.PropTypes.instanceOf(Immutable.OrderedSet),
     onTaggerFocus: React.PropTypes.func,
 
     onTagAttach: React.PropTypes.func,
@@ -162,8 +163,9 @@ var Tagger = React.createClass({
     //Show tags starting with value
     //If no tag starting with value, offer to create it
     else {
+      var tags = _Database.getTags(this.props.taggerValue);
       var title;
-      if (this.props.suggestions.size > 0) {
+      if (tags.size > 0) {
         title = '"' + this.props.taggerValue + '"' + " tags";
       }
       else {
@@ -172,7 +174,7 @@ var Tagger = React.createClass({
       suggestions = (
         <div>
             <Subheader text={title}/>
-            <Tags tags={this.props.suggestions}
+            <Tags tags={tags}
                   disabledTags={tagsOnAllFiles}
                   onTagClick={this.props.onTagAttach}/>
         </div>
