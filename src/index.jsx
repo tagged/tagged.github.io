@@ -46,7 +46,9 @@ var App = React.createClass({
       search: {
         tags: Immutable.OrderedSet(),
         value: "",
-        suggestionsVisible: true,
+        suggestions: {
+          visible: true,
+        },
         files: {
           files: Immutable.OrderedMap(),
           open: Immutable.Set(),
@@ -307,13 +309,15 @@ var App = React.createClass({
     }
 
     //Suggestion visiblility is already in the correct state
-    if (this.state.search.suggestionsVisible === visible) {
+    if (this.state.search.suggestions.visible === visible) {
       return;
     }
     
     this.setState({
       search: Update(this.state.search, {
-        suggestionsVisible: {$set: visible},
+        suggestions: {
+          visible: {$set: visible},
+        }
       })
     });
   },
@@ -1030,7 +1034,7 @@ var App = React.createClass({
       filesSelected: this.state.search.files.selected,
       filesOpen: this.state.search.files.open,
 
-      suggestionsVisible: this.state.search.suggestionsVisible,
+      suggestionsVisible: this.state.search.suggestions.visible,
       
       onSearchTagAdd: this.addSearchTag,
       onSearchTagDelete: this.deleteSearchTag,
