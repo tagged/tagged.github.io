@@ -10,7 +10,6 @@ var Dimension = R.dimension;
 var Typography = R.typography;
 var Util = require('./util/util');
 var Immutable = require('immutable');
-var _Database = require('./res/_database');
 
 
 

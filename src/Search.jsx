@@ -9,7 +9,6 @@ var Color = R.color;
 var Dimension = R.dimension;
 var Util = require('./util/util');
 var Immutable = require('immutable');
-var _Database = require('./res/_database');
 
 
 
