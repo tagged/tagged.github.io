@@ -48,8 +48,8 @@ var App = React.createClass({
         value: "",
         suggestions: {
           visible: true,
+          tags: Immutable.OrderedSet(),
           requestsPending: 0,
-          tags: Immutable.OrderedSet()
         },
         files: {
           files: Immutable.OrderedMap(),
@@ -71,6 +71,10 @@ var App = React.createClass({
         isShowingFiles: false,
         previousPage: Page.CLOUD,
         value: "",
+        suggestions: {
+          tags: Immutable.OrderedSet(),
+          requestsPending: 0,
+        }
       },
       snackbar: {
         visible: false,
@@ -210,6 +214,11 @@ var App = React.createClass({
         this.state.search.value !== prevState.search.value) {
           this.updateSearchSuggestions();
     }
+
+    //Update tagger suggestions after a change in tagger value
+    if (this.state.tagger.value !== prevState.tagger.value) {
+      this.updateTaggerSuggestions();
+    }
   },
 
   componentWillUnmount: function() {
@@ -248,7 +257,38 @@ var App = React.createClass({
     });
   },
 
+  updateTaggerSuggestions: function() {
+    //Don't need to call database if tagger value is empty
+    if (this.state.tagger.value === '') {
+      return;
+    }
+    //Tagger suggestions are calculated from tagger value
+    //Database should return an Immutable.OrderedSet of strings
+    var oneMore = this.state.tagger.suggestions.requestsPending + 1;
+    this.setState({
+      tagger: Update(this.state.tagger, {
+        suggestions: {
+          requestsPending: {$set: oneMore},
+        }
+      })
+    }, function() {
+      _Database.getTags(
+        this.state.tagger.value
+      ).then(function(suggestedTags) {
+        var oneLess = this.state.tagger.suggestions.requestsPending - 1;
+        this.setState({
+          tagger: Update(this.state.tagger, {
+            suggestions: {
+              tags: {$set: suggestedTags},
+              requestsPending: {$set: oneLess},
+            }
+          })
+        });
+      }.bind(this));
+    });
+  },
 
+  
   // SEARCH
 
 
@@ -1124,6 +1164,10 @@ var App = React.createClass({
       onClose: this.closeTagger,
 
       taggerValue: this.state.tagger.value,
+      
+      suggestions: this.state.tagger.suggestions.tags,
+      suggestionsLoading: this.state.tagger.suggestions.requestsPending > 0,
+      
       onTaggerValueChange: this.handleTaggerValueChange,
       onTaggerFocus: this.handleTaggerFocus,
 

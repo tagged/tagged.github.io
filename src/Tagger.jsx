@@ -23,17 +23,15 @@ var Tagger = React.createClass({
     onClose: React.PropTypes.func,
 
     taggerValue: React.PropTypes.string,
+    
+    suggestions: React.PropTypes.instanceOf(Immutable.OrderedSet),
+    suggestionsLoading: React.PropTypes.bool,
+
     onTaggerValueChange: React.PropTypes.func,
     onTaggerFocus: React.PropTypes.func,
 
     onTagAttach: React.PropTypes.func,
     onTagDetach: React.PropTypes.func,
-  },
-
-  getInitialState: function() {
-    return {
-      suggestions: Immutable.OrderedSet(),
-    };
   },
 
   getStyle: function() {
@@ -86,33 +84,6 @@ var Tagger = React.createClass({
         paddingTop: Dimension.space,
       }
     };
-  },
-
-  componentDidMount: function() {
-    this.updateSuggestions();
-  },
-  
-  componentDidUpdate: function(prevProps) {
-    //Update suggestions when value changes
-    if (this.props.taggerValue !== prevProps.taggerValue) {
-      this.updateSuggestions();
-    }
-  },
-
-  updateSuggestions: function() {
-    //Don't need to call database if tagger value is empty
-    if (this.props.taggerValue === '') {
-      return;
-    }
-    //Suggestions are calculated from value
-    //Database should return an Immutable.OrderedSet of strings
-    _Database.getTags(
-      this.props.taggerValue
-    ).then(function(suggestions) {
-      this.setState({
-        suggestions: suggestions
-      });
-    }.bind(this));
   },
 
   render: function() {
@@ -197,7 +168,7 @@ var Tagger = React.createClass({
     //If no tag starting with value, offer to create it
     else {
       var title;
-      if (this.state.suggestions.size > 0) {
+      if (this.props.suggestions.size > 0) {
         title = '"' + this.props.taggerValue + '"' + " tags";
       }
       else {
@@ -206,7 +177,7 @@ var Tagger = React.createClass({
       suggestions = (
         <div>
             <Subheader text={title}/>
-            <Tags tags={this.state.suggestions}
+            <Tags tags={this.props.suggestions}
                   disabledTags={tagsOnAllFiles}
                   onTagClick={this.props.onTagAttach}/>
         </div>

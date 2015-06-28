@@ -23,6 +23,8 @@ var Search = React.createClass({
     filesSelected: React.PropTypes.instanceOf(Immutable.Set),
     filesOpen: React.PropTypes.instanceOf(Immutable.Set),
 
+    suggestions: React.PropTypes.instanceOf(Immutable.OrderedSet),
+    suggestionsLoading: React.PropTypes.bool,
     suggestionsVisible: React.PropTypes.bool,
 
     onSearchTagAdd: React.PropTypes.func,
