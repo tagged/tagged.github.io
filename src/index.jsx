@@ -34,6 +34,15 @@ var App = React.createClass({
 
   //Search tags determine files
   //Files determine which files are allowed in files.open, files.selected
+
+  //"Secondary state" is state that *can* be computed from other state,
+  //but is done so via a database read/GET. It would be expensive to 
+  //read the database for every render, so secondary state serves as a
+  //cache. Secondary state changes when its related primary state changes. 
+  //Secondary state is updated in post-render lifecycle methods like 
+  //componentDidMount and componentDidUpdate, so that their calculation 
+  //(database read) doesn't stall UI render.
+
   getInitialState: function() {
     return {
       width: 0,
@@ -48,7 +57,7 @@ var App = React.createClass({
         value: "",
         suggestions: {
           visible: true,
-          tags: Immutable.OrderedSet(),
+          tags: Immutable.OrderedSet(),//secondary state
           requestsPending: 0,
         },
         files: {
@@ -72,7 +81,7 @@ var App = React.createClass({
         previousPage: Page.CLOUD,
         value: "",
         suggestions: {
-          tags: Immutable.OrderedSet(),
+          tags: Immutable.OrderedSet(),//secondary state
           requestsPending: 0,
         }
       },
