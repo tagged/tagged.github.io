@@ -141,11 +141,17 @@ var Tagger = React.createClass({
     }
 
     var suggestions;
-    //No value. Show:
+    
+    //Don't show tagger suggestions while they are loading
+    if (this.props.suggestionsLoading) {
+      suggestions = null;//<div>LOADING...</div>;
+    }
+    //Otherwise, show suggestions
+    //No value. Suggestions:
     //-tags on some files (if more than one file)
     //-recent tags
     //-all tags
-    if (this.props.taggerValue === '') {
+    else if (this.props.taggerValue === '') {
       if (files.size > 1 && !tagsOnSomeFiles.isEmpty()) {
         var title;
         if (files.size === 2) {
