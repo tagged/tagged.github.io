@@ -3,7 +3,7 @@
   "description": "Web app for tagging cloud files",
   "main": "bundle.js",
   "scripts": {
-    "bundle:vendor": "browserify --require react --require react/addons --require ./velocity/velocity.js --require immutable --require svg.js > ./vendor.js",
+    "bundle:vendor": "browserify --require react --require react/addons --require ./velocity/velocity.js --require immutable --require svg.js --require rsvp > ./vendor.js",
     "build:js": "jsx ./src ./build",
     "build:jsx": "jsx --harmony --extension jsx ./src ./build",
     "bundle:app": "browserify --external react --external react/addons --external ./velocity/velocity.js ./build/index.js --external immutable --external svg.js > ./app.js",
@@ -20,6 +20,7 @@
     "react-router": "^0.13.3",
     "react-tap-event-plugin": "^0.1.7",
     "react-tools": "^0.13.3",
+    "rsvp": "^3.0.18",
     "svg.js": "^1.1.0"
   },
   "devDependencies": {

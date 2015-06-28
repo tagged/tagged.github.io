@@ -1,8 +1,10 @@
 //Eventually use real database logic
 
 var Immutable = require('immutable');
-
+var RSVP = require('rsvp');
 var _cloud = require('./_cloud');
+
+var databaseLatency = 1500;
 
 module.exports = {
   
@@ -236,10 +238,15 @@ module.exports = {
       suggestedTags = Immutable.Set(suggestions).subtract(searchTags).sort();
     }
     
-    return {
-      tags: suggestedTags,
-      title: this._labelSearchSuggestion(searchTags, searchValue, suggestedTags)
-    };
+    return new RSVP.Promise(function(resolve, reject) {
+      window.setTimeout(function() {
+        var databaseResponse = {
+          tags: suggestedTags,
+          title: this._labelSearchSuggestion(searchTags, searchValue, suggestedTags)
+        };
+        resolve(databaseResponse);
+      }.bind(this), databaseLatency);
+    }.bind(this));
   },
   
 

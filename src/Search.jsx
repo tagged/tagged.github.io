@@ -101,15 +101,15 @@ var Search = React.createClass({
 
   updateSuggestions: function() {
     //Suggestions are calculated from search tags and value
-    //TODO: asynchronously?
     //Database should return an object with properties tag and title
-    var suggestions = _Database.suggestSearchTags(
+    _Database.suggestSearchTags(
       this.props.searchTags, 
       this.props.searchValue
-    );
-    this.setState({
-      suggestions: suggestions
-    });
+    ).then(function(suggestions) {
+      this.setState({
+        suggestions: suggestions
+      });
+    }.bind(this));
   },
 
   render: function() {
