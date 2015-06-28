@@ -9,24 +9,8 @@ var databaseLatency = 1500;
 module.exports = {
   
   
-  /**
-   * Converts an array of file objects to an 
-   * Immutable.OrderedMap where keys are ids 
-   * and values are file objects.
-   *
-   * @param files An array of file objects
-   */
-  mapFiles: function(files) {
-    var pairs = [];
-    for (var i=0; i < files.length; i++) {
-      var file = files[i];
-      //Use full file path as id
-      var id = file.path.concat(file.name).join('/');
-      pairs.push([id, file]);
-    }
-    return Immutable.OrderedMap(pairs);
-  },
-  
+  // READ
+
   
   /**
    * Returns an array which includes all files directly inside 
@@ -107,42 +91,93 @@ module.exports = {
       }, databaseLatency);
     });
   },
-  
-  
+
+
   /**
-   * Calls the callback for each path specified
+   * Returns Immutable.OrderedSet of tag suggestions based on 
+   * specified search tags and search value
    * 
-   * @param paths An array of file paths. Each path should be an array
-   * @param callback A function to be called for each path
-   *
-   * @throws "File not found"
+   * @param searchValue string with which all returned tags should start
+   * @param searchTags  Immutable.Set of tags with which all returned tags should share a file
    */
-  forEachPath: function(paths, callback) {
-    for (var i = 0 ; i < paths.length; i++) {
-      //Take as path all but file name
-      var path = paths[i];
-      var basename = path.slice(0,-1);
-      var filename = path[path.length - 1];
-      var contents = this.goToFolder(basename);
-      //Find index of file with filename
-      var index;
-      var file;
-      for (var j = 0; j < contents.length; j++) {
-        var item = contents[j];
-        if (!item.isFolder && item.name === filename) {
-          index = j;
-          file = item;
-          break;
+  suggestSearchTags: function(searchTags, searchValue) {
+
+    var suggestedTags;
+
+    if (searchTags.isEmpty()) {
+      return this.getTags(searchValue);
+    } else {
+      //Tags on files that contain all search tags AND start with search value
+      //(empty string starts every string)
+
+      console.log('ask db for search tag suggestions');
+    
+      var suggestions = [];
+      var allFiles = this.getFiles(_cloud);
+      for (var i = 0; i < allFiles.length; i++) {
+        var file = allFiles[i];
+        if (searchTags.intersect(file.tags).size === searchTags.size) { 
+          //Keep only file tags that start with search value
+          var matchingTags = [];
+          for (var j = 0; j < file.tags.length; j++) {
+            var tag = file.tags[j];
+            if (tag.indexOf(searchValue) === 0) {
+              matchingTags.push(tag);
+            }
+          }
+          //Add matching file tags to suggested tags
+          Array.prototype.push.apply(suggestions, matchingTags);
         }
       }
-      if (index === undefined) {
-        throw "File not found";
-      }
-      //Call callback
-      callback(file, index, contents);
+      //Exclude existing search tags (we're refining)
+      suggestedTags = Immutable.Set(suggestions).subtract(searchTags).sort();
+
+      return new RSVP.Promise(function(resolve, reject) {
+        window.setTimeout(function() {
+          resolve(suggestedTags);
+        }, databaseLatency);
+      });
+
     }
   },
+  
 
+  /**
+   * Return contents at the specified path.
+   *
+   * @param path An array of strings representing a directory path
+   * 
+   * @return An object of folders and files, where:
+   *   folders: Immutable.List of folder names
+   *   files: Immutable.OrderedMap of file objects
+   */
+  getContents: function(path) {
+    var contents = this.goToFolder(path);
+
+    var folders = [];
+    var files = [];
+    for (var i=0; i < contents.length; i++) {
+      var item = contents[i];
+      if (item.isFolder) {
+        //folder names only
+        folders.push(item.name);
+      } 
+      else {
+        files.push(item);
+      }
+    }
+    
+    folders.sort();
+
+    return {
+      folders: Immutable.List(folders),
+      files: this.mapFiles(files),
+    };
+  },
+
+  
+  // WRITE
+  
   
   /**
    * Deletes files matching the specified paths.
@@ -201,121 +236,6 @@ module.exports = {
     });
   },
 
-
-  /**
-   * Returns Immutable.OrderedSet of tag suggestions based on 
-   * specified search tags and search value
-   * 
-   * @param searchValue string with which all returned tags should start
-   * @param searchTags  Immutable.Set of tags with which all returned tags should share a file
-   */
-  suggestSearchTags: function(searchTags, searchValue) {
-
-    var suggestedTags;
-
-    if (searchTags.isEmpty()) {
-      return this.getTags(searchValue);
-    } else {
-      //Tags on files that contain all search tags AND start with search value
-      //(empty string starts every string)
-
-      console.log('ask db for search tag suggestions');
-    
-      var suggestions = [];
-      var allFiles = this.getFiles(_cloud);
-      for (var i = 0; i < allFiles.length; i++) {
-        var file = allFiles[i];
-        if (searchTags.intersect(file.tags).size === searchTags.size) { 
-          //Keep only file tags that start with search value
-          var matchingTags = [];
-          for (var j = 0; j < file.tags.length; j++) {
-            var tag = file.tags[j];
-            if (tag.indexOf(searchValue) === 0) {
-              matchingTags.push(tag);
-            }
-          }
-          //Add matching file tags to suggested tags
-          Array.prototype.push.apply(suggestions, matchingTags);
-        }
-      }
-      //Exclude existing search tags (we're refining)
-      suggestedTags = Immutable.Set(suggestions).subtract(searchTags).sort();
-
-      return new RSVP.Promise(function(resolve, reject) {
-        window.setTimeout(function() {
-          resolve(suggestedTags);
-        }, databaseLatency);
-      });
-
-    }
-  },
-  
-
-  /**
-   * Returns a reference to the contents array for the folder at
-   * the specified path.
-   *
-   * @param path An array of strings representing a folder path
-   * 
-   * @return An array reference to a folders contents
-   *
-   * @throws "Bad path"
-   */
-  goToFolder: function(path) {
-    //Point to the contents of folder at path
-    var contents = _cloud;
-    for (var i=0; i < path.length; i++) {
-      var targetFolderName = path[i];
-      var foundTarget = false;
-      //Search contents for folder item with the name
-      for (var j=0; j < contents.length; j++) {
-        var item = contents[j];
-        if (item.isFolder && item.name === targetFolderName) {
-          contents = item.contents;
-          foundTarget = true;
-          break;
-        }
-      }
-      if (!foundTarget) {
-        throw "Bad path";
-      }
-    }
-    return contents;
-  },
-  
-  
-  /**
-   * Return contents at the specified path.
-   *
-   * @param path An array of strings representing a directory path
-   * 
-   * @return An object of folders and files, where:
-   *   folders: Immutable.List of folder names
-   *   files: Immutable.OrderedMap of file objects
-   */
-  getContents: function(path) {
-    var contents = this.goToFolder(path);
-
-    var folders = [];
-    var files = [];
-    for (var i=0; i < contents.length; i++) {
-      var item = contents[i];
-      if (item.isFolder) {
-        //folder names only
-        folders.push(item.name);
-      } 
-      else {
-        files.push(item);
-      }
-    }
-    
-    folders.sort();
-
-    return {
-      folders: Immutable.List(folders),
-      files: this.mapFiles(files),
-    };
-  },
 
   /**
    * Go to the specified path, and update and create files 
@@ -392,6 +312,97 @@ module.exports = {
     return this.mapFiles(files);
   },
 
+
+  // OTHER
+
+
+  /**
+   * Converts an array of file objects to an 
+   * Immutable.OrderedMap where keys are ids 
+   * and values are file objects.
+   *
+   * @param files An array of file objects
+   */
+  mapFiles: function(files) {
+    var pairs = [];
+    for (var i=0; i < files.length; i++) {
+      var file = files[i];
+      //Use full file path as id
+      var id = file.path.concat(file.name).join('/');
+      pairs.push([id, file]);
+    }
+    return Immutable.OrderedMap(pairs);
+  },
+    
+
+  /**
+   * Returns a reference to the contents array for the folder at
+   * the specified path.
+   *
+   * @param path An array of strings representing a folder path
+   * 
+   * @return An array reference to a folders contents
+   *
+   * @throws "Bad path"
+   */
+  goToFolder: function(path) {
+    //Point to the contents of folder at path
+    var contents = _cloud;
+    for (var i=0; i < path.length; i++) {
+      var targetFolderName = path[i];
+      var foundTarget = false;
+      //Search contents for folder item with the name
+      for (var j=0; j < contents.length; j++) {
+        var item = contents[j];
+        if (item.isFolder && item.name === targetFolderName) {
+          contents = item.contents;
+          foundTarget = true;
+          break;
+        }
+      }
+      if (!foundTarget) {
+        throw "Bad path";
+      }
+    }
+    return contents;
+  },
+  
+  
+  /**
+   * Calls the callback for each path specified
+   * 
+   * @param paths An array of file paths. Each path should be an array
+   * @param callback A function to be called for each path
+   *
+   * @throws "File not found"
+   */
+  forEachPath: function(paths, callback) {
+    for (var i = 0 ; i < paths.length; i++) {
+      //Take as path all but file name
+      var path = paths[i];
+      var basename = path.slice(0,-1);
+      var filename = path[path.length - 1];
+      var contents = this.goToFolder(basename);
+      //Find index of file with filename
+      var index;
+      var file;
+      for (var j = 0; j < contents.length; j++) {
+        var item = contents[j];
+        if (!item.isFolder && item.name === filename) {
+          index = j;
+          file = item;
+          break;
+        }
+      }
+      if (index === undefined) {
+        throw "File not found";
+      }
+      //Call callback
+      callback(file, index, contents);
+    }
+  },
+
+  
   /**
    * Convert number to an abbreviated form. The abbreviation
    * will have two decimals or none, and it will have a 
@@ -437,12 +448,14 @@ module.exports = {
     return digits + decimals + ' ' + abbr;
   },
 
+
   //Pad specified number with zeros to the specified length string
   pad: function(number, length) {
     //(length - 1) zeros
     var zeros = Array(length).join(0);
     return (zeros + number).slice(-length);
   },
+
 
   mimeTypes: {
     //Text formats
@@ -502,6 +515,7 @@ module.exports = {
     'video/jpeg': 'JPGV',
   },
 
+
   months: [
     "Jan",
     "Feb",
@@ -517,10 +531,12 @@ module.exports = {
     "Dec"
   ],
 
+
   //Temporary, until cloud APIs provide real links
   fakeFileLinks: {
     'Dropbox': '//www.dropbox.com/home',
     'Google Drive': '//drive.google.com',
   }
+
 
 };
