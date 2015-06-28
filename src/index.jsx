@@ -720,16 +720,22 @@ var App = React.createClass({
     var path = this.state.cloud.path.rest().toArray();
     
     //Upload files to database
-    var cloudFiles = _Database.uploadFiles(fileData, path);
 
-    //Update cloud files based on database response
-    this.setState({
-      cloud: Update(this.state.cloud, {
-        files: {
-          files: {$set: cloudFiles}
-        }
-      })
-    });
+    _Database.uploadFiles(
+      fileData, path
+    ).then(function(cloudFiles) {
+      
+      //Update cloud files based on database response
+      this.setState({
+        cloud: Update(this.state.cloud, {
+          files: {
+            files: {$set: cloudFiles}
+          }
+        })
+      });
+
+    }.bind(this));
+
   },
 
   handleFileUpload: function(event) {

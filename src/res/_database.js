@@ -337,7 +337,7 @@ module.exports = {
       return !item.isFolder;
     });
 
-    return this.mapFiles(files);
+    return this.delayResponse(this.mapFiles(files));
   },
 
 
