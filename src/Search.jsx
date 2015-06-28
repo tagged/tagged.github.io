@@ -21,6 +21,7 @@ var Search = React.createClass({
     files: React.PropTypes.instanceOf(Immutable.OrderedMap),
     filesSelected: React.PropTypes.instanceOf(Immutable.Set),
     filesOpen: React.PropTypes.instanceOf(Immutable.Set),
+    filesLoading: React.PropTypes.bool,
 
     suggestions: React.PropTypes.instanceOf(Immutable.OrderedSet),
     suggestionsLoading: React.PropTypes.bool,
@@ -135,11 +136,17 @@ var Search = React.createClass({
     }
 
     //Sort files by name
-    var files = this.props.files.sort(Util.sortByName).map(function(file, id) {
-      return (
-        <File {...this.getFileProps(file, id)}/>
-      );
-    }, this).valueSeq();
+    var files;
+    if (this.props.filesLoading) {
+      files = null;//<Loading/>
+    }
+    else {
+      files = this.props.files.sort(Util.sortByName).map(function(file, id) {
+        return (
+          <File {...this.getFileProps(file, id)}/>
+        );
+      }, this).valueSeq();
+    }
 
     var fileActionBar = null;
     if (!this.props.searchTags.isEmpty()) {
