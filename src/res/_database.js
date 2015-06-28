@@ -18,12 +18,12 @@ module.exports = {
    * 
    * @param contents An array of file and folder objects
    */
-  getFiles: function(contents) {
+  getAllFiles: function(contents) {
     var files = [];
     for (var i = 0; i < contents.length; i++) {
       var item = contents[i];
       if (item.isFolder) {
-        Array.prototype.push.apply(files, this.getFiles(item.contents));
+        Array.prototype.push.apply(files, this.getAllFiles(item.contents));
       }
       else {
         files.push(item);
@@ -45,7 +45,7 @@ module.exports = {
     
     if (!tags.isEmpty()) {
       //Keep files that contain all tags
-      var allFiles = this.getFiles(_cloud);
+      var allFiles = this.getAllFiles(_cloud);
       for (var i = 0; i < allFiles.length; i++) {
         var file = allFiles[i];
         if (tags.intersect(file.tags).size === tags.size) {
@@ -66,7 +66,7 @@ module.exports = {
    */
   getTags: function(value) {
     var tags = [];
-    var allFiles = this.getFiles(_cloud);
+    var allFiles = this.getAllFiles(_cloud);
     for (var i = 0; i < allFiles.length; i++) {
       var file = allFiles[i];
       Array.prototype.push.apply(tags, file.tags);
@@ -109,7 +109,7 @@ module.exports = {
       console.log('ask db for search tag suggestions');
     
       var suggestions = [];
-      var allFiles = this.getFiles(_cloud);
+      var allFiles = this.getAllFiles(_cloud);
       for (var i = 0; i < allFiles.length; i++) {
         var file = allFiles[i];
         if (searchTags.intersect(file.tags).size === searchTags.size) { 
