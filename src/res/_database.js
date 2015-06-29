@@ -112,7 +112,7 @@ module.exports = {
       var allFiles = this.getAllFiles(_cloud);
       for (var i = 0; i < allFiles.length; i++) {
         var file = allFiles[i];
-        if (searchTags.intersect(file.tags).size === searchTags.size) { 
+        if (searchTags.isSubset(file.tags)) { 
           //Keep only file tags that start with search value
           var matchingTags = [];
           for (var j = 0; j < file.tags.length; j++) {
