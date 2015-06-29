@@ -42,6 +42,13 @@ var App = React.createClass({
   //calculation (database read) doesn't stall UI render. 
   //Secondary state is stored back in state so that it can be accessed 
   //during the next render cycle. 
+
+  //tagger.files cannot consistently be calculated from the basePage.files
+  //state because of user interactions on the Tagger page.
+  //Example: When opening Tagger from Search, search.files is copied to
+  //tagger.files. However, when a tag is detached from a file, and that
+  //tag is currently a search tag, and the file is in search.files, the file 
+  //is removed from search.files but NOT from tagger.files.
   
   getInitialState: function() {
     return {
@@ -78,6 +85,7 @@ var App = React.createClass({
         currentRequest: null,
       },
       tagger: {
+        files: Immutable.OrderedMap(),
         isShowingFiles: false,
         basePage: Page.CLOUD,
         value: "",
@@ -789,10 +797,17 @@ var App = React.createClass({
 
 
   openTagger: function() {
-    //Link Tagger to current page, then navigate to Tagger page.
+    //Link Tagger to current page
+    //Copy selected basePage files to tagger.files
+    //Navigate to Tagger page
+    var basePage = this.state.page;
+    var files = this.state[basePage].files.files.filter(function(file, id) {
+      return this.state[basePage].files.selected.includes(id);
+    }, this);
     this.setState({
       tagger: Update(this.state.tagger, {
-        basePage: {$set: this.state.page}
+        files: {$set: files},
+        basePage: {$set: basePage}
       })
     }, this.navigate.bind(this, Page.TAGGER));
   },
@@ -806,11 +821,12 @@ var App = React.createClass({
   },
 
   closeTagger: function() {
-    //Collapse header and clear value when closing Tagger
+    //Collapse header, clear files, clear value
     this.setState({
       tagger: Update(this.state.tagger, {
+        files: {$set: Immutable.OrderedMap()},
         isShowingFiles: {$set: false},
-        value: {$set: ""}
+        value: {$set: ""},
       })
     });
     this.navigate(this.state.tagger.basePage);
@@ -851,22 +867,21 @@ var App = React.createClass({
   },
 
   handleTagAttach: function(tag) {
-    //Tagger files are the selected files on the base page
-    var basePage = this.state.tagger.basePage;
-    var taggerFiles = this.state[basePage].files.files.filter(function(file, id) {
-      return this.state[basePage].files.selected.includes(id);
-    }, this);
-    var taggerFileIds = this.state[basePage].files.selected;
-
-    //Optimistically update Search and Cloud file states
-    
-    //Save previous states
+    //Save previous file states
+    var taggerFiles = this.state.tagger.files;
     var searchFileState = this.state.search.files;
     var cloudFileState = this.state.cloud.files;
     
+    //Optimistically update file states
+    
+    //Add tag to tagger files
+    var newTaggerFiles = taggerFiles.map(function(file, id) {
+      return this.attachTagToFile(tag, file);
+    }, this);
+    
     //Add tag to search files that are also tagger files
     var newSearchFiles = searchFileState.files.map(function(file, id) {
-      if (taggerFileIds.includes(id)) {
+      if (taggerFiles.has(id)) {
         return this.attachTagToFile(tag, file);
       }
       else {
@@ -876,7 +891,7 @@ var App = React.createClass({
 
     //Add tag to cloud files that are also tagger files
     var newCloudFiles = cloudFileState.files.map(function(file, id) {
-      if (taggerFileIds.includes(id)) {
+      if (taggerFiles.has(id)) {
         return this.attachTagToFile(tag, file);
       }
       else {
@@ -888,14 +903,15 @@ var App = React.createClass({
     //Only need to check to add any tagger files if tag is in search tags.
     var searchTags = this.state.search.tags;
     if (searchTags.includes(tag)) {
-      var searchFilesFromTagger = taggerFiles.filter(function(file) {
-        return searchTags.intersect(file.tags).size === searchTags.size;
+      var searchFilesFromTagger = newTaggerFiles.filter(function(file) {
+        return searchTags.isSubset(file.tags);
       });
       newSearchFiles = newSearchFiles.merge(searchFilesFromTagger);
     }
 
     this.setState({
       tagger: Update(this.state.tagger, {
+        files: {$set: newTaggerFiles},
         value: {$set: ""}
       }),
       search: Update(this.state.search, {
@@ -932,22 +948,21 @@ var App = React.createClass({
       _Database.attachTag(paths.toArray(), tag);
     };
 
-    var undoAttach = function() {
+    var undo = function() {
       //Ensure file state does not change between
       //the point snackbar is shown and the point
       //this method is called.
-
+      
       //Reset file state
       this.setState({
+        tagger: Update(this.state.tagger, {
+          files: {$set: taggerFiles},
+        }),
         search: Update(this.state.search, {
-          files: {
-            files: {$set: searchFileState.files},
-          }
+          files: {$set: searchFileState}
         }),
         cloud: Update(this.state.cloud, {
-          files: {
-            files: {$set: cloudFileState.files}
-          }
+          files: {$set: cloudFileState}
         })
       });
     }.bind(this);
@@ -955,7 +970,7 @@ var App = React.createClass({
     this.showSnackbar({
       message: message,
       action: action,
-      cancel: undoAttach,
+      cancel: undo,
       complete: attachTag,
     });
       
@@ -977,22 +992,21 @@ var App = React.createClass({
   },
 
   handleTagDetach: function(tag) {
-    //Tagger files are the selected files on the base page
-    var basePage = this.state.tagger.basePage;
-    var taggerFiles = this.state[basePage].files.files.filter(function(file, id) {
-      return this.state[basePage].files.selected.includes(id);
-    }, this);
-    var taggerFileIds = this.state[basePage].files.selected;
-
-    //Optimistically update Search and Cloud file states
-    
-    //Save previous states
+    //Save previous file states
+    var taggerFiles = this.state.tagger.files;
     var searchFileState = this.state.search.files;
     var cloudFileState = this.state.cloud.files;
     
+    //Optimistically update file states
+    
+    //Remove tag from tagger files
+    var newTaggerFiles = taggerFiles.map(function(file, id) {
+      return this.detachTagFromFile(tag, file);
+    }, this);
+    
     //Remove tag from search files that are also tagger files
     var newSearchFiles = searchFileState.files.map(function(file, id) {
-      if (taggerFileIds.includes(id)) {
+      if (taggerFiles.has(id)) {
         return this.detachTagFromFile(tag, file);
       }
       else {
@@ -1002,7 +1016,7 @@ var App = React.createClass({
 
     //Remove tag from cloud files that are also tagger files
     var newCloudFiles = cloudFileState.files.map(function(file, id) {
-      if (taggerFileIds.includes(id)) {
+      if (taggerFiles.has(id)) {
         return this.detachTagFromFile(tag, file);
       }
       else {
@@ -1010,10 +1024,10 @@ var App = React.createClass({
       }
     }, this);
     
-    //Remove search files that no longer match all search tags
+    //Also remove from any search files that no longer match all search tags
     var searchTags = this.state.search.tags;
     newSearchFiles = newSearchFiles.filter(function(file) {
-      return searchTags.intersect(file.tags).size === searchTags.size;
+      return searchTags.isSubset(file.tags);
     });
     
     //Remove open searchFile ids no longer in search files
@@ -1027,6 +1041,9 @@ var App = React.createClass({
     });
     
     this.setState({
+      tagger: Update(this.state.tagger, {
+        files: {$set: newTaggerFiles},
+      }),
       search: Update(this.state.search, {
         files: {
           files: {$set: newSearchFiles},
@@ -1057,13 +1074,16 @@ var App = React.createClass({
       _Database.detachTag(paths.toArray(), tag);
     };
 
-    var undoDetach = function() {
+    var undo = function() {
       //Ensure file state does not change between
       //the point snackbar is shown and the point
       //this method is called.
 
       //Reset file state
       this.setState({
+        tagger: Update(this.state.tagger, {
+          files: {$set: taggerFiles},
+        }),
         search: Update(this.state.search, {
           files: {$set: searchFileState}
         }),
@@ -1076,7 +1096,7 @@ var App = React.createClass({
     this.showSnackbar({
       message: message,
       action: action,
-      cancel: undoDetach,
+      cancel: undo,
       complete: detachTag,
     });
     
@@ -1196,13 +1216,8 @@ var App = React.createClass({
   },
 
   getTaggerProps: function() {
-    //Tagger files are the selected files on the base page
-    var files = this.state[this.state.tagger.basePage].files.files.filter(function(file, id) {
-      return this.state[this.state.tagger.basePage].files.selected.includes(id);
-    }, this);
-
     return {
-      files: files,
+      files: this.state.tagger.files,
       isShowingFiles: this.state.tagger.isShowingFiles,
       onToggle: this.handleTaggerToggle,
       onClose: this.closeTagger,
