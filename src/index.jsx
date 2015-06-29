@@ -221,11 +221,8 @@ var App = React.createClass({
     var pathChanged = !Immutable.is(currState.cloud.path, prevState.cloud.path);
     this.updateCloud(pathChanged);
 
-    //Update tagger suggestions after a change in tagger value
-    if (currState.tagger.value !== prevState.tagger.value) {
-      this.updateTaggerSuggestions();
-    }
-
+    var taggerValueChanged = currState.tagger.value !== prevState.tagger.value;
+    this.updateTagger(taggerValueChanged);
   },
 
   componentWillUnmount: function() {
@@ -360,10 +357,12 @@ var App = React.createClass({
 
     });
   },
-
-    
   
-  updateTaggerSuggestions: function() {
+  updateTagger: function(taggerValueChanged) {
+    if (!taggerValueChanged) {
+      return;
+    }
+
     //Tagger value is empty: don't need to call database
     if (this.state.tagger.value === '') {
       this.setState({
