@@ -83,7 +83,7 @@ var App = React.createClass({
         value: "",
         suggestions: {
           tags: Immutable.OrderedSet(),//secondary state
-          requestsPending: 0,
+          currentRequest: null,
         }
       },
       snackbar: {
@@ -369,7 +369,7 @@ var App = React.createClass({
       this.setState({
         tagger: Update(this.state.tagger, {
           suggestions: {
-            requestsPending: {$set: 0},//clear requestsPending
+            currentRequest: {$set: null},//clear current request
             tags: {$set: Immutable.OrderedSet()},
           }
         })
@@ -377,32 +377,31 @@ var App = React.createClass({
       return;
     }
     
-    console.log('updateTaggerSuggestions', this.state.tagger.suggestions.requestsPending);
+    console.log('updateTaggerSuggestions');
     
     //Tagger suggestions are calculated from tagger value
     //Database should return an Immutable.OrderedSet of strings
-    var oneMore = this.state.tagger.suggestions.requestsPending + 1;
+    var requestId = Util.uuid();
     this.setState({
       tagger: Update(this.state.tagger, {
         suggestions: {
-          requestsPending: {$set: oneMore},
+          currentRequest: {$set: requestId},
         }
       })
     }, function() {
       _Database.getTags(
         this.state.tagger.value
       ).then(function(suggestedTags) {
-        
-        //Check if requestsPending has been cleared
-        if (this.state.tagger.suggestions.requestsPending === 0) {
+
+        //Check if current request matches this request
+        if (this.state.tagger.suggestions.currentRequest !== requestId) {
           return;
         }
-        var oneLess = this.state.tagger.suggestions.requestsPending - 1;
         this.setState({
           tagger: Update(this.state.tagger, {
             suggestions: {
               tags: {$set: suggestedTags},
-              requestsPending: {$set: oneLess},
+              currentRequest: {$set: null},
             }
           })
         });
@@ -1212,7 +1211,7 @@ var App = React.createClass({
       taggerValue: this.state.tagger.value,
       
       suggestions: this.state.tagger.suggestions.tags,
-      suggestionsLoading: this.state.tagger.suggestions.requestsPending > 0,
+      suggestionsLoading: this.state.tagger.suggestions.currentRequest !== null,
       
       onTaggerValueChange: this.handleTaggerValueChange,
       onTaggerFocus: this.handleTaggerFocus,
