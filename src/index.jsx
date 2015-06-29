@@ -228,7 +228,8 @@ var App = React.createClass({
 
     var searchTagsChanged = !Immutable.is(currState.search.tags, prevState.search.tags);
     var searchValueChanged = currState.search.value !== prevState.search.value;
-    var updateSuggestions = searchTagsChanged || searchValueChanged;
+    var taggerClosed = prevState.page === Page.TAGGER && currState.page !== Page.TAGGER;
+    var updateSuggestions = searchTagsChanged || searchValueChanged || taggerClosed;
     var updateFiles = searchTagsChanged;
     this.updateSearch(updateSuggestions, updateFiles);
 

@@ -4,7 +4,7 @@ var Immutable = require('immutable');
 var RSVP = require('rsvp');
 var _cloud = require('./_cloud');
 
-var databaseLatency = 4000;
+var databaseLatency = 1500;
 
 module.exports = {
   
