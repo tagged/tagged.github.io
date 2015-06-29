@@ -85,7 +85,7 @@ module.exports = {
       console.log('ask db for all tags');
     }
 
-    return this.delayResponse(tagSet);
+    return this.delayResponse(tagSet, 200);
   },
 
 
@@ -128,7 +128,7 @@ module.exports = {
       //Exclude existing search tags (we're refining)
       suggestedTags = Immutable.Set(suggestions).subtract(searchTags).sort();
 
-      return this.delayResponse(suggestedTags);
+      return this.delayResponse(suggestedTags, 200);
     }
   },
   
@@ -433,11 +433,15 @@ module.exports = {
   
   //Returns a Promise that resolves after a delay
   //Use this to simulate a delayed database response
-  delayResponse: function(response) {
+  //@param delay the number of millisecond to delay the response; optional
+  delayResponse: function(response, delay) {
+    if (delay === undefined) {
+      delay = databaseLatency;
+    }
     return new RSVP.Promise(function(resolve, reject) {
       window.setTimeout(function() {
         resolve(response);
-      }, databaseLatency);
+      }, delay);
     });
   },
   
