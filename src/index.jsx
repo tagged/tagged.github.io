@@ -75,7 +75,7 @@ var App = React.createClass({
           open: Immutable.Set(),
           selected: Immutable.Set(),
         },
-        requestsPending: 0,
+        requestsPending: Immutable.Set(),
       },
       tagger: {
         isShowingFiles: false,
@@ -319,7 +319,7 @@ var App = React.createClass({
     if (this.state.cloud.path.size === 1) {
       this.setState({
         cloud: Update(this.state.cloud, {
-          requestsPending: {$set: 0},//clear requestsPending
+          requestsPending: {$set: Immutable.Set()},//clear requestsPending
           folders: {$set: Immutable.List()},
           files: {
             files: {$set: Immutable.OrderedMap()}
@@ -331,10 +331,10 @@ var App = React.createClass({
         
     console.log('updateCloud');
     
-    var oneMore = this.state.cloud.requestsPending + 1;
+    var requestId = Util.uuid();
     this.setState({
       cloud: Update(this.state.cloud, {
-        requestsPending: {$set: oneMore}
+        requestsPending: {$set: this.state.cloud.requestsPending.add(requestId)}
       })
     }, function() {
       
@@ -344,13 +344,12 @@ var App = React.createClass({
       ).then(function(contents) {
         
         //Check if requestsPending has been cleared
-        if (this.state.cloud.requestsPending === 0) {
+        if (!this.state.cloud.requestsPending.includes(requestId)) {
           return;
         }
-        var oneLess = this.state.cloud.requestsPending - 1;
         this.setState({
           cloud: Update(this.state.cloud, {
-            requestsPending: {$set: oneLess},
+            requestsPending: {$set: this.state.cloud.requestsPending.delete(requestId)},
             folders: {$set: contents.folders},
             files: {
               files: {$set: contents.files}
