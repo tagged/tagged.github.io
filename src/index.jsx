@@ -751,14 +751,17 @@ var App = React.createClass({
       };
     }
 
-    var path = this.state.cloud.path.rest().toArray();
+    var path = this.state.cloud.path;
     
     //Upload files to database
-
     _Database.uploadFiles(
-      fileData, path
+      fileData, path.rest().toArray()
     ).then(function(cloudFiles) {
-      
+
+      //If path has changed, no need to display files from old path
+      if (!Immutable.is(this.state.cloud.path, path)) {
+        return;
+      }
       //Update cloud files based on database response
       this.setState({
         cloud: Update(this.state.cloud, {
