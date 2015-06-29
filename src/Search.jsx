@@ -3,6 +3,7 @@ var Tags = require('./Tags');
 var Subheader = require('./Subheader');
 var File = require('./File');
 var FileActionBar = require('./FileActionBar');
+var Loading = require('./Loading');
 
 var R = require('./res/index');
 var Color = R.color;
@@ -55,6 +56,13 @@ var Search = React.createClass({
       suggestions: {
         tags: {
           paddingTop: Dimension.space
+        }
+      },
+      loading: {
+        root: {
+          paddingTop: Dimension.space,
+          paddingLeft: Dimension.marginMobile,
+          paddingRight: Dimension.marginMobile
         }
       }
     };
@@ -137,7 +145,7 @@ var Search = React.createClass({
 
     var files;
     if (this.props.filesLoading) {
-      files = null;//<Loading/>
+      files = null;//<Loading/>;
     }
     else {
       //Sort files by name
@@ -164,6 +172,11 @@ var Search = React.createClass({
       );
     }
 
+    var loading = null;
+    if (this.props.filesLoading) {
+      loading = <Loading style={style.loading}/>;
+    }
+
     return (
       <div style={style.search}>
           <div style={style.header}>
@@ -180,6 +193,7 @@ var Search = React.createClass({
           </div>
           {files}
           {fileActionBar}
+          {loading}
       </div>
     );
   },
