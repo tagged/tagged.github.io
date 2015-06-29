@@ -75,7 +75,7 @@ var App = React.createClass({
           open: Immutable.Set(),
           selected: Immutable.Set(),
         },
-        requestsPending: Immutable.Set(),
+        currentRequest: null,
       },
       tagger: {
         isShowingFiles: false,
@@ -319,7 +319,7 @@ var App = React.createClass({
     if (this.state.cloud.path.size === 1) {
       this.setState({
         cloud: Update(this.state.cloud, {
-          requestsPending: {$set: Immutable.Set()},//clear requestsPending
+          currentRequest: {$set: null},//clear current request
           folders: {$set: Immutable.List()},
           files: {
             files: {$set: Immutable.OrderedMap()}
@@ -334,7 +334,7 @@ var App = React.createClass({
     var requestId = Util.uuid();
     this.setState({
       cloud: Update(this.state.cloud, {
-        requestsPending: {$set: this.state.cloud.requestsPending.add(requestId)}
+        currentRequest: {$set: requestId}
       })
     }, function() {
       
@@ -343,13 +343,13 @@ var App = React.createClass({
         this.state.cloud.path.slice(1).toArray()
       ).then(function(contents) {
         
-        //Check if requestsPending has been cleared
-        if (!this.state.cloud.requestsPending.includes(requestId)) {
+        //Check if currentRequest matches this request
+        if (this.state.cloud.currentRequest !== requestId) {
           return;
         }
         this.setState({
           cloud: Update(this.state.cloud, {
-            requestsPending: {$set: this.state.cloud.requestsPending.delete(requestId)},
+            currentRequest: {$set: null},
             folders: {$set: contents.folders},
             files: {
               files: {$set: contents.files}
@@ -1181,7 +1181,7 @@ var App = React.createClass({
       filesSelected: this.state.cloud.files.selected,
       filesOpen: this.state.cloud.files.open,
 
-      loading: this.state.cloud.requestsPending > 0,
+      loading: this.state.cloud.currentRequest !== null,
       
       onPathShorten: this.handlePathShorten,
       onPathLengthen: this.handlePathLengthen,
