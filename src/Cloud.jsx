@@ -113,7 +113,6 @@ var Cloud = React.createClass({
     }
 
     var files;
-
     if (this.props.loading) {
       files = null;//<Loading/>
     }
@@ -126,7 +125,10 @@ var Cloud = React.createClass({
     }
 
     var fileActionBar = null;
-    if (this.props.path.size > 1) {
+    if (this.props.loading) {
+      fileActionBar = null;//<Loading/>
+    }
+    else if (this.props.path.size > 1) {
       fileActionBar = (
         <FileActionBar numberOfFiles={this.props.files.size}
                        numberOfFilesSelected={this.props.filesSelected.size}
