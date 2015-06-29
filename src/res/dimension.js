@@ -13,6 +13,7 @@ module.exports = {
   heightActionBar: 48,
   heightSubheader: 48,
   heightTag: 32,
+  heightProgressBar: 4,
 
   heightTextSingle: 48,
   heightTextDouble: 56,
