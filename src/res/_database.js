@@ -4,7 +4,7 @@ var Immutable = require('immutable');
 var RSVP = require('rsvp');
 var _cloud = require('./_cloud');
 
-var databaseLatency = 2000;
+var databaseLatency = 4000;
 
 module.exports = {
   
@@ -85,7 +85,7 @@ module.exports = {
       console.log('ask db for all tags');
     }
 
-    return this.delayResponse(tagSet, 200);
+    return this.delayResponse(tagSet, 20);
   },
 
 
@@ -128,7 +128,7 @@ module.exports = {
       //Exclude existing search tags (we're refining)
       suggestedTags = Immutable.Set(suggestions).subtract(searchTags).sort();
 
-      return this.delayResponse(suggestedTags, 200);
+      return this.delayResponse(suggestedTags, 20);
     }
   },
   

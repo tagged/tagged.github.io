@@ -65,13 +65,13 @@ var App = React.createClass({
         suggestions: {
           visible: true,
           tags: Immutable.OrderedSet(),//secondary state
-          requestsPending: 0,
+          currentRequest: null,
         },
         files: {
           files: Immutable.OrderedMap(),//secondary state
           open: Immutable.Set(),
           selected: Immutable.Set(),
-          requestsPending: 0,
+          currentRequest: null,
         },
       },
       cloud: {
@@ -252,73 +252,92 @@ var App = React.createClass({
     if (!updateSuggestions && !updateFiles) {
       return;
     }
-    
+
     console.log('updateSearch');
     
-    var increaseRequestsPending = {};
-    if (updateSuggestions) {
-      var oneMore = this.state.search.suggestions.requestsPending + 1;
-      increaseRequestsPending.suggestions = {
-        requestsPending: {$set: oneMore}
-      };
-    }
-    if (updateFiles) {
-      var oneMore = this.state.search.files.requestsPending + 1;
-      increaseRequestsPending.files = {
-        requestsPending: {$set: oneMore},
-      };
-    }
+    //Create new request ids, if updating
+    var suggestionsRequest = updateSuggestions ? Util.uuid() : this.state.search.suggestions.currentRequest;
+    var filesRequest = updateFiles ? Util.uuid() : this.state.search.files.currentRequest;
+    
     this.setState({
-      search: Update(this.state.search, increaseRequestsPending)
+      search: Update(this.state.search, {
+        suggestions: {
+          currentRequest: {$set: suggestionsRequest}
+        },
+        files: {
+          currentRequest: {$set: filesRequest}
+        },
+      })
     }, function() {
-      if (updateSuggestions) this._updateSearchSuggestions();
-      if (updateFiles) this._updateSearchFiles();
+      
+      if (updateSuggestions) {
+        //Search suggestions are calculated from search tags and search value
+        //Database should return an Immutable.OrderedSet of strings
+        _Database.suggestSearchTags(
+          this.state.search.tags, 
+          this.state.search.value
+        ).then(function(suggestedTags) {
+          //Check if currentRequest matches this request
+          if (this.state.search.suggestions.currentRequest !== suggestionsRequest) {
+            return;
+          }
+          this.setState({
+            search: Update(this.state.search, {
+              suggestions: {
+                tags: {$set: suggestedTags},
+                currentRequest: {$set: null},
+              }
+            })
+          });
+        }.bind(this));
+      }
+
+      if (updateFiles) {
+        var searchTags = this.state.search.tags;
+
+        //No search tags: don't need to call database
+        //Clear files and file requests
+        if (searchTags.isEmpty()) {
+          this.setState({
+            search: Update(this.state.search, {
+              files: {
+                files: {$set: Immutable.OrderedMap()},
+                currentRequest: {$set: null},
+              },
+            })
+          });
+          return;
+        }
+            
+        //Search files are calculated from search tags
+        //Database should return an Immutable.OrderedSet of strings
+        _Database.filterFiles(
+          searchTags
+        ).then(function(files) {
+          
+          //Check if currentRequest matches this request
+          if (this.state.search.files.currentRequest !== filesRequest) {
+            return;
+          }
+          var selected = this.state.search.files.selected.filter(function(fileId) {
+            return files.has(fileId);
+          });
+          var open = this.state.search.files.open.filter(function(fileId) {
+            return files.has(fileId);
+          });
+          this.setState({
+            search: Update(this.state.search, {
+              files: {
+                files: {$set: files},
+                open: {$set: open},
+                selected: {$set: selected},
+                currentRequest: {$set: null},
+              }
+            })
+          });
+        }.bind(this));
+      }
     });
-  },
-
-  _updateSearchSuggestions: function() {
-    //Search suggestions are calculated from search tags and search value
-    //Database should return an Immutable.OrderedSet of strings
-    _Database.suggestSearchTags(
-      this.state.search.tags, 
-      this.state.search.value
-    ).then(function(suggestedTags) {
-      var oneLess = this.state.search.suggestions.requestsPending - 1;
-      this.setState({
-        search: Update(this.state.search, {
-          suggestions: {
-            tags: {$set: suggestedTags},
-            requestsPending: {$set: oneLess},
-          }
-        })
-      });
-    }.bind(this));
-  },
-
-  _updateSearchFiles: function() {
-    //Tagger suggestions are calculated from tagger value
-    //Database should return an Immutable.OrderedSet of strings
-    _Database.filterFiles(
-      this.state.search.tags
-    ).then(function(files) {
-      var selected = this.state.search.files.selected.filter(function(fileId) {
-        return files.has(fileId);
-      });
-      var open = this.state.search.files.open.filter(function(fileId) {
-        return files.has(fileId);
-      });
-      var oneLess = this.state.search.files.requestsPending - 1;
-      this.setState({
-        search: Update(this.state.search, {
-          files: {
-            files: {$set: files},
-            open: {$set: open},
-            selected: {$set: selected},
-            requestsPending: {$set: oneLess},
-          }
-        })
-      });
-    }.bind(this));
   },
 
   updateCloud: function(pathChanged) {
@@ -1174,11 +1193,11 @@ var App = React.createClass({
       files: this.state.search.files.files,
       filesSelected: this.state.search.files.selected,
       filesOpen: this.state.search.files.open,
-      filesLoading: this.state.search.files.requestsPending > 0,
+      filesLoading: this.state.search.files.currentRequest !== null,
 
       suggestions: this.state.search.suggestions.tags,
       suggestionsVisible: this.state.search.suggestions.visible,
-      suggestionsLoading: this.state.search.suggestions.requestsPending > 0,
+      suggestionsLoading: this.state.search.suggestions.currentRequest !== null,
       
       onSearchTagAdd: this.addSearchTag,
       onSearchTagDelete: this.deleteSearchTag,
