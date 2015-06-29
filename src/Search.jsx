@@ -135,12 +135,12 @@ var Search = React.createClass({
       }
     }
 
-    //Sort files by name
     var files;
     if (this.props.filesLoading) {
       files = null;//<Loading/>
     }
     else {
+      //Sort files by name
       files = this.props.files.sort(Util.sortByName).map(function(file, id) {
         return (
           <File {...this.getFileProps(file, id)}/>
@@ -149,7 +149,10 @@ var Search = React.createClass({
     }
 
     var fileActionBar = null;
-    if (!this.props.searchTags.isEmpty()) {
+    if (this.props.filesLoading) {
+      fileActionBar = null;//<Loading/>
+    }
+    else if (!this.props.searchTags.isEmpty()) {
       fileActionBar = (
         <FileActionBar numberOfFiles={this.props.files.size}
                        numberOfFilesSelected={this.props.filesSelected.size}
