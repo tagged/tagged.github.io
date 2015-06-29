@@ -164,8 +164,14 @@ var App = React.createClass({
   },
 
   handleResize: function() {
+    //window width, excluding scrollbar
+    var width = document.documentElement.clientWidth;
+    //do nothing if width hasn't changed
+    if (width === this.state.width) {
+      return;
+    }
     this.setState({
-      width: document.documentElement.clientWidth,//excludes scrollbar
+      width: width
     });
   },
 
