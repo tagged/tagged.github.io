@@ -4,6 +4,7 @@ var Folder = require('./Folder');
 var CloudFolder = require('./CloudFolder');
 var File = require('./File');
 var FileActionBar = require('./FileActionBar');
+var Loading = require('./Loading');
 
 var R = require('./res/index');
 var Dimension = R.dimension;
@@ -47,7 +48,14 @@ var Cloud = React.createClass({
           paddingLeft: Dimension.marginMobile,
           paddingRight: Dimension.marginMobile,
         }
-      }
+      },
+      loading: {
+        root: {
+          paddingTop: Dimension.space,
+          paddingLeft: Dimension.marginMobile,
+          paddingRight: Dimension.marginMobile
+        }
+      },
     };
   },
 
@@ -141,6 +149,11 @@ var Cloud = React.createClass({
       );
     }
 
+    var loading = null;
+    if (this.props.loading) {
+      loading = <Loading style={style.loading}/>;
+    }
+
     return (
       <div style={style.cloud} 
            onDrop={this.handleFileDrop}
@@ -151,6 +164,7 @@ var Cloud = React.createClass({
           {folders}
           {files}
           {fileActionBar}
+          {loading}
       </div>
     );
   },
