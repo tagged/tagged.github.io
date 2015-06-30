@@ -496,6 +496,10 @@ var App = React.createClass({
     this.setState({
       search: Update(this.state.search, {
         tags: {$set: newSearchTags},
+        files: {
+          open: {$set: Immutable.Set()},
+          selected: {$set: Immutable.Set()}
+        }
       }),
     }, function() {
       this.showSearchSuggestions(suggestionsVisible);
