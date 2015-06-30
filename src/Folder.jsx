@@ -25,7 +25,8 @@ var Folder = React.createClass({
       },
       leftIcon: {
         clearance: {
-          float: 'left'
+          float: 'left',
+          marginRight: Dimension.quantum,
         }
       },
       rightIcon: {
