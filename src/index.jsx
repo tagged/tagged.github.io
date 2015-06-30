@@ -119,6 +119,10 @@ var App = React.createClass({
       search: Update(this.state.search, {
         tags: {$set: searchTags},
         value: {$set: value},
+        files: {
+          open: {$set: Immutable.Set()},
+          selected: {$set: Immutable.Set()}
+        }
       }),
       cloud: Update(this.state.cloud, {
         path: {$set: path},
