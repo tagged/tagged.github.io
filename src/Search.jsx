@@ -24,8 +24,7 @@ var Search = React.createClass({
     filesOpen: React.PropTypes.instanceOf(Immutable.Set),
     filesLoading: React.PropTypes.bool,
 
-    suggestions: React.PropTypes.instanceOf(Immutable.OrderedSet),
-    suggestionsLoading: React.PropTypes.bool,
+    allTags: React.PropTypes.object,
     suggestionsVisible: React.PropTypes.bool,
 
     onSearchTagAdd: React.PropTypes.func,
@@ -96,51 +95,69 @@ var Search = React.createClass({
 
     var suggestions = null;
     if (this.props.suggestionsVisible) {
-
-      //Don't show search suggestions while they are loading
-
-      if (this.props.suggestionsLoading) {
-        suggestions = null;//<div>LOADING...</div>;
-      }
-
-      //Otherwise, show suggestions
-
-      else {
-        //Calculate suggestions label
-        var haveSuggestions = this.props.suggestions.size > 0;
-        var label;
-        var searchTags = this.props.searchTags;
-        var searchValue = this.props.searchValue;
-        if (searchValue === "") {
-          if (searchTags.isEmpty()) {
-            label = haveSuggestions ? 
-                    "All " + this.props.suggestions.size + " tags" : 
-                    "No tags exist yet";
-          } else {
-            label = haveSuggestions ? 
-                    "Refine search" : 
-                    "No tags to refine search";
-          }
+      
+      var searchTags = this.props.searchTags;
+      var searchValue = this.props.searchValue;
+      
+      var tags;
+      if (searchTags.isEmpty()) {
+        if (searchValue === '') {
+          //Suggest all tags
+          tags = this.props.allTags.sort();
         } else {
-          if (searchTags.isEmpty()) {
-            label = haveSuggestions ? 
-                    ('"' + searchValue + '" tags') : 
-                    ('No "' + searchValue + '" tags');
-          } else {
-            label = haveSuggestions ? 
-                    ('"' + searchValue + '" tags to refine search') : 
-                    ('No "' + searchValue + '" tags to refine search');
-          }
+          //Suggest all tags starting with value
+          tags = this.props.allTags.filter(function(tag) {
+            return tag.indexOf(searchValue) === 0;
+          });
         }
-        suggestions = (
-          <div>
-              <Subheader text={label}/>
-              <Tags tags={this.props.suggestions}
-                    onTagClick={this.props.onSearchTagAdd}
-                    style={style.suggestions}/>
-          </div>
-        );
+      } else {
+        //Suggest tags on search files starting with value
+        var tagArray = [];
+        this.props.files.forEach(function(file) {
+          for (var i = 0; i < file.tags.length; i++) {
+            var tag = file.tags[i];
+            if (tag.indexOf(searchValue) === 0) {
+              tagArray.push(tag);
+            }
+          }
+        });
+        tags = Immutable.OrderedSet(tagArray).
+                         subtract(searchTags). //exclude search tags
+                         sort();
       }
+
+      var label;
+      var haveSuggestions = tags.size > 0;
+      if (searchValue === "") {
+        if (searchTags.isEmpty()) {
+          label = haveSuggestions ? 
+                  "All " + tags.size + " tags" : 
+                  "No tags exist yet";
+        } else {
+          label = haveSuggestions ? 
+                  "Refine search" : 
+                  "No tags to refine search";
+        }
+      } else {
+        if (searchTags.isEmpty()) {
+          label = haveSuggestions ? 
+                  ('"' + searchValue + '" tags') : 
+                  ('No "' + searchValue + '" tags');
+        } else {
+          label = haveSuggestions ? 
+                  ('"' + searchValue + '" tags to refine search') : 
+                  ('No "' + searchValue + '" tags to refine search');
+        }
+      }
+      suggestions = (
+        <div>
+            <Subheader text={label}/>
+            <Tags tags={tags}
+                  onTagClick={this.props.onSearchTagAdd}
+                  style={style.suggestions}/>
+        </div>
+      );
+
     }
 
     var files;

@@ -48,7 +48,7 @@ module.exports = {
       var allFiles = this.getAllFiles(_cloud);
       for (var i = 0; i < allFiles.length; i++) {
         var file = allFiles[i];
-        if (tags.intersect(file.tags).size === tags.size) {
+        if (tags.isSubset(file.tags)) {
           files.push(file);
         }
       }
@@ -64,7 +64,8 @@ module.exports = {
    * 
    * @param value If provided, a string with which all tags should start
    */
-  getTags: function(value) {
+  getAllTags: function() {
+    console.log('ask db for all tags');    
     var tags = [];
     var allFiles = this.getAllFiles(_cloud);
     for (var i = 0; i < allFiles.length; i++) {
@@ -72,66 +73,9 @@ module.exports = {
       Array.prototype.push.apply(tags, file.tags);
     }
     
-    var tagSet = Immutable.Set(tags).sort();
-    
-    //Filter tags that start with value
-    if (value !== undefined) {
-      console.log('ask db for tags starting with ' + value);
-      tagSet = tagSet.filter(function(tag) {
-        return tag.indexOf(value) === 0;
-      });
-    }
-    else {
-      console.log('ask db for all tags');
-    }
-
-    return this.delayResponse(tagSet, 20);
+    return Immutable.Set(tags).sort();
   },
 
-
-  /**
-   * Returns Immutable.OrderedSet of tag suggestions based on 
-   * specified search tags and search value
-   * 
-   * @param searchValue string with which all returned tags should start
-   * @param searchTags  Immutable.Set of tags with which all returned tags should share a file
-   */
-  suggestSearchTags: function(searchTags, searchValue) {
-
-    var suggestedTags;
-
-    if (searchTags.isEmpty()) {
-      return this.getTags(searchValue);
-    } else {
-      //Tags on files that contain all search tags AND start with search value
-      //(empty string starts every string)
-
-      console.log('ask db for search tag suggestions');
-    
-      var suggestions = [];
-      var allFiles = this.getAllFiles(_cloud);
-      for (var i = 0; i < allFiles.length; i++) {
-        var file = allFiles[i];
-        if (searchTags.isSubset(file.tags)) { 
-          //Keep only file tags that start with search value
-          var matchingTags = [];
-          for (var j = 0; j < file.tags.length; j++) {
-            var tag = file.tags[j];
-            if (tag.indexOf(searchValue) === 0) {
-              matchingTags.push(tag);
-            }
-          }
-          //Add matching file tags to suggested tags
-          Array.prototype.push.apply(suggestions, matchingTags);
-        }
-      }
-      //Exclude existing search tags (we're refining)
-      suggestedTags = Immutable.Set(suggestions).subtract(searchTags).sort();
-
-      return this.delayResponse(suggestedTags, 20);
-    }
-  },
-  
 
   /**
    * Return contents at the specified path.

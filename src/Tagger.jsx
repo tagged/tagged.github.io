@@ -22,9 +22,7 @@ var Tagger = React.createClass({
     onClose: React.PropTypes.func,
 
     taggerValue: React.PropTypes.string,
-    
-    suggestions: React.PropTypes.instanceOf(Immutable.OrderedSet),
-    suggestionsLoading: React.PropTypes.bool,
+    allTags: React.PropTypes.object,
 
     onTaggerValueChange: React.PropTypes.func,
     onTaggerFocus: React.PropTypes.func,
@@ -139,57 +137,46 @@ var Tagger = React.createClass({
       tagsTitle = "Tags on all files";
     }
 
-    var suggestions;
-    
-    //Don't show tagger suggestions while they are loading
-    if (this.props.suggestionsLoading) {
-      suggestions = null;//<div>LOADING...</div>;
-    }
-    //Otherwise, show suggestions
+    var suggestionTags;
+    var suggestionLabel;
     //No value. Suggestions:
     //-tags on some files (if more than one file)
-    //-recent tags
-    //-all tags
-    else if (this.props.taggerValue === '') {
+    //-recent tags(?)
+    //-all tags(?)
+    if (this.props.taggerValue === '') {
       if (files.size > 1 && !tagsOnSomeFiles.isEmpty()) {
-        var title;
+        suggestionTags = tagsOnSomeFiles;
         if (files.size === 2) {
-          title = "Tags on one file";
+          suggestionLabel = "Tags on one file";
         }
         else if (files.size > 2) {
-          title = "Tags on some files";
+          suggestionLabel = "Tags on some files";
         }
-        suggestions = (
-          <div>
-              <Subheader text={title}/>
-              <Tags ref="tagsOnSomeFiles"
-                    tags={tagsOnSomeFiles}
-                    onTagClick={this.props.onTagAttach}/>
-          </div>
-        );
       }
     }
     //Show tags starting with value
     //If no tag starting with value, offer to create it
     else {
-      var title;
-      if (this.props.suggestions.size > 0) {
-        title = '"' + this.props.taggerValue + '"' + " tags";
+      suggestionTags = this.props.allTags.filter(function(tag) {
+        return tag.indexOf(this.props.taggerValue) === 0;
+      }, this);
+      if (suggestionTags.size > 0) {
+        suggestionLabel = '"' + this.props.taggerValue + '"' + " tags";
       }
       else {
-        title = "Create new tag " + '"' + this.props.taggerValue + '"';
+        suggestionLabel = "Create new tag " + '"' + this.props.taggerValue + '"';
       }
-      suggestions = (
+    }
+    if (suggestionTags !== undefined) {
+      var suggestions = (
         <div>
-            <Subheader text={title}/>
-            <Tags tags={this.props.suggestions}
+            <Subheader text={suggestionLabel}/>
+            <Tags tags={suggestionTags}
                   disabledTags={tagsOnAllFiles}
                   onTagClick={this.props.onTagAttach}/>
         </div>
       );
     }
-
-
 
     return (
       <div style={style.tagger}>

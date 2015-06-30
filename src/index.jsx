@@ -52,6 +52,7 @@ var App = React.createClass({
   
   getInitialState: function() {
     return {
+      allTags: Immutable.OrderedSet(),
       width: 0,
       accounts: {
         'Dropbox': 'j.doe@gmail.com',
@@ -64,8 +65,6 @@ var App = React.createClass({
         value: "",
         suggestions: {
           visible: true,
-          tags: Immutable.OrderedSet(),//secondary state
-          currentRequest: null,
         },
         files: {
           files: Immutable.OrderedMap(),//secondary state
@@ -89,10 +88,6 @@ var App = React.createClass({
         isShowingFiles: false,
         basePage: Page.CLOUD,
         value: "",
-        suggestions: {
-          tags: Immutable.OrderedSet(),//secondary state
-          currentRequest: null,
-        }
       },
       snackbar: {
         visible: false,
@@ -224,24 +219,23 @@ var App = React.createClass({
 
     //Set initial search suggestions
     //this.showSearchSuggestions(true);
-    this.updateSearch(true, false);
+
+    //Download all tags
+    this.setState({
+      allTags: _Database.getAllTags()
+    });
+
   },
 
   componentDidUpdate: function(prevProps, prevState) {
     var currState = this.state;
 
     var searchTagsChanged = !Immutable.is(currState.search.tags, prevState.search.tags);
-    var searchValueChanged = currState.search.value !== prevState.search.value;
-    var taggerClosed = prevState.page === Page.TAGGER && currState.page !== Page.TAGGER;
-    var updateSuggestions = searchTagsChanged || searchValueChanged || taggerClosed;
     var updateFiles = searchTagsChanged;
-    this.updateSearch(updateSuggestions, updateFiles);
+    this.updateSearch(updateFiles);
 
     var pathChanged = !Immutable.is(currState.cloud.path, prevState.cloud.path);
     this.updateCloud(pathChanged);
-
-    var taggerValueChanged = currState.tagger.value !== prevState.tagger.value;
-    this.updateTagger(taggerValueChanged);
   },
 
   componentWillUnmount: function() {
@@ -252,51 +246,25 @@ var App = React.createClass({
     window.removeEventListener('resize', this.handleResize);
   },
 
-  updateSearch: function(updateSuggestions, updateFiles) {
+  updateSearch: function(updateFiles) {
     //No need to do anything?
-    if (!updateSuggestions && !updateFiles) {
+    if (!updateFiles) {
       return;
     }
 
     console.log('updateSearch');
     
     //Create new request ids, if updating
-    var suggestionsRequest = updateSuggestions ? Util.uuid() : this.state.search.suggestions.currentRequest;
     var filesRequest = updateFiles ? Util.uuid() : this.state.search.files.currentRequest;
     
     this.setState({
       search: Update(this.state.search, {
-        suggestions: {
-          currentRequest: {$set: suggestionsRequest}
-        },
         files: {
           currentRequest: {$set: filesRequest}
         },
       })
     }, function() {
       
-      if (updateSuggestions) {
-        //Search suggestions are calculated from search tags and search value
-        //Database should return an Immutable.OrderedSet of strings
-        _Database.suggestSearchTags(
-          this.state.search.tags, 
-          this.state.search.value
-        ).then(function(suggestedTags) {
-          //Check if currentRequest matches this request
-          if (this.state.search.suggestions.currentRequest !== suggestionsRequest) {
-            return;
-          }
-          this.setState({
-            search: Update(this.state.search, {
-              suggestions: {
-                tags: {$set: suggestedTags},
-                currentRequest: {$set: null},
-              }
-            })
-          });
-        }.bind(this));
-      }
-
       if (updateFiles) {
         var searchTags = this.state.search.tags;
 
@@ -396,55 +364,6 @@ var App = React.createClass({
     });
   },
   
-  updateTagger: function(taggerValueChanged) {
-    if (!taggerValueChanged) {
-      return;
-    }
-
-    //Tagger value is empty: don't need to call database
-    if (this.state.tagger.value === '') {
-      this.setState({
-        tagger: Update(this.state.tagger, {
-          suggestions: {
-            currentRequest: {$set: null},//clear current request
-            tags: {$set: Immutable.OrderedSet()},
-          }
-        })
-      });
-      return;
-    }
-    
-    console.log('updateTaggerSuggestions');
-    
-    //Tagger suggestions are calculated from tagger value
-    //Database should return an Immutable.OrderedSet of strings
-    var requestId = Util.uuid();
-    this.setState({
-      tagger: Update(this.state.tagger, {
-        suggestions: {
-          currentRequest: {$set: requestId},
-        }
-      })
-    }, function() {
-      _Database.getTags(
-        this.state.tagger.value
-      ).then(function(suggestedTags) {
-
-        //Check if current request matches this request
-        if (this.state.tagger.suggestions.currentRequest !== requestId) {
-          return;
-        }
-        this.setState({
-          tagger: Update(this.state.tagger, {
-            suggestions: {
-              tags: {$set: suggestedTags},
-              currentRequest: {$set: null},
-            }
-          })
-        });
-      }.bind(this));
-    });
-  },
   
 
   // SEARCH
@@ -1204,9 +1123,8 @@ var App = React.createClass({
       filesOpen: this.state.search.files.open,
       filesLoading: this.state.search.files.currentRequest !== null,
 
-      suggestions: this.state.search.suggestions.tags,
+      allTags: this.state.allTags,
       suggestionsVisible: this.state.search.suggestions.visible,
-      suggestionsLoading: this.state.search.suggestions.currentRequest !== null,
       
       onSearchTagAdd: this.addSearchTag,
       onSearchTagDelete: this.deleteSearchTag,
@@ -1257,10 +1175,8 @@ var App = React.createClass({
       onClose: this.closeTagger,
 
       taggerValue: this.state.tagger.value,
-      
-      suggestions: this.state.tagger.suggestions.tags,
-      suggestionsLoading: this.state.tagger.suggestions.currentRequest !== null,
-      
+      allTags: this.state.allTags,
+
       onTaggerValueChange: this.handleTaggerValueChange,
       onTaggerFocus: this.handleTaggerFocus,
 
