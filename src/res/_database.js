@@ -4,7 +4,7 @@ var Immutable = require('immutable');
 var RSVP = require('rsvp');
 var _cloud = require('./_cloud');
 
-var databaseLatency = 1500;
+var databaseLatency = 500;
 
 module.exports = {
   
@@ -232,8 +232,8 @@ module.exports = {
   attachTag: function(paths, tag) {
     console.log('attach tag in database');
     this.forEachPath(paths, function(file) {
-      //Attach tag to file
-      file.tags.push(tag);
+      //Attach tag to file (prevent duplicate tags)
+      file.tags = Immutable.Set(file.tags).add(tag).toArray();
     });
   },
 
