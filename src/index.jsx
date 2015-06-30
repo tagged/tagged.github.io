@@ -824,7 +824,8 @@ var App = React.createClass({
     var taggerFiles = this.state.tagger.files;
     var searchFileState = this.state.search.files;
     var cloudFileState = this.state.cloud.files;
-    
+    var allTags = this.state.allTags;
+
     //Optimistically update file states
     
     //Add tag to tagger files
@@ -863,6 +864,7 @@ var App = React.createClass({
     }
 
     this.setState({
+      allTags: allTags.add(tag),
       tagger: Update(this.state.tagger, {
         files: {$set: newTaggerFiles},
         value: {$set: ""}
@@ -906,8 +908,9 @@ var App = React.createClass({
       //the point snackbar is shown and the point
       //this method is called.
       
-      //Reset file state
+      //Reset state
       this.setState({
+        allTags: allTags,
         tagger: Update(this.state.tagger, {
           files: {$set: taggerFiles},
         }),
