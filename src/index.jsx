@@ -57,9 +57,7 @@ var App = React.createClass({
       search: {
         tags: Immutable.OrderedSet(),
         value: "",
-        suggestions: {
-          visible: true,
-        },
+        suggestionsVisible: true,
         files: {
           open: Immutable.Set(),
           selected: Immutable.Set(),
@@ -207,10 +205,6 @@ var App = React.createClass({
 
     //Set initial window width
     this.handleResize();
-
-    //Set initial search suggestions
-    //this.showSearchSuggestions(true);
-
   },
 
   componentWillUnmount: function() {
@@ -312,15 +306,13 @@ var App = React.createClass({
     }
 
     //Suggestion visiblility is already in the correct state
-    if (this.state.search.suggestions.visible === visible) {
+    if (this.state.search.suggestionsVisible === visible) {
       return;
     }
     
     this.setState({
       search: Update(this.state.search, {
-        suggestions: {
-          visible: {$set: visible},
-        }
+        suggestionsVisible: {$set: visible},
       })
     });
   },
@@ -750,7 +742,7 @@ var App = React.createClass({
       filesSelected: this.state.search.files.selected,
       filesOpen: this.state.search.files.open,
       
-      suggestionsVisible: this.state.search.suggestions.visible,
+      suggestionsVisible: this.state.search.suggestionsVisible,
       
       onSearchTagAdd: this.addSearchTag,
       onSearchTagDelete: this.deleteSearchTag,
