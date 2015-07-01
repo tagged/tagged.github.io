@@ -17,7 +17,7 @@ var Cloud = React.createClass({
   
   propTypes: {
     accounts: React.PropTypes.object,
-    path: React.PropTypes.object,
+    path: React.PropTypes.array,
     
     files: React.PropTypes.array,
     filesDeleted: React.PropTypes.instanceOf(Immutable.Set),
@@ -76,7 +76,7 @@ var Cloud = React.createClass({
   render: function() {
     var style = this.getStyle();
     
-    var contents = FileStore.getContents(this.props.files, this.props.path.rest().toArray());
+    var contents = FileStore.getContents(this.props.files, this.props.path.slice(1));
 
     // FOLDERS
     
@@ -84,7 +84,7 @@ var Cloud = React.createClass({
     cloudFolders.sort();
     
     //Special folder for each cloud provider
-    if (this.props.path.size === 1) {
+    if (this.props.path.length === 1) {
       folders = Providers.map(function(provider) {
         var account = this.props.accounts[provider.name];
         var onClick;
@@ -137,7 +137,7 @@ var Cloud = React.createClass({
     });
     
     var fileActionBar = null;
-    if (this.props.path.size > 1) {
+    if (this.props.path.length > 1) {
       fileActionBar = (
         <FileActionBar numberOfFiles={cloudFiles.length}
                        numberOfFilesSelected={this.props.filesSelected.size}
@@ -170,7 +170,7 @@ var Cloud = React.createClass({
   
   handleFileDragOver: function(event) {
     event.preventDefault();
-    var dropEffect = this.props.path.size > 1 ? 'copy' : 'none';
+    var dropEffect = this.props.path.length > 1 ? 'copy' : 'none';
     event.dataTransfer.dropEffect = dropEffect;
   },
 

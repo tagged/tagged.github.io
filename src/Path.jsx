@@ -9,7 +9,7 @@ var Util = require('./util/util');
 var Path = React.createClass({
   
   propTypes: {
-    path: React.PropTypes.object,
+    path: React.PropTypes.array,
     onPathShorten: React.PropTypes.func,
     style: React.PropTypes.object
   },
@@ -64,7 +64,7 @@ var Path = React.createClass({
     );
 
     var path = this.props.path.map(function(directory, index) {
-      var isLastDirectory = index === this.props.path.size - 1;
+      var isLastDirectory = index === this.props.path.length - 1;
       if (isLastDirectory) {
         return (
           <span key={index}>

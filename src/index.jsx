@@ -64,7 +64,7 @@ var App = React.createClass({
         },
       },
       cloud: {
-        path: Immutable.List(["Home"]),
+        path: ["Home"],
         files: {
           open: Immutable.Set(),
           selected: Immutable.Set(),
@@ -93,7 +93,7 @@ var App = React.createClass({
     
     var page = event.state.page;
     var searchTags = Immutable.OrderedSet(event.state.searchTags);
-    var path = Immutable.List(event.state.path);
+    var path = event.state.path;
     
     var value = "";
     var suggestionsVisible = searchTags.isEmpty() || this.searchInputIsFocused();
@@ -130,7 +130,7 @@ var App = React.createClass({
     var browserState = {
       page: this.state.page,
       searchTags: this.state.search.tags.toArray(),
-      path: this.state.cloud.path.toArray()
+      path: this.state.cloud.path,
     };
     var url = this.getURL(this.state.page);
     if (replace) {
@@ -175,8 +175,9 @@ var App = React.createClass({
         break;
       case Page.CLOUD:
         url = "/home";
-        if (!this.state.cloud.path.rest().isEmpty()) {
-          url = url + "/" + this.state.cloud.path.rest().join("/");
+        var path = this.state.cloud.path.slice(1);
+        if (path.length > 0) {
+          url = url + "/" + path.join("/");
         }
         break;
       case Page.TAGGER:
@@ -194,7 +195,7 @@ var App = React.createClass({
     window.history.replaceState({
       page: this.state.page,
       searchTags: this.state.search.tags.toArray(),
-      path: this.state.cloud.path.toArray()
+      path: this.state.cloud.path
     }, '');
 
     //Listen for page changes
@@ -475,7 +476,7 @@ var App = React.createClass({
   },
 
   handlePathLengthen: function(folder) {
-    var newPath = this.state.cloud.path.push(folder);
+    var newPath = this.state.cloud.path.concat([folder]);
     this.handlePathChange(newPath);
   },
 
@@ -506,7 +507,7 @@ var App = React.createClass({
 
     //Upload file information to FileStore
     FileStore.uploadFiles(
-      fileData, this.state.cloud.path.rest().toArray()
+      fileData, this.state.cloud.path.slice(1)
     );
 
     //Update files
