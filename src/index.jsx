@@ -646,7 +646,22 @@ var App = React.createClass({
       this.setState({
         files: FileStore.getAll(),
         tagsDetached: this.state.tagsDetached.delete(tag),
+        
       });
+      //If detaching a tag that is currently a search tag,
+      //remove all tagger.files from search.files.selected/open
+      if (this.state.search.tags.includes(tag)) {
+        this.setState({
+          search: Update(this.state.search, {
+            files: {
+              open: {$set: this.state.search.files.open.
+                                subtract(this.state.tagger.files)},
+              selected: {$set: this.state.search.files.selected.
+                                    subtract(this.state.tagger.files)},
+            }
+          })
+        });
+      }
     }.bind(this);
 
     var undo = function() {
