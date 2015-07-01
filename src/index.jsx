@@ -49,8 +49,8 @@ var App = React.createClass({
       
       width: 0,
       accounts: {
-        'Dropbox': 'j.doe@gmail.com',
-        'Google Drive': 'j.doe.2015@gmail.com',
+        'Dropbox': 'John Doe',
+        'Google Drive': 'j.doe.2015',
         'Box': null
       },
       page: Page.CLOUD,
