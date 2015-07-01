@@ -3,14 +3,13 @@ var Tags = require('./Tags');
 var Subheader = require('./Subheader');
 var File = require('./File');
 var FileActionBar = require('./FileActionBar');
-var Loading = require('./Loading');
 
 var R = require('./res/index');
 var Color = R.color;
 var Dimension = R.dimension;
 var Util = require('./util/util');
 var Immutable = require('immutable');
-
+var FileStore = require('./res/FileStore');
 
 
 var Search = React.createClass({
@@ -19,12 +18,11 @@ var Search = React.createClass({
     searchTags: React.PropTypes.instanceOf(Immutable.Set),
     searchValue: React.PropTypes.string,
     
-    files: React.PropTypes.instanceOf(Immutable.OrderedMap),
+    files: React.PropTypes.array,
+    filesDeleted: React.PropTypes.instanceOf(Immutable.Set),
     filesSelected: React.PropTypes.instanceOf(Immutable.Set),
     filesOpen: React.PropTypes.instanceOf(Immutable.Set),
-    filesLoading: React.PropTypes.bool,
 
-    allTags: React.PropTypes.object,
     suggestionsVisible: React.PropTypes.bool,
 
     onSearchTagAdd: React.PropTypes.func,
@@ -57,71 +55,93 @@ var Search = React.createClass({
           paddingTop: Dimension.space
         }
       },
-      loading: {
-        root: {
-          paddingTop: Dimension.space,
-          paddingLeft: Dimension.marginMobile,
-          paddingRight: Dimension.marginMobile
-        }
-      }
     };
   },
 
-  getFileProps: function(file, id) {
+  getFileProps: function(file) {
+    var path = file.path.join('/');
     return {
-      name: file.name,
-      path: Util.makePath(file.path),
+      name: file.path[file.path.length - 1],
+      path: Util.makePath(file.path.slice(0,-1)),
       modified: file.modified,
       size: file.size,
       type: file.type,
-      cloud: file.cloud,
+      cloud: file.path[0],
       link: file.link,
       tags: Immutable.OrderedSet(file.tags),
       disabledTags: this.props.searchTags,
       onTagClick: this.props.onSearchTagAdd,
-      isSelected: this.props.filesSelected.includes(id),
-      isOpen: this.props.filesOpen.includes(id),
-      onFileSelect: this.props.onFileSelect.bind(null, id),
-      onFileToggle: this.props.onFileToggle.bind(null, id),
-      key: id
+      isSelected: this.props.filesSelected.includes(path),
+      isOpen: this.props.filesOpen.includes(path),
+      onFileSelect: this.props.onFileSelect.bind(null, path),
+      onFileToggle: this.props.onFileToggle.bind(null, path),
+      key: path
     };
   },
 
   render: function() {
     var style = this.getStyle();
+    
+    var searchTags = this.props.searchTags;
+    var searchValue = this.props.searchValue;
+    
+    var allFiles = FileStore.getFiles(this.props.files);
+    var allTags = FileStore.getTags(allFiles);
 
-    var placeholder = this.props.searchTags.isEmpty() ?
-                      "Search files by tag" : "Refine search";
+    // FILES
+
+    var searchFiles = FileStore.filterFiles(allFiles, searchTags);
+      
+    //Filter out deleted files
+    searchFiles = searchFiles.filter(function(file) {
+      return !this.props.filesDeleted.includes(file.path.join('/'));
+    }, this);
+
+    //Sort by name
+    searchFiles.sort(Util.sortByName);
+
+    var files = searchFiles.map(function(file) {
+      return <File {...this.getFileProps(file)}/>;
+    }, this);
+    
+    // FILE ACTION BAR
+    
+    var searchFilePaths = searchFiles.map(function(file) {
+      return file.path.join('/');
+    });
+    
+    var fileActionBar = null;
+    if (!searchTags.isEmpty()) {
+      fileActionBar = (
+        <FileActionBar numberOfFiles={searchFiles.length}
+                       numberOfFilesSelected={this.props.filesSelected.size}
+                       onSelectAll={this.props.onFileSelectAll.bind(null, searchFilePaths)}
+                       onUnselectAll={this.props.onFileUnselectAll}
+                       onDelete={this.props.onFileDelete.bind(null, this.props.filesSelected)}
+                       onTag={this.props.onFileTag}
+                       style={style.fileActionBar}/>
+      );
+    }
+
+    // SUGGESTIONS
 
     var suggestions = null;
     if (this.props.suggestionsVisible) {
-      
-      var searchTags = this.props.searchTags;
-      var searchValue = this.props.searchValue;
       
       var tags;
       if (searchTags.isEmpty()) {
         if (searchValue === '') {
           //Suggest all tags
-          tags = this.props.allTags.sort();
+          tags = allTags.sort();
         } else {
           //Suggest all tags starting with value
-          tags = this.props.allTags.filter(function(tag) {
+          tags = allTags.filter(function(tag) {
             return tag.indexOf(searchValue) === 0;
-          });
+          }).sort();
         }
       } else {
         //Suggest tags on search files starting with value
-        var tagArray = [];
-        this.props.files.forEach(function(file) {
-          for (var i = 0; i < file.tags.length; i++) {
-            var tag = file.tags[i];
-            if (tag.indexOf(searchValue) === 0) {
-              tagArray.push(tag);
-            }
-          }
-        });
-        tags = Immutable.OrderedSet(tagArray).
+        tags = FileStore.getTagsStartingWith(searchFiles, searchValue).
                          subtract(searchTags). //exclude search tags
                          sort();
       }
@@ -157,51 +177,21 @@ var Search = React.createClass({
                   style={style.suggestions}/>
         </div>
       );
-
+      
     }
 
-    var files;
-    if (this.props.filesLoading) {
-      files = null;//<Loading/>;
-    }
-    else {
-      //Sort files by name
-      files = this.props.files.sort(Util.sortByName).map(function(file, id) {
-        return (
-          <File {...this.getFileProps(file, id)}/>
-        );
-      }, this).valueSeq();
-    }
-
-    var fileActionBar = null;
-    if (this.props.filesLoading) {
-      fileActionBar = null;//<Loading/>
-    }
-    else if (!this.props.searchTags.isEmpty()) {
-      fileActionBar = (
-        <FileActionBar numberOfFiles={this.props.files.size}
-                       numberOfFilesSelected={this.props.filesSelected.size}
-                       onSelectAll={this.props.onFileSelectAll}
-                       onUnselectAll={this.props.onFileUnselectAll}
-                       onDelete={this.props.onFileDelete}
-                       onTag={this.props.onFileTag}
-                       style={style.fileActionBar}/>
-      );
-    }
-
-    var loading = null;
-    if (this.props.filesLoading) {
-      loading = <Loading style={style.loading}/>;
-    }
+    var placeholder = searchTags.isEmpty() ? 
+                      "Search files by tag" : 
+                      "Refine search";
 
     return (
       <div style={style.search}>
           <div style={style.header}>
               <Tags ref="searchTags"
-                    tags={this.props.searchTags}
+                    tags={searchTags}
                     onTagClick={this.props.onSearchTagDelete}
                     withInput={true}
-                    value={this.props.searchValue}
+                    value={searchValue}
                     onValueChange={this.props.onSearchValueChange}
                     placeholder={placeholder}
                     onSubmit={this.props.onSearchTagAdd}
@@ -210,7 +200,6 @@ var Search = React.createClass({
           </div>
           {files}
           {fileActionBar}
-          {loading}
       </div>
     );
   },

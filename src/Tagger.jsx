@@ -10,19 +10,24 @@ var Dimension = R.dimension;
 var Typography = R.typography;
 var Util = require('./util/util');
 var Immutable = require('immutable');
+var FileStore = require('./res/FileStore');
 
 
 
 var Tagger = React.createClass({
   
   propTypes: {
-    files: React.PropTypes.instanceOf(Immutable.OrderedMap),
+    files: React.PropTypes.array,
+    taggerFiles: React.PropTypes.instanceOf(Immutable.Set),
     isShowingFiles: React.PropTypes.bool,
+    
+    tagsAttached: React.PropTypes.instanceOf(Immutable.Set),
+    tagsDetached: React.PropTypes.instanceOf(Immutable.Set),
+
     onToggle: React.PropTypes.func,
     onClose: React.PropTypes.func,
 
     taggerValue: React.PropTypes.string,
-    allTags: React.PropTypes.object,
 
     onTaggerValueChange: React.PropTypes.func,
     onTaggerFocus: React.PropTypes.func,
@@ -86,24 +91,38 @@ var Tagger = React.createClass({
   render: function() {
     var style = this.getStyle();
     
-    //Sort files by name
-    var files = this.props.files.sort(Util.sortByName).map(function(file, id) {
+    var allFiles = FileStore.getFiles(this.props.files);
+
+    // FILES
+
+    var taggerFiles = allFiles.filter(function(file) {
+      return this.props.taggerFiles.includes(file.path.join('/'));
+    }, this);
+
+    //Sort by name
+    taggerFiles.sort(Util.sortByName);
+
+    var files = taggerFiles.map(function(file) {
       return (
-        <div style={style.file} key={id}>
-            {file.name}
+        <div style={style.file} key={file.path.join('/')}>
+            {file.path[file.path.length - 1]}
         </div>
       );
-    }).valueSeq();
+    });
+
+    var filesTitle = files.length + " file" + (files.length === 1 ? "" : "s");
+
+    // TAGS
 
     //Count each tag
-    var tags = {};
-    this.props.files.forEach(function(file) {
+    var tagCount = {};
+    taggerFiles.forEach(function(file) {
       for (var i=0; i < file.tags.length; i++) {
         var tag = file.tags[i];
-        if (!tags.hasOwnProperty(tag)) {
-          tags[tag] = 0;
+        if (!tagCount.hasOwnProperty(tag)) {
+          tagCount[tag] = 0;
         }
-        tags[tag]++;
+        tagCount[tag]++;
       }
     });
 
@@ -113,9 +132,9 @@ var Tagger = React.createClass({
     
     var tagsOnAllFiles = [];
     var tagsOnSomeFiles = [];
-    for (var tag in tags) {
-      var count = tags[tag];
-      if (count === files.size) {
+    for (var tag in tagCount) {
+      var count = tagCount[tag];
+      if (count === files.length) {
         tagsOnAllFiles.push(tag);
       }
       else {
@@ -123,19 +142,34 @@ var Tagger = React.createClass({
       }
     }
     
-    tagsOnAllFiles = Immutable.OrderedSet(tagsOnAllFiles).sort();
-    tagsOnSomeFiles = Immutable.OrderedSet(tagsOnSomeFiles).sort();
+    tagsOnAllFiles = Immutable.Set(tagsOnAllFiles);
+    tagsOnSomeFiles = Immutable.Set(tagsOnSomeFiles);
 
-    var tagsTitle;
-    if (files.size === 1) {
-      tagsTitle = "Tags";
+    //Pretend tagAttached is on all files
+    if (!this.props.tagsAttached.isEmpty()) {
+      tagsOnAllFiles = tagsOnAllFiles.union(this.props.tagsAttached);
+      tagsOnSomeFiles = tagsOnSomeFiles.subtract(this.props.tagsAttached);
     }
-    else if (files.size === 2) {
-      tagsTitle = "Tags on both files";
+    //Pretend tagsDetached are on no files
+    if (!this.props.tagsDetached.isEmpty()) {
+      tagsOnAllFiles = tagsOnAllFiles.subtract(this.props.tagsDetached);
     }
-    else if (files.size > 2) {
-      tagsTitle = "Tags on all files";
+    
+    var tagsOnAllFilesTitle;
+    if (files.length === 1) {
+      tagsOnAllFilesTitle = "Tags";
     }
+    else if (files.length === 2) {
+      tagsOnAllFilesTitle = "Tags on both files";
+    }
+    else if (files.length > 2) {
+      tagsOnAllFilesTitle = "Tags on all files";
+    }
+
+    //Save handleTagAttach from recalculating tag counts
+    var onTagAttach = this.props.onTagAttach.bind(null, tagCount);
+
+    // SUGGESTIONS
 
     var suggestionTags;
     var suggestionLabel;
@@ -144,12 +178,12 @@ var Tagger = React.createClass({
     //-recent tags(?)
     //-all tags(?)
     if (this.props.taggerValue === '') {
-      if (files.size > 1 && !tagsOnSomeFiles.isEmpty()) {
+      if (files.length > 1 && !tagsOnSomeFiles.isEmpty()) {
         suggestionTags = tagsOnSomeFiles;
-        if (files.size === 2) {
+        if (files.length === 2) {
           suggestionLabel = "Tags on one file";
         }
-        else if (files.size > 2) {
+        else if (files.length > 2) {
           suggestionLabel = "Tags on some files";
         }
       }
@@ -157,7 +191,8 @@ var Tagger = React.createClass({
     //Show tags starting with value
     //If no tag starting with value, offer to create it
     else {
-      suggestionTags = this.props.allTags.filter(function(tag) {
+      var allTags = FileStore.getTags(allFiles);
+      suggestionTags = allTags.filter(function(tag) {
         return tag.indexOf(this.props.taggerValue) === 0;
       }, this);
       if (suggestionTags.size > 0) {
@@ -171,9 +206,9 @@ var Tagger = React.createClass({
       var suggestions = (
         <div>
             <Subheader text={suggestionLabel}/>
-            <Tags tags={suggestionTags}
+            <Tags tags={suggestionTags.sort()}
                   disabledTags={tagsOnAllFiles}
-                  onTagClick={this.props.onTagAttach}/>
+                  onTagClick={onTagAttach}/>
         </div>
       );
     }
@@ -186,7 +221,7 @@ var Tagger = React.createClass({
                            onToggle={this.props.onToggle}
                            style={style.collapsible}>
                   <div isController={true} style={style.fileCount}>
-                      {files.size + " file" + (files.size === 1 ? "" : "s")}
+                      {filesTitle}
                       <ExpandCollapse isExpanded={this.props.isShowingFiles}
                                       fill={Color.whitePrimary}
                                       style={style.expandCollapse}/>
@@ -195,15 +230,15 @@ var Tagger = React.createClass({
               </Collapsible>
           </div>
           <div style={style.body}>
-              <Subheader text={tagsTitle}/>
+              <Subheader text={tagsOnAllFilesTitle}/>
               <Tags ref="tagsOnAllFiles"
-                    tags={tagsOnAllFiles}
+                    tags={tagsOnAllFiles.sort()}
                     onTagClick={this.props.onTagDetach}
                     withInput={true}
                     value={this.props.taggerValue}
                     onValueChange={this.props.onTaggerValueChange}
                     placeholder={"Add tag"}
-                    onSubmit={this.props.onTagAttach}
+                    onSubmit={onTagAttach}
                     onFocus={this.props.onTaggerFocus}/>
               {suggestions}
           </div>
