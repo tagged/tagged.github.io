@@ -478,27 +478,20 @@ var App = React.createClass({
 
 
   handlePathShorten: function(index) {
-    this.state.snackbar.complete();
-    
-    var path = this.state.cloud.path.slice(0, index + 1);
-    this.setState({
-      cloud: Update(this.state.cloud, {
-        path: {$set: path},
-        files: {
-          selected: {$set: Immutable.Set()},
-          open: {$set: Immutable.Set()}
-        }
-      })
-    }, this.setBrowserState);
+    var newPath = this.state.cloud.path.slice(0, index + 1);
+    this.handlePathChange(newPath);
   },
 
   handlePathLengthen: function(folder) {
+    var newPath = this.state.cloud.path.push(folder);
+    this.handlePathChange(newPath);
+  },
+
+  handlePathChange: function(newPath) {
     this.state.snackbar.complete();
-    
-    var path = this.state.cloud.path.push(folder);
     this.setState({
       cloud: Update(this.state.cloud, {
-        path: {$set: path},
+        path: {$set: newPath},
         files: {
           selected: {$set: Immutable.Set()},
           open: {$set: Immutable.Set()}
