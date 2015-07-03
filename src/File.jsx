@@ -26,8 +26,9 @@ var File = React.createClass({
     cloud: React.PropTypes.string,
     link: React.PropTypes.string,
     tags: React.PropTypes.instanceOf(Immutable.OrderedSet),
-    disabledTags: React.PropTypes.instanceOf(Immutable.Set),
+    specialTags: React.PropTypes.instanceOf(Immutable.Set),
     onTagClick: React.PropTypes.func,
+    onSpecialTagClick: React.PropTypes.func,
     isSelected: React.PropTypes.bool,
     isOpen: React.PropTypes.bool,
     onFileSelect: React.PropTypes.func,
@@ -127,8 +128,9 @@ var File = React.createClass({
                   {tagCount}
               </div>
               <Tags tags={this.props.tags.sort()}
-                    disabledTags={this.props.disabledTags}
+                    specialTags={this.props.specialTags}
                     onTagClick={this.props.onTagClick}
+                    onSpecialTagClick={this.props.onSpecialTagClick}
                     style={style.tags}/>
           </Collapsible>
           <a href={this.props.link}

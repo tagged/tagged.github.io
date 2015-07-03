@@ -69,8 +69,7 @@ var Cloud = React.createClass({
       cloud: file.path[0],
       link: file.link,
       tags: Immutable.OrderedSet(file.tags),
-      disabledTags: Immutable.Set(file.tags), //all
-      onTagClick: Util.noop, //nothing
+      onTagClick: Util.noop, //nothing -- TODO: Search by tag clicked
       isSelected: this.props.filesSelected.includes(path),
       isOpen: this.props.filesOpen.includes(path),
       onFileSelect: this.props.onFileSelect.bind(null, path),

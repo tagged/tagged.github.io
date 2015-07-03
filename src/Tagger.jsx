@@ -207,7 +207,7 @@ var Tagger = React.createClass({
         <div>
             <Subheader text={suggestionLabel}/>
             <Tags tags={suggestionTags.sort()}
-                  disabledTags={tagsOnAllFiles}
+                  specialTags={tagsOnAllFiles}
                   onTagClick={onTagAttach}/>
         </div>
       );

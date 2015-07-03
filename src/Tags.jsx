@@ -18,8 +18,9 @@ var Tags = React.createClass({
   
   propTypes: {
     tags: React.PropTypes.instanceOf(Immutable.OrderedSet),
-    disabledTags: React.PropTypes.instanceOf(Immutable.Set),
+    specialTags: React.PropTypes.instanceOf(Immutable.Set),
     onTagClick: React.PropTypes.func,
+    onSpecialTagClick: React.PropTypes.func,
     style: React.PropTypes.object,
 
     withInput: React.PropTypes.bool,
@@ -34,7 +35,8 @@ var Tags = React.createClass({
 
   getDefaultProps: function() {
     return {
-      disabledTags: Immutable.Set(),
+      specialTags: Immutable.Set(),
+      onSpecialTagClick: Util.noop,
       withInput: false,
       style: {},
     };
@@ -54,15 +56,17 @@ var Tags = React.createClass({
       tag: {
         tag: {
           backgroundColor: Color.blue100,
+          color: Color.blue900,
           cursor: 'pointer',
-          outlineColor: Color.blue500
+          outlineColor: Color.blue500,
         }
       },
-      tagDisabled: {
+      specialTag: {
         tag: {
-          backgroundColor: Color.blackDivider,
-          cursor: 'auto',
-          outlineColor: Color.blackHint
+          backgroundColor: Color.blue500,
+          color: Color.whitePrimary,
+          cursor: 'pointer',
+          outlineColor: Color.blue900,
         }
       },
       tagInput: {
@@ -81,28 +85,26 @@ var Tags = React.createClass({
 
     var tags = this.props.tags.map(function(tag) {
       
-      var isDisabled = this.props.disabledTags.includes(tag);
+      var isSpecial = this.props.specialTags.includes(tag);
       
       var onMouseDown = function(event) {
         //Don't hide suggestions yet
         event.stopPropagation();
       };
-      
-      var onClick = function(event) {
-        if (!isDisabled) {
-          this.props.onTagClick(tag);
-        }
-      }.bind(this);
 
+      var onClick = function() {
+        isSpecial ? this.props.onSpecialTagClick(tag) : this.props.onTagClick(tag);
+      }.bind(this);
+      
       var onKeyDown = function(event) {
         if (event.key === 'Enter') {
-          this.props.onTagClick(tag);
+          isSpecial ? this.props.onSpecialTagClick(tag) : this.props.onTagClick(tag);
         }
       }.bind(this);
 
       return (
         <Tag text={tag}
-             style={isDisabled ? style.tagDisabled : style.tag}
+             style={isSpecial ? style.specialTag : style.tag}
              onClick={onClick}
              onMouseDown={onMouseDown}
              onKeyDown={onKeyDown}
