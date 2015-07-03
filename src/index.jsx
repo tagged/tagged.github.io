@@ -18,7 +18,6 @@ var Animation = R.animation;
 var Color = R.color;
 var Dimension = R.dimension;
 var Icon = R.icon;
-var Shadow = R.shadow;
 var Typography = R.typography;
 var Value = R.value;
 
@@ -866,7 +865,6 @@ var App = React.createClass({
       },
       appBar: {
         backgroundColor: Color.blue500,
-        boxShadow: Shadow.zDepth[1],
         paddingTop: Dimension.quantum,
         paddingBottom: Dimension.quantum,
         paddingRight: Dimension.quantum,

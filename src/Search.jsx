@@ -7,6 +7,7 @@ var FileActionBar = require('./FileActionBar');
 var R = require('./res/index');
 var Color = R.color;
 var Dimension = R.dimension;
+var Shadow = R.shadow;
 var Util = require('./util/util');
 var Immutable = require('immutable');
 var FileStore = require('./res/FileStore');
@@ -55,6 +56,11 @@ var Search = React.createClass({
           paddingTop: Dimension.space
         }
       },
+      fileActionBar: {
+        root: {
+          boxShadow: Shadow.zDepthTop[1],
+        }
+      }
     };
   },
 

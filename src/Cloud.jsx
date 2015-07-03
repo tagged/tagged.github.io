@@ -8,6 +8,7 @@ var FileActionBar = require('./FileActionBar');
 var R = require('./res/index');
 var Dimension = R.dimension;
 var Providers = R.providers;
+var Shadow = R.shadow;
 var Util = require('./util/util');
 var Immutable = require('immutable');
 var FileStore = require('./res/FileStore');
@@ -49,6 +50,11 @@ var Cloud = React.createClass({
           paddingRight: Dimension.marginMobile,
         }
       },
+      fileActionBar: {
+        root: {
+          boxShadow: Shadow.zDepthTop[1],
+        }
+      }
     };
   },
 
@@ -146,7 +152,8 @@ var Cloud = React.createClass({
                        onDelete={this.props.onFileDelete.bind(null, this.props.filesSelected)}
                        onTag={this.props.onFileTag}
                        canUpload={true}
-                       onFileUpload={this.props.onFileUpload}/>
+                       onFileUpload={this.props.onFileUpload}
+                       style={style.fileActionBar}/>
       );
     }
 
