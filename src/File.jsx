@@ -33,6 +33,7 @@ var File = React.createClass({
     isOpen: React.PropTypes.bool,
     onFileSelect: React.PropTypes.func,
     onFileToggle: React.PropTypes.func,
+    onFileOpen: React.PropTypes.func,
   },
 
   getStyle: function() {
@@ -89,7 +90,7 @@ var File = React.createClass({
     var style = Util.prefix(this.getStyle());
 
     var filename = (
-      <div style={style.filename}>{this.props.name}</div>
+      <div style={style.filename} onClick={this.props.onFileOpen}>{this.props.name}</div>
     );
 
     var metadata;

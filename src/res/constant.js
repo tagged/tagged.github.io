@@ -4,6 +4,7 @@ module.exports = {
     SEARCH: "search",
     CLOUD: "cloud",
     TAGGER: "tagger",
+    FILEVIEW: "fileview",
     SCRATCH: "scratch"
   },
   ternary: {

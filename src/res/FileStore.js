@@ -567,6 +567,29 @@ var FileStore = {
     return filteredFiles;
   },
 
+  
+  /**
+   * Get file at the given path, if the file exists.
+   *
+   * @param path {array} file path
+   * 
+   * @return {object} file at the specified path, if the file exists
+   */
+  getFile: function(contents, path) {
+    var basename = path.slice(0,-1);
+    var filename = path[path.length - 1];
+    contents = this.goToFolder(contents, basename);
+    for (var i = 0; i < contents.length; i++) {
+      var item = contents[i];
+      if (!item.isFolder) {
+        var name = item.path[item.path.length - 1];
+        if (name === filename) {
+          return item;
+        }
+      }
+    }
+  },
+
 
   /**
    * Splits contents of given folder into files and folders.
@@ -581,7 +604,7 @@ var FileStore = {
     contents = this.goToFolder(contents, path);
     var folders = [];
     var files = [];
-    for (var i=0; i < contents.length; i++) {
+    for (var i = 0; i < contents.length; i++) {
       var item = contents[i];
       if (item.isFolder) {
         //folder names only

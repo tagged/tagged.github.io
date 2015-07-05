@@ -38,6 +38,7 @@ var Search = React.createClass({
     onFileUnselectAll: React.PropTypes.func,
     onFileDelete: React.PropTypes.func,
     onFileTag: React.PropTypes.func,
+    onFileOpen: React.PropTypes.func,
   },
 
   getStyle: function() {
@@ -82,6 +83,7 @@ var Search = React.createClass({
       isOpen: this.props.filesOpen.includes(path),
       onFileSelect: this.props.onFileSelect.bind(null, path),
       onFileToggle: this.props.onFileToggle.bind(null, path),
+      onFileOpen: this.props.onFileOpen.bind(null, path),
       key: path
     };
   },

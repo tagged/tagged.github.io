@@ -7,6 +7,7 @@ var Update = React.addons.update;
 var Search = require('./Search');
 var Cloud = require('./Cloud');
 var Tagger = require('./Tagger');
+var Fileview = require('./Fileview');
 var Snackbar = require('./Snackbar');
 
 var MaterialIcon = require('./MaterialIcon');
@@ -34,6 +35,7 @@ var FileStore = require('./res/FileStore');
 var App = React.createClass({
 
   getInitialState: function() {
+    var homepage = Page.CLOUD;
     return {
       files: FileStore.getAll(),
       
@@ -52,7 +54,7 @@ var App = React.createClass({
         'Google Drive': 'j.doe.2015',
         'Box': null
       },
-      page: Page.CLOUD,
+      page: homepage,
       search: {
         tags: Immutable.OrderedSet(),
         value: "",
@@ -72,8 +74,13 @@ var App = React.createClass({
       tagger: {
         files: Immutable.Set(),
         isShowingFiles: false,
-        basePage: Page.CLOUD,
+        basePage: homepage,
         value: "",
+      },
+      fileview: {
+        file: "",
+        value: "",
+        basePage: homepage,
       },
       snackbar: {
         visible: false,
@@ -131,7 +138,7 @@ var App = React.createClass({
       searchTags: this.state.search.tags.toArray(),
       path: this.state.cloud.path,
     };
-    var url = this.getURL(this.state.page);
+    //var url = this.getURL(this.state.page);
     if (replace) {
       window.history.replaceState(browserState, '');
     }
@@ -690,6 +697,92 @@ var App = React.createClass({
   },
 
 
+  // FILEVIEW
+
+
+  openFileview: function(file) {
+    //Link to current page
+    //Navigate to Fileview
+    var basePage = this.state.page;
+    this.setState({
+      fileview: Update(this.state.fileview, {
+        file: {$set: file},
+        basePage: {$set: basePage}
+      })
+    }, this.navigate.bind(this, Page.FILEVIEW));
+  },
+
+  closeFileview: function() {
+    //clear value
+    this.setState({
+      fileview: Update(this.state.fileview, {
+        file: {$set: ""},
+        value: {$set: ""},
+      })
+    });
+    this.navigate(this.state.fileview.basePage);
+  },
+
+  handleFileviewFocus: function() {
+    this.state.snackbar.complete();
+  },
+
+  handleFileviewValueChange: function(event) {
+    this.state.snackbar.complete();
+
+    var newValue = this.refs.fileview.refs.tags.getInputValue();
+    this.setState({
+      fileview: Update(this.state.fileview, {
+        value: {$set: newValue},
+      })
+    });
+  },
+
+  handleFileviewTagAttach: function(tag) {
+    
+    //Prepare snackbar
+
+    var message = "Added tag " + '"' + tag + '"';
+
+    var action = "UNDO";
+
+    var attachTag = function() {
+      //Attach tag in FileStore
+      FileStore.attachTag([this.state.fileview.file], tag);
+      this.setState({
+        files: FileStore.getAll(),
+        tagsAttached: this.state.tagsAttached.delete(tag),
+      });
+    }.bind(this);
+
+    var undo = function() {
+      //Reset state
+      this.setState({
+        tagsAttached: this.state.tagsAttached.delete(tag),
+      });
+    }.bind(this);
+
+    //Optimistically attach tag
+    
+    this.setState({
+      tagsAttached: this.state.tagsAttached.add(tag),
+      fileview: Update(this.state.fileview, {
+        value: {$set: ""}
+      })
+    }, function() {
+      
+      this.showSnackbar({
+        message: message,
+        action: action,
+        cancel: undo,
+        complete: attachTag,
+      });
+      
+    });
+    
+  },
+
+  
   // SNACKBAR
 
 
@@ -771,6 +864,7 @@ var App = React.createClass({
       onFileUnselectAll: this.handleFileUnselectAll,
       onFileDelete: this.handleFileDelete,
       onFileTag: this.openTagger,
+      onFileOpen: this.openFileview,
     };
   },
 
@@ -820,6 +914,22 @@ var App = React.createClass({
     };
   },
 
+  getFileviewProps: function() {
+    return {
+      files: this.state.files,
+      file: this.state.fileview.file,
+      onClose: this.closeFileview,
+      value: this.state.fileview.value,
+      onValueChange: this.handleFileviewValueChange,
+      onFocus: this.handleFileviewFocus,
+      tagsAttached: this.state.tagsAttached,
+      tagsDetached: this.state.tagsDetached,
+
+      onTagAttach: this.handleFileviewTagAttach,
+      //onTagDetach: this.handleTagDetachSingle,
+    };
+  },
+
   getPage: function() {
     var page;
     switch(this.state.page) {
@@ -831,6 +941,9 @@ var App = React.createClass({
         break;
       case Page.TAGGER:
         page = <Tagger ref="tagger" {...this.getTaggerProps()}/>;
+        break;
+      case Page.FILEVIEW:
+        page = <Fileview ref="fileview" {...this.getFileviewProps()}/>;
         break;
       default:
         //Invariant: this.state.page should always be one of the above
