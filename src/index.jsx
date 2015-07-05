@@ -325,6 +325,68 @@ var App = React.createClass({
   },
 
 
+  // CLOUD
+
+
+  handlePathShorten: function(index) {
+    var newPath = this.state.cloud.path.slice(0, index + 1);
+    this.handlePathChange(newPath);
+  },
+
+  handlePathLengthen: function(folder) {
+    var newPath = this.state.cloud.path.concat([folder]);
+    this.handlePathChange(newPath);
+  },
+
+  handlePathChange: function(newPath) {
+    this.state.snackbar.complete();
+    this.setState({
+      cloud: Update(this.state.cloud, {
+        path: {$set: newPath},
+        files: {
+          selected: {$set: Immutable.Set()},
+          open: {$set: Immutable.Set()}
+        }
+      })
+    }, this.setBrowserState);
+  },
+
+  upload: function(files) {
+        
+    var fileData = {};
+    for (var i = 0; i < files.length; i++) {
+      var file = files[i];
+      fileData[file.name] = {
+        name: file.name,
+        size: file.size,
+        mime: file.type,
+      };
+    }
+
+    //Upload file information to FileStore
+    FileStore.uploadFiles(
+      fileData, this.state.cloud.path.slice(1)
+    );
+
+    //Update files
+    this.setState({
+      files: FileStore.getAll()
+    });
+  },
+
+  handleFileUpload: function(event) {
+    event.stopPropagation();
+    event.preventDefault();
+    this.upload(event.target.files);
+  },
+
+  handleFileDrop: function(event) {
+    event.stopPropagation();
+    event.preventDefault();
+    this.upload(event.dataTransfer.files);
+  },
+
+
   // FILES (Search, Cloud)
 
  
@@ -470,68 +532,6 @@ var App = React.createClass({
       cancel: undoDelete,
       complete: deleteFiles,
     });
-  },
-
-
-  // CLOUD
-
-
-  handlePathShorten: function(index) {
-    var newPath = this.state.cloud.path.slice(0, index + 1);
-    this.handlePathChange(newPath);
-  },
-
-  handlePathLengthen: function(folder) {
-    var newPath = this.state.cloud.path.concat([folder]);
-    this.handlePathChange(newPath);
-  },
-
-  handlePathChange: function(newPath) {
-    this.state.snackbar.complete();
-    this.setState({
-      cloud: Update(this.state.cloud, {
-        path: {$set: newPath},
-        files: {
-          selected: {$set: Immutable.Set()},
-          open: {$set: Immutable.Set()}
-        }
-      })
-    }, this.setBrowserState);
-  },
-
-  upload: function(files) {
-        
-    var fileData = {};
-    for (var i = 0; i < files.length; i++) {
-      var file = files[i];
-      fileData[file.name] = {
-        name: file.name,
-        size: file.size,
-        mime: file.type,
-      };
-    }
-
-    //Upload file information to FileStore
-    FileStore.uploadFiles(
-      fileData, this.state.cloud.path.slice(1)
-    );
-
-    //Update files
-    this.setState({
-      files: FileStore.getAll()
-    });
-  },
-
-  handleFileUpload: function(event) {
-    event.stopPropagation();
-    event.preventDefault();
-    this.upload(event.target.files);
-  },
-
-  handleFileDrop: function(event) {
-    event.stopPropagation();
-    event.preventDefault();
-    this.upload(event.dataTransfer.files);
   },
 
 
