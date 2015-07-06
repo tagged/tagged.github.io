@@ -1,6 +1,7 @@
 var React = require('react');
 var Tags = require('./Tags');
 var Subheader = require('./Subheader');
+var TagActionBar = require('./TagActionBar');
 
 var R = require('./res/index');
 var Color = R.color;
@@ -23,8 +24,10 @@ var Fileview = React.createClass({
     onFocus: React.PropTypes.func,
     tagsAttached: React.PropTypes.instanceOf(Immutable.Set),
     tagsDetached: React.PropTypes.instanceOf(Immutable.Set),
+    tagsSelected: React.PropTypes.instanceOf(Immutable.Set),
     onTagAttach: React.PropTypes.func,
     onTagDetach: React.PropTypes.func,
+    onTagSelect: React.PropTypes.func,
   },
 
   getStyle: function() {
@@ -83,10 +86,12 @@ var Fileview = React.createClass({
     var fileModified = file.modified;
     var fileSize = file.size;
     var fileType = file.type;
-    var plural = file.tags.length !== 1;
-    var tagCount = file.tags.length + (plural ? " tags" : " tag");
-    var tags = Immutable.Set(file.tags).union(this.props.tagsAttached).sort();
-
+    var tags = Immutable.Set(file.tags)
+                        .union(this.props.tagsAttached)
+                        .subtract(this.props.tagsDetached)
+                        .sort();
+    var tagCount = tags.size + (tags.size !== 1 ? " tags" : " tag");
+    
     // SUGGESTIONS
 
     var suggestions = null;
@@ -117,6 +122,14 @@ var Fileview = React.createClass({
       );
     }
 
+    var tagActionBar = null;
+    if (this.props.tagsSelected.size > 0) {
+      tagActionBar = (
+        <TagActionBar numberOfTagsSelected={this.props.tagsSelected.size}
+                      onUntag={this.props.onTagDetach.bind(null, this.props.tagsSelected)}/>
+      );
+    }
+    
     return (
       <div style={style.fileview}>
           <div style={style.header}>
@@ -131,7 +144,9 @@ var Fileview = React.createClass({
               <div style={style.metadata}>{tagCount}</div>
               <Tags ref="tags"
                     tags={tags}
-                    onTagClick={Util.noop}
+                    onTagClick={this.props.onTagSelect}
+                    specialTags={this.props.tagsSelected}
+                    onSpecialTagClick={this.props.onTagSelect}
                     withInput={true}
                     value={this.props.value}
                     onValueChange={this.props.onValueChange}
@@ -141,9 +156,10 @@ var Fileview = React.createClass({
                     style={style.tags}/>
               {suggestions}
           </div>
+          {tagActionBar}
       </div>
     );
-  },
+  }
 
 });
 

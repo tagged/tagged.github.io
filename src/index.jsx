@@ -81,6 +81,7 @@ var App = React.createClass({
         file: "",
         value: "",
         basePage: homepage,
+        tagsSelected: Immutable.Set(),
       },
       snackbar: {
         visible: false,
@@ -690,6 +691,7 @@ var App = React.createClass({
       fileview: Update(this.state.fileview, {
         file: {$set: ""},
         value: {$set: ""},
+        tagsSelected: {$set: Immutable.Set()}
       })
     });
     this.navigate(this.state.fileview.basePage);
@@ -718,6 +720,89 @@ var App = React.createClass({
       })
     });
     this.handleTagAttach([this.state.fileview.file], tag);
+  },
+
+  //@param tags {Immutable.Set} tags to detach
+  handleFileviewTagDetach: function(tags) {
+    var count = 1;
+    
+    //Prepare snackbar
+
+    var message = "Removed " + tags.size + ' tag' + (tags.size === 1 ? '': 's') + ' from ' + count + ' file' + (count === 1 ? '' : 's');
+
+    var action = "UNDO";
+
+    var detachTag = function() {
+      //Detach tag in database
+      FileStore.detachTags([this.state.fileview.file], tags);
+      this.setState({
+        files: FileStore.getAll(),
+        tagsDetached: this.state.tagsDetached.subtract(tags),
+      });
+      
+      //If detaching a tag that is currently a search tag,
+      //remove file from search.files.selected
+      var searchFilesOpen = this.state.search.files.open;
+      var searchFilesSelected = this.state.search.files.selected;
+      tags.forEach(function(tag) {
+        if (this.state.search.tags.includes(tag)) {
+          searchFilesOpen = searchFilesOpen.subtract([this.state.fileview.file]);
+          searchFilesSelected = searchFilesSelected.subtract([this.state.fileview.file]);
+        }
+      }, this);
+      this.setState({
+        search: Update(this.state.search, {
+          files: {
+            open: {$set: searchFilesOpen},
+            selected: {$set: searchFilesSelected},
+          }
+        })
+      });
+      
+    }.bind(this);
+
+    var undo = function() {
+      //Reset state
+      this.setState({
+        tagsDetached: this.state.tagsDetached.subtract(tags),
+        fileview: Update(this.state.fileview, {
+          tagsSelected: {$set: tags}
+        })
+      });
+    }.bind(this);
+    
+    //Optimistically detach tag
+    this.setState({
+      tagsDetached: this.state.tagsDetached.union(tags),
+      fileview: Update(this.state.fileview, {
+        value: {$set: ""},
+        tagsSelected: {$set: Immutable.Set()}
+      })
+    }, function() {
+      
+      this.showSnackbar({
+        message: message,
+        action: action,
+        cancel: undo,
+        complete: detachTag,
+      });
+
+    });
+    
+  },
+
+  handleTagSelect: function(tag) {
+    this.state.snackbar.complete();
+
+    var page = this.state.page;
+    var tagsSelected = this.state[page].tagsSelected.includes(tag) ?
+                       this.state[page].tagsSelected.delete(tag) :
+                       this.state[page].tagsSelected.add(tag);
+    this.setState({
+      fileview: Update(this.state.fileview, {
+        tagsSelected: {$set: tagsSelected}
+      })
+    });
   },
 
 
@@ -909,9 +994,10 @@ var App = React.createClass({
       onFocus: this.handleFileviewFocus,
       tagsAttached: this.state.tagsAttached,
       tagsDetached: this.state.tagsDetached,
-
+      tagsSelected: this.state.fileview.tagsSelected,
       onTagAttach: this.handleFileviewTagAttach,
-      //onTagDetach: this.handleTagDetachSingle,
+      onTagDetach: this.handleFileviewTagDetach,
+      onTagSelect: this.handleTagSelect,
     };
   },
 

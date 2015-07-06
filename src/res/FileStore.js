@@ -392,6 +392,20 @@ var FileStore = {
 
 
   /**
+   * Detach tags from files at specified paths.
+   * 
+   * @param tags {string[]} tags to detach from all files
+   * @param paths {string[]} file paths
+   */
+  detachTags: function(paths, tags) {
+    console.log('detach tags in filestore');
+    this.forEachPath(paths, function(file) {
+      file.tags = Immutable.Set(file.tags).subtract(tags).toArray();
+    });
+  },
+
+
+  /**
    * Calls the callback for each file path specified
    * 
    * @param paths {string[]} file paths
