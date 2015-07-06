@@ -76,6 +76,7 @@ var App = React.createClass({
         isShowingFiles: false,
         basePage: homepage,
         value: "",
+        tagsSelected: Immutable.Set(),
       },
       fileview: {
         file: "",
@@ -609,52 +610,61 @@ var App = React.createClass({
   },
 
   //@param tag {string} tag to detach
-  handleTagDetach: function(tag) {
+  handleTaggerTagDetach: function(tags) {
     
     //Prepare snackbar
 
     var count = this.state.tagger.files.size;
 
-    var message = "Removed " + '"' + tag + '"' + " from " + count + " file" + (count === 1 ? "" : "s");
+    var message = 'Removed ' + tags.size + ' tag' + (tags.size === 1 ? '': 's') + ' from ' + count + ' file' + (count === 1 ? '' : 's');
 
     var action = "UNDO";
 
     var detachTag = function() {
       //Detach tag in database
-      FileStore.detachTag(this.state.tagger.files.toArray(), tag);
+      FileStore.detachTags(this.state.tagger.files.toArray(), tags);
       this.setState({
         files: FileStore.getAll(),
-        tagsDetached: this.state.tagsDetached.delete(tag),
-        
+        tagsDetached: this.state.tagsDetached.subtract(tags),
       });
+      
       //If detaching a tag that is currently a search tag,
-      //remove all tagger.files from search.files.selected/open
-      if (this.state.search.tags.includes(tag)) {
-        this.setState({
-          search: Update(this.state.search, {
-            files: {
-              open: {$set: this.state.search.files.open.
-                                subtract(this.state.tagger.files)},
-              selected: {$set: this.state.search.files.selected.
-                                    subtract(this.state.tagger.files)},
-            }
-          })
-        });
-      }
+      //remove all tagger.files from search.files.selected
+      var searchFilesOpen = this.state.search.files.open;
+      var searchFilesSelected = this.state.search.files.selected;
+      tags.forEach(function(tag) {
+        if (this.state.search.tags.includes(tag)) {
+          searchFilesOpen = searchFilesOpen.subtract(this.state.tagger.files);
+          searchFilesSelected = searchFilesSelected.subtract(this.state.tagger.files);
+        }
+      }, this);
+      this.setState({
+        search: Update(this.state.search, {
+          files: {
+            open: {$set: searchFilesOpen},
+            selected: {$set: searchFilesSelected},
+          }
+        })
+      });
+      
     }.bind(this);
 
     var undo = function() {
       //Reset state
       this.setState({
-        tagsDetached: this.state.tagsDetached.delete(tag),
+        tagsDetached: this.state.tagsDetached.subtract(tags),
+        tagger: Update(this.state.tagger, {
+          tagsSelected: {$set: tags}
+        })
       });
     }.bind(this);
     
     //Optimistically detach tag
     this.setState({
-      tagsDetached: this.state.tagsDetached.add(tag),
+      tagsDetached: this.state.tagsDetached.union(tags),
       tagger: Update(this.state.tagger, {
         value: {$set: ""},
+        tagsSelected: {$set: Immutable.Set()},
       })
     }, function() {
       
@@ -728,7 +738,7 @@ var App = React.createClass({
     
     //Prepare snackbar
 
-    var message = "Removed " + tags.size + ' tag' + (tags.size === 1 ? '': 's') + ' from ' + count + ' file' + (count === 1 ? '' : 's');
+    var message = 'Removed ' + tags.size + ' tag' + (tags.size === 1 ? '': 's') + ' from ' + count + ' file' + (count === 1 ? '' : 's');
 
     var action = "UNDO";
 
@@ -798,16 +808,28 @@ var App = React.createClass({
     var tagsSelected = this.state[page].tagsSelected.includes(tag) ?
                        this.state[page].tagsSelected.delete(tag) :
                        this.state[page].tagsSelected.add(tag);
-    this.setState({
-      fileview: Update(this.state.fileview, {
-        tagsSelected: {$set: tagsSelected}
-      })
+    this.setTagState(page, {
+      tagsSelected: {$set: tagsSelected}
     });
   },
 
 
   // TAGS (Tagger, Fileview)
 
+
+  //Analogous to setFileState
+  setTagState: function(page, tagUpdate) {
+    if (page === Page.TAGGER) {
+      this.setState({
+        tagger: Update(this.state.tagger, tagUpdate)
+      });
+    }
+    else if (page === Page.FILEVIEW) {
+      this.setState({
+        fileview: Update(this.state.fileview, tagUpdate)
+      });
+    }
+  },
   
   //@param files {array} paths of files to which tag is attached
   //@param tag {string} tag to attach
@@ -970,6 +992,7 @@ var App = React.createClass({
 
       tagsAttached: this.state.tagsAttached,
       tagsDetached: this.state.tagsDetached,
+      tagsSelected: this.state.tagger.tagsSelected,
 
       onToggle: this.handleTaggerToggle,
       onClose: this.closeTagger,
@@ -980,7 +1003,8 @@ var App = React.createClass({
       onTaggerFocus: this.handleTaggerFocus,
 
       onTagAttach: this.handleTaggerTagAttach,
-      onTagDetach: this.handleTagDetach,
+      onTagDetach: this.handleTaggerTagDetach,
+      onTagSelect: this.handleTagSelect,
     };
   },
 

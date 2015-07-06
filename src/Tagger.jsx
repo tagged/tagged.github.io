@@ -3,6 +3,7 @@ var Collapsible = require('./Collapsible');
 var ExpandCollapse = require('./ExpandCollapse');
 var Tags = require('./Tags');
 var Subheader = require('./Subheader');
+var TagActionBar = require('./TagActionBar');
 
 var R = require('./res/index');
 var Color = R.color;
@@ -194,9 +195,12 @@ var Tagger = React.createClass({
       var allTags = FileStore.getTags(allFiles);
       suggestionTags = allTags.filter(function(tag) {
         return tag.indexOf(this.props.taggerValue) === 0;
-      }, this);
+      }, this).subtract(tagsOnAllFiles).sort();
       if (suggestionTags.size > 0) {
         suggestionLabel = '"' + this.props.taggerValue + '"' + " tags";
+      }
+      else if (tagsOnAllFiles.includes(this.props.taggerValue)) {
+        suggestionLabel = 'All files already have tag "' + this.props.taggerValue + '"';
       }
       else {
         suggestionLabel = "Create new tag " + '"' + this.props.taggerValue + '"';
@@ -213,6 +217,14 @@ var Tagger = React.createClass({
       );
     }
 
+    var tagActionBar = null;
+    if (this.props.tagsSelected.size > 0) {
+      tagActionBar = (
+        <TagActionBar numberOfTagsSelected={this.props.tagsSelected.size}
+                      onUntag={this.props.onTagDetach.bind(null, this.props.tagsSelected)}/>
+      );
+    }
+    
     return (
       <div style={style.tagger}>
           <div style={style.header}>
@@ -233,7 +245,9 @@ var Tagger = React.createClass({
               <Subheader text={tagsOnAllFilesTitle}/>
               <Tags ref="tagsOnAllFiles"
                     tags={tagsOnAllFiles.sort()}
-                    onTagClick={this.props.onTagDetach}
+                    onTagClick={this.props.onTagSelect}
+                    specialTags={this.props.tagsSelected}
+                    onSpecialTagClick={this.props.onTagSelect}
                     withInput={true}
                     value={this.props.taggerValue}
                     onValueChange={this.props.onTaggerValueChange}
@@ -242,6 +256,7 @@ var Tagger = React.createClass({
                     onFocus={this.props.onTaggerFocus}/>
               {suggestions}
           </div>
+          {tagActionBar}
       </div>
     );
   },
