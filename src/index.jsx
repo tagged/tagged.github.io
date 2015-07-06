@@ -60,14 +60,12 @@ var App = React.createClass({
         value: "",
         suggestionsVisible: true,
         files: {
-          open: Immutable.Set(),
           selected: Immutable.Set(),
         },
       },
       cloud: {
         path: ["Home"],
         files: {
-          open: Immutable.Set(),
           selected: Immutable.Set(),
         },
       },
@@ -112,14 +110,12 @@ var App = React.createClass({
         tags: {$set: searchTags},
         value: {$set: value},
         files: {
-          open: {$set: Immutable.Set()},
           selected: {$set: Immutable.Set()}
         }
       }),
       cloud: Update(this.state.cloud, {
         path: {$set: path},
         files: {
-          open: {$set: Immutable.Set()},
           selected: {$set: Immutable.Set()}
         }
       })
@@ -242,10 +238,7 @@ var App = React.createClass({
   addSearchTag: function(tag) {
     this.state.snackbar.complete();
 
-    //Add tag to search tags
-    //Update files, based on new search tags
-    //Filter files.selected and files.open, based on files
-    //Clear search value
+    //Add tag to search tags; clear search value
     
     var newSearchTags = this.state.search.tags.add(tag);
 
@@ -266,9 +259,7 @@ var App = React.createClass({
   deleteSearchTag: function(tag) {
     this.state.snackbar.complete();
 
-    //Remove tag from search tags
-    //Update files, based on new search tags
-    //Filter files.selected and files.open, based on files
+    //Remove tag from search tags; unselect all files
 
     var newSearchTags = this.state.search.tags.delete(tag);
 
@@ -279,7 +270,6 @@ var App = React.createClass({
       search: Update(this.state.search, {
         tags: {$set: newSearchTags},
         files: {
-          open: {$set: Immutable.Set()},
           selected: {$set: Immutable.Set()}
         }
       }),
@@ -347,7 +337,6 @@ var App = React.createClass({
         path: {$set: newPath},
         files: {
           selected: {$set: Immutable.Set()},
-          open: {$set: Immutable.Set()}
         }
       })
     }, this.setBrowserState);
@@ -416,20 +405,6 @@ var App = React.createClass({
     }
   },
 
-  handleFileToggle: function(filePath) {
-    this.state.snackbar.complete();
-    
-    var page = this.state.page;
-    var filesOpen = this.state[page].files.open.includes(filePath) ?
-                    this.state[page].files.open.delete(filePath) :
-                    this.state[page].files.open.add(filePath);
-    this.setFileState(page, {
-      files: {
-        open: {$set: filesOpen}
-      }
-    });
-  },
-
   handleFileSelect: function(filePath) {
     this.state.snackbar.complete();
     
@@ -476,26 +451,18 @@ var App = React.createClass({
     var searchFilesSelected = searchFileState.selected.filter(function(path) {
       return !filePaths.includes(path);
     });
-    var searchFilesOpen = searchFileState.open.filter(function(path) {
-      return !filePaths.includes(path);
-    });
     var cloudFilesSelected = cloudFileState.selected.filter(function(path) {
-      return !filePaths.includes(path);
-    });
-    var cloudFilesOpen = cloudFileState.open.filter(function(path) {
       return !filePaths.includes(path);
     });
     this.setState({
       filesDeleted: filePaths,
       search: Update(this.state.search, {
         files: {
-          open: {$set: searchFilesOpen},
           selected: {$set: searchFilesSelected}
         }
       }),
       cloud: Update(this.state.cloud, {
         files: {
-          open: {$set: cloudFilesOpen},
           selected: {$set: cloudFilesSelected}
         }
       }),
@@ -630,18 +597,15 @@ var App = React.createClass({
       
       //If detaching a tag that is currently a search tag,
       //remove all tagger.files from search.files.selected
-      var searchFilesOpen = this.state.search.files.open;
       var searchFilesSelected = this.state.search.files.selected;
       tags.forEach(function(tag) {
         if (this.state.search.tags.includes(tag)) {
-          searchFilesOpen = searchFilesOpen.subtract(this.state.tagger.files);
           searchFilesSelected = searchFilesSelected.subtract(this.state.tagger.files);
         }
       }, this);
       this.setState({
         search: Update(this.state.search, {
           files: {
-            open: {$set: searchFilesOpen},
             selected: {$set: searchFilesSelected},
           }
         })
@@ -752,18 +716,15 @@ var App = React.createClass({
       
       //If detaching a tag that is currently a search tag,
       //remove file from search.files.selected
-      var searchFilesOpen = this.state.search.files.open;
       var searchFilesSelected = this.state.search.files.selected;
       tags.forEach(function(tag) {
         if (this.state.search.tags.includes(tag)) {
-          searchFilesOpen = searchFilesOpen.subtract([this.state.fileview.file]);
           searchFilesSelected = searchFilesSelected.subtract([this.state.fileview.file]);
         }
       }, this);
       this.setState({
         search: Update(this.state.search, {
           files: {
-            open: {$set: searchFilesOpen},
             selected: {$set: searchFilesSelected},
           }
         })
@@ -940,7 +901,6 @@ var App = React.createClass({
       files: this.state.files,
       filesDeleted: this.state.filesDeleted,
       filesSelected: this.state.search.files.selected,
-      filesOpen: this.state.search.files.open,
       
       suggestionsVisible: this.state.search.suggestionsVisible,
       
@@ -950,7 +910,6 @@ var App = React.createClass({
       onSearchFocus: this.handleSearchFocus,
       onSearchValueChange: this.handleSearchValueChange,
       
-      onFileToggle: this.handleFileToggle,
       onFileSelect: this.handleFileSelect,
       onFileSelectAll: this.handleFileSelectAll,
       onFileUnselectAll: this.handleFileUnselectAll,
@@ -968,12 +927,10 @@ var App = React.createClass({
       files: this.state.files,
       filesDeleted: this.state.filesDeleted,
       filesSelected: this.state.cloud.files.selected,
-      filesOpen: this.state.cloud.files.open,
       
       onPathShorten: this.handlePathShorten,
       onPathLengthen: this.handlePathLengthen,
 
-      onFileToggle: this.handleFileToggle,
       onFileSelect: this.handleFileSelect,
       onFileSelectAll: this.handleFileSelectAll,
       onFileUnselectAll: this.handleFileUnselectAll,

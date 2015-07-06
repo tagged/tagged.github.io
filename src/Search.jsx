@@ -22,7 +22,6 @@ var Search = React.createClass({
     files: React.PropTypes.array,
     filesDeleted: React.PropTypes.instanceOf(Immutable.Set),
     filesSelected: React.PropTypes.instanceOf(Immutable.Set),
-    filesOpen: React.PropTypes.instanceOf(Immutable.Set),
 
     suggestionsVisible: React.PropTypes.bool,
 
@@ -32,7 +31,6 @@ var Search = React.createClass({
     onSearchFocus: React.PropTypes.func,
     onSearchValueChange: React.PropTypes.func,
     
-    onFileToggle: React.PropTypes.func,
     onFileSelect: React.PropTypes.func,
     onFileSelectAll: React.PropTypes.func,
     onFileUnselectAll: React.PropTypes.func,
@@ -80,9 +78,7 @@ var Search = React.createClass({
       onTagClick: this.props.onSearchTagAdd,
       onSpecialTagClick: this.props.onSearchTagDelete,
       isSelected: this.props.filesSelected.includes(path),
-      isOpen: this.props.filesOpen.includes(path),
       onFileSelect: this.props.onFileSelect.bind(null, path),
-      onFileToggle: this.props.onFileToggle.bind(null, path),
       onFileOpen: this.props.onFileOpen.bind(null, path),
       key: path
     };

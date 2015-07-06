@@ -30,9 +30,7 @@ var File = React.createClass({
     onTagClick: React.PropTypes.func,
     onSpecialTagClick: React.PropTypes.func,
     isSelected: React.PropTypes.bool,
-    isOpen: React.PropTypes.bool,
     onFileSelect: React.PropTypes.func,
-    onFileToggle: React.PropTypes.func,
     onFileOpen: React.PropTypes.func,
   },
 
@@ -50,31 +48,23 @@ var File = React.createClass({
           marginRight: Dimension.quantum
         }
       },
-      collapsible: {
-        component: {
-          marginRight: Dimension.touchTarget + Dimension.quantum
-        }
+      fileInfo: {
+        marginRight: Dimension.touchTarget + Dimension.quantum,
+        overflow: 'hidden',//clear checkbox
       },
       filename: {
-        paddingTop: Dimension.quantum,
+        paddingTop: Dimension.space + Dimension.quantum,
         lineHeight: Typography.lineHeight,
         fontSize: Typography.fontSize,
-        fontWeight: Typography.fontWeightRegular,
-        whiteSpace: this.props.isOpen ? 'normal' : 'nowrap',
-        textOverflow: 'ellipsis',
-        overflow: 'hidden'
-      },
-      metadata: {
-        lineHeight: Typography.lineHeightSmall,
-        fontSize: Typography.fontSizeSmall,
-        fontWeight: Typography.fontWeightThin,
-        whiteSpace: this.props.isOpen ? 'normal' : 'nowrap',
-        textOverflow: 'ellipsis',
-        overflow: 'hidden'
+        fontWeight: Typography.fontWeightMedium,
+        whiteSpace: 'normal',//'nowrap',
+        //textOverflow: 'ellipsis',
+        //overflow: 'hidden',
+        cursor: 'pointer',
       },
       tags: {
         tags: {
-          paddingTop: Dimension.quantum
+          paddingTop: Dimension.space,
         }
       },
       fileLink: {
@@ -90,21 +80,12 @@ var File = React.createClass({
     var style = Util.prefix(this.getStyle());
 
     var filename = (
-      <div style={style.filename} onClick={this.props.onFileOpen}>{this.props.name}</div>
+      <div style={style.filename} 
+           onClick={this.props.onFileOpen}>
+          {this.props.name}
+      </div>
     );
 
-    var metadata;
-    if (this.props.isOpen) {
-      metadata = (
-        <div>
-            <div style={style.metadata}>{this.props.path}</div>
-            <div style={style.metadata}>{this.props.modified}</div>
-            <div style={style.metadata}>{this.props.size}</div>
-            <div style={style.metadata}>{this.props.type}</div>
-        </div>
-      );
-    }
-    
     var plural = this.props.tags.size !== 1;
 
     var tagCount = (
@@ -120,20 +101,14 @@ var File = React.createClass({
                     checkColor={Color.whitePrimary}
                     style={style.checkbox}
                     onClick={this.props.onFileSelect}/>
-          <Collapsible isOpen={this.props.isOpen}
-                       onToggle={this.props.onFileToggle}
-                       style={style.collapsible}>
-              <div isController={true}>
-                  {filename}
-                  {metadata}
-                  {tagCount}
-              </div>
+          <div style={style.fileInfo}>
+              {filename}
               <Tags tags={this.props.tags.sort()}
                     specialTags={this.props.specialTags}
                     onTagClick={this.props.onTagClick}
                     onSpecialTagClick={this.props.onSpecialTagClick}
                     style={style.tags}/>
-          </Collapsible>
+          </div>
           <a href={this.props.link}
              target="_blank"
              tabIndex="1"

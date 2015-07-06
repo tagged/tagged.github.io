@@ -23,12 +23,10 @@ var Cloud = React.createClass({
     files: React.PropTypes.array,
     filesDeleted: React.PropTypes.instanceOf(Immutable.Set),
     filesSelected: React.PropTypes.instanceOf(Immutable.Set),
-    filesOpen: React.PropTypes.instanceOf(Immutable.Set),
     
     onPathShorten: React.PropTypes.func,
     onPathLengthen: React.PropTypes.func,
 
-    onFileToggle: React.PropTypes.func,
     onFileSelect: React.PropTypes.func,
     onFileSelectAll: React.PropTypes.func,
     onFileUnselectAll: React.PropTypes.func,
@@ -72,9 +70,7 @@ var Cloud = React.createClass({
       tags: Immutable.OrderedSet(file.tags),
       onTagClick: Util.noop, //nothing -- TODO: Search by tag clicked
       isSelected: this.props.filesSelected.includes(path),
-      isOpen: this.props.filesOpen.includes(path),
       onFileSelect: this.props.onFileSelect.bind(null, path),
-      onFileToggle: this.props.onFileToggle.bind(null, path),
       onFileOpen: this.props.onFileOpen.bind(null, path),
       key: path
     };
