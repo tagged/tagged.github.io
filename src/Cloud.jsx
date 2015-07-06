@@ -35,6 +35,8 @@ var Cloud = React.createClass({
     onFileOpen: React.PropTypes.func,
     onFileUpload: React.PropTypes.func,
     onFileDrop: React.PropTypes.func,
+
+    onTagClick: React.PropTypes.func,
   },
 
   getStyle: function() {
@@ -68,7 +70,7 @@ var Cloud = React.createClass({
       cloud: file.path[0],
       link: file.link,
       tags: Immutable.OrderedSet(file.tags),
-      onTagClick: Util.noop, //nothing -- TODO: Search by tag clicked
+      onTagClick: this.props.onTagClick,
       isSelected: this.props.filesSelected.includes(path),
       onFileSelect: this.props.onFileSelect.bind(null, path),
       onFileOpen: this.props.onFileOpen.bind(null, path),

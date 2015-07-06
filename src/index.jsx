@@ -342,6 +342,22 @@ var App = React.createClass({
     }, this.setBrowserState);
   },
 
+  handleCloudTagClick: function(tag) {
+    //Start new search with the given tag
+    //Clear selected search files
+    this.setState({
+      search: Update(this.state.search, {
+        tags: {$set: Immutable.OrderedSet([tag])},
+        files: {
+          selected: {$set: Immutable.Set()}
+        }
+      })
+    }, function() {
+      this.showSearchSuggestions(false);
+      this.navigate(Page.SEARCH);
+    });
+  },
+
   upload: function(files) {
         
     var fileData = {};
@@ -939,6 +955,8 @@ var App = React.createClass({
       onFileOpen: this.openFileview,
       onFileUpload: this.handleFileUpload,
       onFileDrop: this.handleFileDrop,
+
+      onTagClick: this.handleCloudTagClick,
     };
   },
 
