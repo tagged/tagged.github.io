@@ -56,7 +56,7 @@ var File = React.createClass({
         paddingTop: Dimension.space + Dimension.quantum,
         lineHeight: Typography.lineHeight,
         fontSize: Typography.fontSize,
-        fontWeight: Typography.fontWeightMedium,
+        fontWeight: Typography.fontWeightRegular,//Medium,
         whiteSpace: 'normal',//'nowrap',
         //textOverflow: 'ellipsis',
         //overflow: 'hidden',
