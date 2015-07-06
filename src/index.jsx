@@ -588,51 +588,23 @@ var App = React.createClass({
 
   //@param tagCount {object} map of tag counts for tagger files (before attach)
   //@param tag {string} tag to attach
-  handleTagAttach: function(tagCount, tag) {
+  handleTaggerTagAttach: function(tagCount, tag) {
+    var taggerFiles = this.state.tagger.files;
     
-    //Prepare snackbar
-
-    var count = this.state.tagger.files.size;
+    var count = taggerFiles.size;
     if (tag in tagCount) {
-      count -= tagCount[tag];//subtract files that already have the tag
+      //subtract files that already have the tag
+      count -= tagCount[tag];
     }
 
-    var message = "Added " + '"' + tag + '"' + " to " + count + " file" + (count === 1 ? "" : "s");
-
-    var action = "UNDO";
-
-    var attachTag = function() {
-      //Attach tag in FileStore
-      FileStore.attachTag(this.state.tagger.files.toArray(), tag);
-      this.setState({
-        files: FileStore.getAll(),
-        tagsAttached: this.state.tagsAttached.delete(tag),
-      });
-    }.bind(this);
-
-    var undo = function() {
-      //Reset state
-      this.setState({
-        tagsAttached: this.state.tagsAttached.delete(tag),
-      });
-    }.bind(this);
-
-    //Optimistically attach tag
+    //Clear tagger value
     this.setState({
-      tagsAttached: this.state.tagsAttached.add(tag),
       tagger: Update(this.state.tagger, {
         value: {$set: ""},
       })
-    }, function() {
-      
-      this.showSnackbar({
-        message: message,
-        action: action,
-        cancel: undo,
-        complete: attachTag,
-      });
-      
-    });  
+    });
+    
+    this.handleTagAttach(taggerFiles.toArray(), tag, count);
   },
 
   //@param tag {string} tag to detach
@@ -739,16 +711,36 @@ var App = React.createClass({
   },
 
   handleFileviewTagAttach: function(tag) {
+    //Clear fileview value
+    this.setState({
+      fileview: Update(this.state.fileview, {
+        value: {$set: ""}
+      })
+    });
+    this.handleTagAttach([this.state.fileview.file], tag);
+  },
+
+
+  // TAGS (Tagger, Fileview)
+
+  
+  //@param files {array} paths of files to which tag is attached
+  //@param tag {string} tag to attach
+  //@param count {number} optional number of files to which tag is attached
+  handleTagAttach: function(files, tag, count) {
     
     //Prepare snackbar
 
     var message = "Added tag " + '"' + tag + '"';
+    if (typeof count === 'number') {
+      message += " to " + count + " file" + (count === 1 ? "" : "s");
+    }
 
     var action = "UNDO";
 
     var attachTag = function() {
       //Attach tag in FileStore
-      FileStore.attachTag([this.state.fileview.file], tag);
+      FileStore.attachTag(files, tag);
       this.setState({
         files: FileStore.getAll(),
         tagsAttached: this.state.tagsAttached.delete(tag),
@@ -762,27 +754,20 @@ var App = React.createClass({
       });
     }.bind(this);
 
-    //Optimistically attach tag
-    
+    //Optimistically attach tag; then show snackbar
+
     this.setState({
       tagsAttached: this.state.tagsAttached.add(tag),
-      fileview: Update(this.state.fileview, {
-        value: {$set: ""}
-      })
     }, function() {
-      
       this.showSnackbar({
         message: message,
         action: action,
         cancel: undo,
         complete: attachTag,
       });
-      
     });
-    
   },
 
-  
   // SNACKBAR
 
 
@@ -909,7 +894,7 @@ var App = React.createClass({
       onTaggerValueChange: this.handleTaggerValueChange,
       onTaggerFocus: this.handleTaggerFocus,
 
-      onTagAttach: this.handleTagAttach,
+      onTagAttach: this.handleTaggerTagAttach,
       onTagDetach: this.handleTagDetach,
     };
   },
