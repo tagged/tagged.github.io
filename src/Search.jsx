@@ -59,7 +59,16 @@ var Search = React.createClass({
         root: {
           boxShadow: Shadow.zDepthTop[1],
         }
-      }
+      },
+      searchTags: {
+        tag: {
+          tag: {
+            backgroundColor: Color.blue500,
+            color: Color.whitePrimary,
+            outlineColor: Color.blue900,
+          }
+        }
+      },
     };
   },
 
@@ -195,6 +204,7 @@ var Search = React.createClass({
               <Tags ref="searchTags"
                     tags={searchTags}
                     onTagClick={this.props.onSearchTagDelete}
+                    style={style.searchTags}
                     withInput={true}
                     value={searchValue}
                     onValueChange={this.props.onSearchValueChange}
