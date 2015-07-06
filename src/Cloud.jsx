@@ -34,6 +34,7 @@ var Cloud = React.createClass({
     onFileUnselectAll: React.PropTypes.func,
     onFileDelete: React.PropTypes.func,
     onFileTag: React.PropTypes.func,
+    onFileOpen: React.PropTypes.func,
     onFileUpload: React.PropTypes.func,
     onFileDrop: React.PropTypes.func,
   },
@@ -74,6 +75,7 @@ var Cloud = React.createClass({
       isOpen: this.props.filesOpen.includes(path),
       onFileSelect: this.props.onFileSelect.bind(null, path),
       onFileToggle: this.props.onFileToggle.bind(null, path),
+      onFileOpen: this.props.onFileOpen.bind(null, path),
       key: path
     };
   },

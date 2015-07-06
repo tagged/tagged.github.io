@@ -979,6 +979,7 @@ var App = React.createClass({
       onFileUnselectAll: this.handleFileUnselectAll,
       onFileDelete: this.handleFileDelete,
       onFileTag: this.openTagger,
+      onFileOpen: this.openFileview,
       onFileUpload: this.handleFileUpload,
       onFileDrop: this.handleFileDrop,
     };
