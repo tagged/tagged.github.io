@@ -170,7 +170,7 @@ var Tags = React.createClass({
       
       var onKeyDown = function(event) {
         if (event.key === 'Enter') {
-          isSpecial ? this.props.onSpecialTagClick(tag) : this.props.onTagClick(tag);
+          onClick();
         }
       }.bind(this);
       
@@ -182,7 +182,7 @@ var Tags = React.createClass({
              style={style.overflowTag}
              onClick={onClick}
              onMouseDown={onMouseDown}
-             onKeyDown={Util.noop}
+             onKeyDown={onKeyDown}
              key={'overflow'}/>
       );
     }
