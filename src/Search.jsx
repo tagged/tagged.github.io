@@ -112,7 +112,7 @@ var Search = React.createClass({
     }, this);
 
     //Sort by name
-    searchFiles.sort(Util.sortByName);
+    searchFiles.sort(FileStore.sortFilesByName);
 
     var files = searchFiles.map(function(file) {
       return <File {...this.getFileProps(file)}/>;

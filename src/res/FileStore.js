@@ -665,7 +665,18 @@ var FileStore = {
     }
     return contents;
   },
-  
+
+
+  //Comparison function which sorts files by name
+  sortFilesByName: function(file1, file2) {
+    var name1 = file1.path[file1.path.length - 1];
+    var name2 = file2.path[file2.path.length - 1];
+    if (name1 === name2) {
+      return 0;
+    }
+    return name1 < name2 ? -1 : 1;
+  },
+
 
 };
 

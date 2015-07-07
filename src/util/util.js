@@ -69,13 +69,6 @@ module.exports = {
     return newObj;
   },
 
-  sortByName: function(item1, item2) {
-    if (item1.name === item2.name) {
-      return 0;
-    }
-    return item1.name < item2.name ? -1 : 1;
-  },
-
   uuid: function() {
     //Taken straight from https://gist.github.com/jed/982883
     return (
