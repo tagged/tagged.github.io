@@ -102,7 +102,6 @@ var App = React.createClass({
     var path = event.state.path;
     
     var value = "";
-    var suggestionsVisible = searchTags.isEmpty();
 
     this.setState({
       page: page,
@@ -120,7 +119,7 @@ var App = React.createClass({
         }
       })
     }, function() {
-      this.showSearchSuggestions(suggestionsVisible);
+      this.showSearchSuggestions(false);
       //Blur the currently focused element
       document.activeElement.blur();
     });
@@ -276,9 +275,6 @@ var App = React.createClass({
 
     var newSearchTags = this.state.search.tags.delete(tag);
 
-    //Show suggestions if there are no search tags
-    var suggestionsVisible = newSearchTags.isEmpty();
-    
     this.setState({
       search: Update(this.state.search, {
         tags: {$set: newSearchTags},
@@ -287,7 +283,7 @@ var App = React.createClass({
         }
       }),
     }, function() {
-      this.showSearchSuggestions(suggestionsVisible);
+      this.showSearchSuggestions(false);
       this.setBrowserState();
     });
   },
