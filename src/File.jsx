@@ -57,6 +57,7 @@ var File = React.createClass({
         overflow: 'hidden',//clear checkbox
       },
       filename: {
+        float: 'left',
         paddingTop: Dimension.space + Dimension.quantum + 2,
         lineHeight: Typography.lineHeight,
         fontSize: Typography.fontSize,
@@ -68,6 +69,7 @@ var File = React.createClass({
       },
       tags: {
         tags: {
+          clear: 'both',//clear floated filename
           paddingTop: Dimension.space,
         }
       },
