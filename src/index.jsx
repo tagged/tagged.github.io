@@ -1034,6 +1034,8 @@ var App = React.createClass({
     }, function() {
       var replace = currentPage === Page.TAGGER;
       this.setBrowserState(replace);
+      //Scroll to the top of the new page
+      window.scroll(0,0);
     });
   },
 
