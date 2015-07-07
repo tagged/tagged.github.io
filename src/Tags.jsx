@@ -18,6 +18,10 @@ var Immutable = require('immutable');
 
 var Tags = React.createClass({
   
+  contextTypes: {
+    preventMouseDown: React.PropTypes.func,
+  },
+  
   propTypes: {
     tags: React.PropTypes.instanceOf(Immutable.OrderedSet),
     specialTags: React.PropTypes.instanceOf(Immutable.Set),
@@ -112,11 +116,6 @@ var Tags = React.createClass({
     var tags = this.props.tags.toList().map(function(tag, tagIndex) {
       
       var isSpecial = this.props.specialTags.includes(tag);
-      
-      var onMouseDown = function(event) {
-        //Don't hide suggestions yet
-        event.stopPropagation();
-      };
 
       var onClick = function() {
         isSpecial ? this.props.onSpecialTagClick(tag) : this.props.onTagClick(tag);
@@ -133,7 +132,7 @@ var Tags = React.createClass({
              text={tag}
              style={isSpecial ? style.specialTag : style.tag}
              onClick={onClick}
-             onMouseDown={onMouseDown}
+             onMouseDown={this.context.preventMouseDown}
              onKeyDown={onKeyDown}
              key={tag}/>
       );
@@ -156,10 +155,6 @@ var Tags = React.createClass({
     (this.state.tagsVisible < this.props.tags.size || this.state.isMounting);
 
     if (showOverflowTag) {
-      var onMouseDown = function(event) {
-        //Don't hide suggestions yet
-        event.stopPropagation();
-      };
       
       var onClick = function() {
         //Show all tags
@@ -181,7 +176,7 @@ var Tags = React.createClass({
              text={'Show all (' + tagCount + ')'}
              style={style.overflowTag}
              onClick={onClick}
-             onMouseDown={onMouseDown}
+             onMouseDown={this.context.preventMouseDown}
              onKeyDown={onKeyDown}
              key={'overflow'}/>
       );
@@ -191,11 +186,6 @@ var Tags = React.createClass({
     var tagInput = null;
     if (this.props.withInput) {
       
-      var onMouseDown = function(event) {
-        //Don't hide suggestions yet
-        event.stopPropagation();
-      };
-
       var onKeyDown = function(event) {
         if (
           //pressed enter
@@ -215,7 +205,7 @@ var Tags = React.createClass({
                   style={style.tagInput}
                   placeholder={this.props.placeholder}
                   onChange={this.props.onValueChange}
-                  onMouseDown={onMouseDown}
+                  onMouseDown={this.context.preventMouseDown}
                   onKeyDown={onKeyDown}
                   onFocus={this.props.onFocus}/>
       );

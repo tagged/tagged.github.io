@@ -146,11 +146,13 @@ var App = React.createClass({
   },
 
   childContextTypes: {
+    preventMouseDown: React.PropTypes.func,
     width: React.PropTypes.number,
   },
 
   getChildContext: function() {
     return {
+      preventMouseDown: this.preventMouseDown,
       width: this.state.width,
     };
   },
@@ -168,7 +170,16 @@ var App = React.createClass({
   },
 
   handleMouseDown: function() {
+    //Hide search suggestions
     this.showSearchSuggestions(false);
+  },
+
+  //Attach this to elements that want to allow a full click before 
+  //search suggestions are hidden (on mousedown). Remeber to hide 
+  //search suggestions after the click.
+  preventMouseDown: function(event) {
+    //Don't hide search suggestions yet
+    event.stopPropagation();
   },
   
   getURL: function(page) {
