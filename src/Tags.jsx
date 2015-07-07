@@ -73,7 +73,7 @@ var Tags = React.createClass({
   getStyle: function() {
     return {
       tags: {
-        whiteSpace: this.state.tagsVisible === this.props.tags.size ? 'normal' : 'nowrap'
+        whiteSpace: (this.props.withOverflow && this.state.tagsVisible < this.props.tags.size) ? 'nowrap' : 'normal'
       },
       tag: {
         tag: {
