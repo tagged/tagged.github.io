@@ -102,7 +102,7 @@ var App = React.createClass({
     var path = event.state.path;
     
     var value = "";
-    var suggestionsVisible = searchTags.isEmpty() || this.searchInputIsFocused();
+    var suggestionsVisible = searchTags.isEmpty();
 
     this.setState({
       page: page,
@@ -121,6 +121,8 @@ var App = React.createClass({
       })
     }, function() {
       this.showSearchSuggestions(suggestionsVisible);
+      //Blur the currently focused element
+      document.activeElement.blur();
     });
   },
 
