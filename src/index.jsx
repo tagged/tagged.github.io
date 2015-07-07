@@ -100,14 +100,12 @@ var App = React.createClass({
     var page = event.state.page;
     var searchTags = Immutable.OrderedSet(event.state.searchTags);
     var path = event.state.path;
-    
-    var value = "";
 
     this.setState({
       page: page,
       search: Update(this.state.search, {
         tags: {$set: searchTags},
-        value: {$set: value},
+        value: {$set: ""},
         files: {
           selected: {$set: Immutable.Set()}
         }
@@ -247,37 +245,28 @@ var App = React.createClass({
     return false;
   },
 
+  //Add search tag; clear search value
   addSearchTag: function(tag) {
     this.state.snackbar.complete();
-
-    //Add tag to search tags; clear search value
-    
-    var newSearchTags = this.state.search.tags.add(tag);
-
-    //Keep suggestions visible if input is focused
-    var suggestionsVisible = this.searchInputIsFocused();
-    
     this.setState({
       search: Update(this.state.search, {
-        tags: {$set: newSearchTags},
+        tags: {$set: this.state.search.tags.add(tag)},
         value: {$set: ""}
       }),
     }, function() {
+      //Keep suggestions visible if input is focused
+      var suggestionsVisible = this.searchInputIsFocused();
       this.showSearchSuggestions(suggestionsVisible);
       this.setBrowserState();
     });
   },
 
+  //Remove search tag; unselect all files
   deleteSearchTag: function(tag) {
     this.state.snackbar.complete();
-
-    //Remove tag from search tags; unselect all files
-
-    var newSearchTags = this.state.search.tags.delete(tag);
-
     this.setState({
       search: Update(this.state.search, {
-        tags: {$set: newSearchTags},
+        tags: {$set: this.state.search.tags.delete(tag)},
         files: {
           selected: {$set: Immutable.Set()}
         }
