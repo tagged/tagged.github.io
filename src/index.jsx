@@ -419,16 +419,16 @@ var App = React.createClass({
    * @param page Must be 'search' or 'cloud'
    * @param fileUpdate An object using the React Immutability Helper syntax
    */
-  setFileState: function(page, fileUpdate) {
+  setFileState: function(page, fileUpdate, callback) {
     if (page === Page.SEARCH) {
       this.setState({
         search: Update(this.state.search, fileUpdate)
-      });
+      }, callback);
     }
     else if (page === Page.CLOUD) {
       this.setState({
         cloud: Update(this.state.cloud, fileUpdate)
-      });
+      }, callback);
     }
   },
 
@@ -443,6 +443,8 @@ var App = React.createClass({
       files: {
         selected: {$set: filesSelected}
       }
+    }, function() {
+      this.showSearchSuggestions(false);
     });
   },
 

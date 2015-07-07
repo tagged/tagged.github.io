@@ -17,6 +17,10 @@ var FALSE = R.constant.ternary.FALSE;
 
 var File = React.createClass({
 
+  contextTypes: {
+    preventMouseDown: React.PropTypes.func,
+  },
+  
   propTypes: {
     name: React.PropTypes.string,
     path: React.PropTypes.string,
@@ -81,7 +85,8 @@ var File = React.createClass({
 
     var filename = (
       <div style={style.filename} 
-           onClick={this.props.onFileOpen}>
+           onClick={this.props.onFileOpen}
+           onMouseDown={this.context.preventMouseDown}>
           {this.props.name}
       </div>
     );
@@ -100,7 +105,8 @@ var File = React.createClass({
                     boxColor={Color.blue500}
                     checkColor={Color.whitePrimary}
                     style={style.checkbox}
-                    onClick={this.props.onFileSelect}/>
+                    onClick={this.props.onFileSelect}
+                    onMouseDown={this.context.preventMouseDown}/>
           <div style={style.fileInfo}>
               {filename}
               <Tags tags={this.props.tags.sort()}
@@ -113,6 +119,7 @@ var File = React.createClass({
           <a href={this.props.link}
              target="_blank"
              tabIndex="1"
+             onMouseDown={this.context.preventMouseDown}
              style={style.fileLink}>
               <ImageIcon {...Image[this.props.cloud]}/>
           </a>
