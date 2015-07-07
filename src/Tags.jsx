@@ -12,6 +12,8 @@ var Immutable = require('immutable');
 
 //Tags contains Tag components and optionally a TagInput.
 //Enable TagInput by setting the `withInput` prop to true.
+//Enable the overflow tag by setting `withOverflow` prop
+//to true.
 
 
 var Tags = React.createClass({
@@ -22,6 +24,8 @@ var Tags = React.createClass({
     onTagClick: React.PropTypes.func,
     onSpecialTagClick: React.PropTypes.func,
     style: React.PropTypes.object,
+
+    withOverflow: React.PropTypes.bool,
 
     withInput: React.PropTypes.bool,
 
@@ -38,7 +42,19 @@ var Tags = React.createClass({
       specialTags: Immutable.Set(),
       onSpecialTagClick: Util.noop,
       withInput: false,
+      withOverflow: false,
       style: {},
+    };
+  },
+
+  getInitialState: function() {
+    return {
+      //initially all tags are visible
+      //if withOverflow is true, can be less
+      tagsVisible: this.props.tags.size,
+      
+      //true until componentDidMount is called
+      isMounting: true,
     };
   },
   
@@ -52,7 +68,9 @@ var Tags = React.createClass({
   
   getStyle: function() {
     return {
-      tags: {},
+      tags: {
+        whiteSpace: this.state.tagsVisible === this.props.tags.size ? 'normal' : 'nowrap'
+      },
       tag: {
         tag: {
           backgroundColor: Color.blue100,
@@ -69,12 +87,21 @@ var Tags = React.createClass({
           outlineColor: Color.blue900,
         }
       },
+      overflowTag: {
+        tag: {
+          backgroundColor: 'transparent',
+          color: Color.blackHint,
+          cursor: 'pointer',
+          outlineColor: Color.blackSecondary,
+          marginRight: 0,
+        }
+      },
       tagInput: {
         input: {
           borderColor: Color.blackSecondary,
           outlineColor: Color.blue500 //focused input
         }
-      },
+      }
     };
   },
 
@@ -82,8 +109,7 @@ var Tags = React.createClass({
     var style = Util.merge(this.getStyle(), this.props.style);
 
 
-
-    var tags = this.props.tags.map(function(tag) {
+    var tags = this.props.tags.toList().map(function(tag, tagIndex) {
       
       var isSpecial = this.props.specialTags.includes(tag);
       
@@ -103,7 +129,8 @@ var Tags = React.createClass({
       }.bind(this);
 
       return (
-        <Tag text={tag}
+        <Tag ref={"tag" + tagIndex}
+             text={tag}
              style={isSpecial ? style.specialTag : style.tag}
              onClick={onClick}
              onMouseDown={onMouseDown}
@@ -112,7 +139,53 @@ var Tags = React.createClass({
       );
 
     }, this);
+
     
+    //If overflowing, all tags might not be visible
+    if (this.props.withOverflow) {
+      tags = tags.slice(0, this.state.tagsVisible);
+    }
+    
+    
+    var overflowTag = null;
+
+    //Normally, show overflow tag when less than all tags are visible
+    //Make an exception during initial mount; need to render overflow tag
+    //in order to calculate overflow
+    var showOverflowTag = this.props.withOverflow &&
+    (this.state.tagsVisible < this.props.tags.size || this.state.isMounting);
+
+    if (showOverflowTag) {
+      var onMouseDown = function(event) {
+        //Don't hide suggestions yet
+        event.stopPropagation();
+      };
+      
+      var onClick = function() {
+        //Show all tags
+        this.setState({
+          tagsVisible: this.props.tags.size
+        });
+      }.bind(this);
+      
+      var onKeyDown = function(event) {
+        if (event.key === 'Enter') {
+          isSpecial ? this.props.onSpecialTagClick(tag) : this.props.onTagClick(tag);
+        }
+      }.bind(this);
+      
+      var tagCount = this.props.tags.size;
+      
+      overflowTag = (
+        <Tag ref='overflowTag'
+             text={'Show all (' + tagCount + ')'}
+             style={style.overflowTag}
+             onClick={onClick}
+             onMouseDown={onMouseDown}
+             onKeyDown={Util.noop}
+             key={'overflow'}/>
+      );
+    }
     
     
     var tagInput = null;
@@ -149,14 +222,62 @@ var Tags = React.createClass({
     }
     
     
-    
     return (
       <div style={style.tags}>
           {tags}
           {tagInput}
+          {overflowTag}
       </div>
     );
-  }  
+  },
+  
+  componentDidMount: function() {
+    this.setState({isMounting: false});
+    
+    if (!this.props.withOverflow) {
+      return;
+    }
+    
+    var tagsVisible = this.calculateOverflow();
+    if (tagsVisible !== this.state.tagsVisible) {
+      this.setState({
+        tagsVisible: tagsVisible,
+      });
+    }
+  },
+
+  //Return the number of tags that can be displayed in one line
+  //while leaving space for overflow tag.
+  calculateOverflow: function() {
+    var tagsWidth = Util.getDOMNodeComputedStyle(this, 'width');
+    var overflowTagWidth = Util.getDOMNodeComputedStyle(this.refs.overflowTag, 'width') + 2 * Dimension.space;
+
+    var currentTag = 0;
+    var widthBeforeCurrentTag = 0;
+    var currentTagWidth;
+    while (currentTag < this.props.tags.size) {
+      
+      currentTagWidth = Util.getDOMNodeComputedStyle(this.refs['tag' + currentTag], 'width') + 3 * Dimension.space;
+      
+      //Make an exception for the last tag, if it fits
+      if (currentTag === this.props.tags.size - 1) {
+        if (widthBeforeCurrentTag + currentTagWidth < tagsWidth) {
+          currentTag ++;
+          break;
+        }
+      }
+      
+      //Stop if currentTag would overflow tags
+      if (widthBeforeCurrentTag + currentTagWidth + overflowTagWidth > tagsWidth) {
+        break;
+      }
+      
+      currentTag ++;
+      widthBeforeCurrentTag += currentTagWidth;
+      
+    }
+    return currentTag;
+  },
 
 });
 

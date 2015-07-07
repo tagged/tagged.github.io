@@ -107,7 +107,8 @@ var File = React.createClass({
                     specialTags={this.props.specialTags}
                     onTagClick={this.props.onTagClick}
                     onSpecialTagClick={this.props.onSpecialTagClick}
-                    style={style.tags}/>
+                    style={style.tags}
+                    withOverflow={true}/>
           </div>
           <a href={this.props.link}
              target="_blank"
