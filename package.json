@@ -11,6 +11,9 @@
     "build": "npm run bundle:vendor && npm run build:app",
     "watch:app": "./node_modules/watch/cli.js 'npm run build:app' ./src",
     "watch": "npm run bundle:vendor && npm run watch:app",
+    "minify:vendor": "uglifyjs ./vendor.js -mc -o ./vendor.min.js",
+    "minify:app": "uglifyjs ./app.js -mc -o ./app.min.js",
+    "minify": "npm run minify:vendor && npm run minify:app",
     "clean": "rm -rf ./build && rm -f ./app.js && rm -f ./vendor.js",
     "test": "jest"
   },
