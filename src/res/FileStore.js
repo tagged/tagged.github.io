@@ -1,6 +1,8 @@
 var Immutable = require('immutable');
 
 var _files = [
+  
+  //Dropbox
   {
     isFolder: true,
     path: ['Dropbox'],
@@ -14,156 +16,211 @@ var _files = [
         link: '//www.dropbox.com/home',
         tags: [],
       },
+      //Dropbox/Recipes
       {
         isFolder: true,
-        path: ['Dropbox','Public'],
+        path: ['Dropbox','Recipes'],
         contents: [
           {
             isFolder: false,
-            path: ['Dropbox','Public','How to use the public folder.rtf'],
-            modified: '2010 Sep 16',
-            size: '1.05 kB',
-            type: 'RTF',
+            path: ['Dropbox','Recipes','pork-adobo.txt'],
+            modified: '2012 Sep 16',
+            size: '199 B',
+            type: 'TXT',
             link: '//www.dropbox.com/home',
-            tags: [],
-          }
-        ]
-      },
-      {
-        isFolder: true,
-        path: ['Dropbox','Samples'],
-        contents: [
-          {
-            isFolder: true,
-            path: ['Dropbox','Samples','Photos'],
-            contents: [
-              {
-                isFolder: false,
-                path: ['Dropbox','Samples','Photos','hawaii-1.jpg'],
-                modified: '2013 Mar 12',
-                size: '4.92 MB',
-                type: 'JPG',
-                link: '//www.dropbox.com/home',
-                tags: ['Hawaii','vacation','photo'],
-              },
-              {
-                isFolder: false,
-                path: ['Dropbox','Samples','Photos','hawaii-2.jpg'],
-                modified: '2013 Mar 12',
-                size: '3.78 MB',
-                type: 'JPG',
-                link: '//www.dropbox.com/home',
-                tags: ['Hawaii','vacation','photo','beach'],
-              },
-              {
-                isFolder: false,
-                path: ['Dropbox','Samples','Photos','hawaii-3.jpg'],
-                modified: '2013 Mar 13',
-                size: '5.21 MB',
-                type: 'JPG',
-                link: '//www.dropbox.com/home',
-                tags: ['Hawaii','vacation','photo','luau'],
-              }
-            ]
+            tags: ['pork','shoyu','vinegar','bay leaf'],
           },
           {
+            isFolder: false,
+            path: ['Dropbox','Recipes','tarragon-chicken.docx'],
+            modified: '2013 Jan 30',
+            size: '27.90 kB',
+            type: 'DOCX',
+            link: '//www.dropbox.com/home',
+            tags: ['chicken','tarragon','white pepper','cream','wine','white wine'],
+          },
+          {
+            isFolder: false,
+            path: ['Dropbox','Recipes','Pesto'],
+            modified: '2013 Nov 20',
+            size: '108 B',
+            type: 'FILE',
+            link: '//www.dropbox.com/home',
+            tags: ['pine nuts','basil','parmesan','olive oil','grana padano'],
+          },
+          {
+            isFolder: false,
+            path: ['Dropbox','Recipes','Spicy pork bulgogi'],
+            modified: '2014 Aug 22',
+            size: '702 B',
+            type: 'FILE',
+            link: '//www.dropbox.com/home',
+            tags: ['spicy','gochujang','pork','pork shoulder'],
+          },
+          {
+            isFolder: false,
+            path: ['Dropbox','Recipes','Gnocchi'],
+            modified: '2014 Oct 17',
+            size: '683 B',
+            type: 'FILE',
+            link: '//www.dropbox.com/home',
+            tags: ['flour','potato','eggs','egg yolks','parmesan'],
+          },
+          {
+            isFolder: false,
+            path: ['Dropbox','Recipes','roast-chicken'],
+            modified: '2014 Dec 1',
+            size: '236 B',
+            type: 'FILE',
+            link: '//www.dropbox.com/home',
+            tags: ['chicken','roast'],
+          },
+          {
+            isFolder: false,
+            path: ['Dropbox','Recipes','Pad kee mao'],
+            modified: '2015 May 25',
+            size: '449 B',
+            type: 'FILE',
+            link: '//www.dropbox.com/home',
+            tags: ['basil','spicy','fish sauce','rice noodles','bourbon'],
+          },
+          {
+            isFolder: false,
+            path: ['Dropbox','Recipes','Baby back ribs'],
+            modified: '2015 Jul 8',
+            size: '320 B',
+            type: 'FILE',
+            link: '//www.dropbox.com/home',
+            tags: ['ribs','pork','honey','vinegar'],
+          },
+          //Dropbox/Recipes/To Try
+          {
             isFolder: true,
-            path: ['Dropbox','Samples','Recipes'],
+            path: ['Dropbox','Recipes','To Try'],
             contents: [
               {
                 isFolder: false,
-                path: ['Dropbox','Samples','Recipes','spicy pork bulgogi'],
-                modified: '2014 Aug 12',
-                size: '255 B',
+                path: ['Dropbox','Recipes','To Try','Perfect french fries'],
+                modified: '2014 Jun 28',
+                size: '908 B',
                 type: 'FILE',
                 link: '//www.dropbox.com/home',
-                tags: ['pork','spicy','recipe'],
+                tags: ['potato','fried','fries'],
               },
               {
                 isFolder: false,
-                path: ['Dropbox','Samples','Recipes','banana cheesecake'],
-                modified: '2013 May 20',
-                size: '749 B',
+                path: ['Dropbox','Recipes','To Try','Chinese roast pork'],
+                modified: '2015 Jul 6',
+                size: '492 B',
                 type: 'FILE',
-                link: '//dropbox.com/home',
-                tags: ['recipe','banana','dessert','cheesecake']
+                link: '//www.dropbox.com/home',
+                tags: ['pork','roast','crunchy','white pepper'],
               },
               {
                 isFolder: false,
-                path: ['Dropbox','Samples','Recipes','char siu'],
-                modified: '2015 Feb 28',
-                size: '25 kB',
-                type: 'PDF',
+                path: ['Dropbox','Recipes','To Try','Braised pork cheeks'],
+                modified: '2014 Nov 27',
+                size: '851 B',
+                type: 'FILE',
                 link: '//www.dropbox.com/home',
-                tags: ['pork','honey','five spice','recipe'],
-              },
+                tags: ['pork cheeks','pork','wine','port wine','honey','flour','bay leaf','olive oil'],
+              }
             ]
           }
         ]
       }
     ]
   },
+  //Google Drive
   {
     isFolder: true,
     path: ['Google Drive'],
     contents: [
       {
         isFolder: false,
-        path: ['Google Drive','pork ribs'],
-        modified: '2014 Aug 12',
-        size: '184 B',
+        path: ['Google Drive','Sunshine & Whiskey.mp3'],
+        modified: '2015 Jan 8',
+        size: '5.22 MB',
         type: 'FILE',
         link: '//drive.google.com',
-        tags: ['pork','honey','vinegar','ribs','recipe'],
+        tags: ['country','music'],
       },
       {
         isFolder: false,
-        path: ['Google Drive','lab5.xlsx'],
-        modified: '2011 Oct 6',
-        size: '15.01 kB',
-        type: 'XLSX',
-        link: '//drive.google.com',
-        tags: ['school','assignment']
+        path: ['Google Drive','Char siu'],
+        modified: '2015 Feb 24',
+        size: '515 B',
+        type: 'FILE',
+        link: '//www.dropbox.com/home',
+        tags: ['pork','honey','five spice','shoyu','white pepper','pork shoulder','roast'],
       },
       {
         isFolder: false,
-        path: ['Google Drive','HW-3'],
-        modified: '2010 Jan 17',
-        size: '290 kB',
+        path: ['Google Drive','Coconut ice cream'],
+        modified: '2015 Mar 8',
+        size: '133 B',
         type: 'FILE',
         link: '//drive.google.com',
-        tags: ['school','homework','assignment']
+        tags: ['coconut milk','sugar','eggs','egg yolks','cream','milk'],
       },
       {
         isFolder: false,
-        path: ['Google Drive','apartment-list.xls'],
-        modified: '2009 Aug 18',
-        size: '20.93 kB',
-        type: 'XLS',
+        path: ['Google Drive','Vietnamese fish sauce wings'],
+        modified: '2015 Mar 20',
+        size: '777 B',
+        type: 'FILE',
         link: '//drive.google.com',
-        tags: ['school','housing']
+        tags: ['fish sauce','chicken','chicken wings','fried','sugar','crunchy'],
       },
       {
         isFolder: false,
-        path: ['Google Drive','Banana ice cream'],
-        modified: '2013 Apr 2',
-        size: '551 B',
-        type: 'TXT',
-        link: '//drive.google.com',
-        tags: ['recipe','ice cream','dessert','banana']
+        path: ['Dropbox','Recipes','To Try','Panang curry'],
+        modified: '2015 Apr 20',
+        size: '739 B',
+        type: 'FILE',
+        link: '//www.dropbox.com/home',
+        tags: ['coconut milk','fish sauce','basil','sugar'],
       },
+      //Google Drive/Photos
       {
         isFolder: true,
-        path: ['Google Drive','Other'],
+        path: ['Google Drive','Photos'],
         contents: [
           {
             isFolder: false,
-            path: ['Google Drive', 'Other','come-fly-with-me.mp3'],
+            path: ['Google Drive', 'Photos','horses.jpg'],
             modified: '2011 May 11',
-            size: '4.19 MB',
-            type: 'MP3',
+            size: '152 kB',
+            type: 'JPG',
             link: '//drive.google.com',
-            tags: ['music']
+            tags: ['horse','outdoor','animal']
+          },
+          {
+            isFolder: false,
+            path: ['Google Drive', 'Photos','farm.jpg'],
+            modified: '2011 May 12',
+            size: '202 kB',
+            type: 'JPG',
+            link: '//drive.google.com',
+            tags: ['horse','chicken','farm','outdoor','animal']
+          },
+          {
+            isFolder: false,
+            path: ['Google Drive', 'Photos','waimea-1.png'],
+            modified: '2012 Jun 30',
+            size: '411 kB',
+            type: 'PNG',
+            link: '//drive.google.com',
+            tags: ['underwater','turtle','animal']
+          },
+          {
+            isFolder: false,
+            path: ['Google Drive', 'Photos','waimea-2.png'],
+            modified: '2012 Jun 30',
+            size: '396 kB',
+            type: 'PNG',
+            link: '//drive.google.com',
+            tags: ['underwater','dolphin','animal']
           }
         ]
       }
