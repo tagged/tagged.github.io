@@ -173,7 +173,7 @@ var Tags = React.createClass({
       
       overflowTag = (
         <Tag ref='overflowTag'
-             text={'Show all (' + tagCount + ')'}
+             text={'Show all ' + tagCount}
              style={style.overflowTag}
              onClick={onClick}
              onMouseDown={this.context.preventMouseDown}
