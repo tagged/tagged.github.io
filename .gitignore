@@ -3,7 +3,5 @@ node_modules
 venv
 
 app.js
-app.min.js
 vendor.js
-vendor.min.js
 serve.py
