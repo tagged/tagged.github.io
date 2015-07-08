@@ -2,10 +2,12 @@ var React = require('react');
 var Tags = require('./Tags');
 var Subheader = require('./Subheader');
 var TagActionBar = require('./TagActionBar');
+var ImageIcon = require('./ImageIcon');
 
 var R = require('./res/index');
 var Color = R.color;
 var Dimension = R.dimension;
+var Image = R.image;
 var Typography = R.typography;
 var Util = require('./util/util');
 var Immutable = require('immutable');
@@ -63,6 +65,7 @@ var Fileview = React.createClass({
         paddingTop: Dimension.quantum,
       },
       body: {
+        position: 'relative',
         paddingLeft: Dimension.marginMobile,
         paddingRight: Dimension.marginMobile,
         paddingTop: Dimension.space,
@@ -72,6 +75,12 @@ var Fileview = React.createClass({
           paddingTop: Dimension.space,
         }
       },
+      fileLink: {
+        display: 'block',
+        position: 'absolute',
+        top: Dimension.quantum,
+        right: Dimension.quantum,
+      }
     };
   },
 
@@ -86,6 +95,8 @@ var Fileview = React.createClass({
     var fileModified = file.modified;
     var fileSize = file.size;
     var fileType = file.type;
+    var fileLink = file.link;
+    var fileProvider = file.path[0];
     var tags = Immutable.Set(file.tags)
                         .union(this.props.tagsAttached)
                         .subtract(this.props.tagsDetached)
@@ -155,6 +166,12 @@ var Fileview = React.createClass({
                     onFocus={this.props.onFocus}
                     style={style.tags}/>
               {suggestions}
+              <a href={fileLink}
+                 target="_blank"
+                 tabIndex="1"
+                 style={style.fileLink}>
+                  <ImageIcon {...Image[fileProvider]}/>
+              </a>
           </div>
           {tagActionBar}
       </div>
