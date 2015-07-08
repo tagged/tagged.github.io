@@ -2,7 +2,7 @@ var React = require('react');
 var R = require('./res/index');
 var Color = R.color;
 var Dimension = R.dimension;
-var Velocity = require('../velocity/velocity.js');
+var Velocity = require('velocity-animate');
 var Util = require('./util/util');
 
 //Naming uses a pipe + flow metaphor:

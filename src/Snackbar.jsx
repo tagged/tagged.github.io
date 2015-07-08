@@ -5,7 +5,7 @@ var Color = R.color;
 var Dimension = R.dimension;
 var Typography = R.typography;
 var Util = require('./util/util');
-var Velocity = require('../velocity/velocity.js');
+var Velocity = require('velocity-animate');
 
 var Snackbar = React.createClass({
   

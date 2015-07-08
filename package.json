@@ -3,10 +3,10 @@
   "description": "Web app for tagging cloud files",
   "main": "bundle.js",
   "scripts": {
-    "bundle:vendor": "browserify --require react --require react/addons --require ./velocity/velocity.js --require immutable --require svg.js --require rsvp > ./vendor.js",
+    "bundle:vendor": "browserify --require react --require react/addons --require velocity-animate --require immutable --require svg.js --require rsvp > ./vendor.js",
     "build:js": "jsx ./src ./build",
     "build:jsx": "jsx --harmony --extension jsx ./src ./build",
-    "bundle:app": "browserify --external react --external react/addons --external ./velocity/velocity.js ./build/index.js --external immutable --external svg.js > ./app.js",
+    "bundle:app": "browserify --external react --external react/addons --external velocity-animate --external immutable --external svg.js ./build/index.js > ./app.js",
     "build:app": "npm run build:js && npm run build:jsx && npm run bundle:app && echo 'Done'",
     "build": "npm run bundle:vendor && npm run build:app",
     "watch:app": "./node_modules/watch/cli.js 'npm run build:app' ./src",
@@ -21,7 +21,8 @@
     "react-tap-event-plugin": "^0.1.7",
     "react-tools": "^0.13.3",
     "rsvp": "^3.0.18",
-    "svg.js": "^1.1.0"
+    "svg.js": "^1.1.0",
+    "velocity-animate": "^1.2.2"
   },
   "devDependencies": {
     "jest-cli": "^0.4.5",
