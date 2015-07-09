@@ -76,10 +76,12 @@ var Fileview = React.createClass({
         }
       },
       fileLink: {
-        display: 'block',
-        position: 'absolute',
-        top: Dimension.quantum,
-        right: Dimension.quantum,
+        float: 'right',
+        marginTop: Dimension.quantum,
+        marginRight: Dimension.quantum,
+        //position file link above later elements
+        position: 'relative',
+        zIndex: 1,
       }
     };
   },
@@ -147,6 +149,12 @@ var Fileview = React.createClass({
               <div style={style.close} onClick={this.props.onClose}>DONE</div>
               <div style={style.fileName}>{fileName}</div>
           </div>
+          <a href={fileLink}
+             target="_blank"
+             tabIndex="1"
+             style={style.fileLink}>
+              <ImageIcon {...Image[fileProvider]}/>
+          </a>
           <div style={style.body}>
               <div style={style.metadata}>{filePath}</div>
               <div style={style.metadata}>{"Modified " + fileModified}</div>
@@ -166,12 +174,6 @@ var Fileview = React.createClass({
                     onFocus={this.props.onFocus}
                     style={style.tags}/>
               {suggestions}
-              <a href={fileLink}
-                 target="_blank"
-                 tabIndex="1"
-                 style={style.fileLink}>
-                  <ImageIcon {...Image[fileProvider]}/>
-              </a>
           </div>
           {tagActionBar}
       </div>
