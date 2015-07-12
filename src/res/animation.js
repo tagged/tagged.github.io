@@ -11,6 +11,13 @@ module.exports = {
       duration: 200,
       easing: 'ease',
     }
+  },
+
+  expandCollapse: {
+    rotate: {
+      duration: 200,
+      easing: 'ease',
+    }
   }
   
 };
