@@ -1,10 +1,10 @@
 var React = require('react/addons');
 var R = require('./res/index');
+var Animation = R.animation;
 var Dimension = R.dimension;
 var Icon = R.icon;
 var Util = require('./util/util');
-
-var SVG = require('svg.js');
+var Velocity = require('velocity-animate');
 
 var ExpandCollapse = React.createClass({
 
@@ -18,53 +18,33 @@ var ExpandCollapse = React.createClass({
       style: {}
     };
   },
-  
-  getInitialState: function() {
-    return {
-      wasExpanded: this.props.isExpanded
-    };
-  },
-
-  renderIcon: function() {
-    var svgNode = React.findDOMNode(this.refs.svg);
-    svgNode.innerHTML = '';//clear contents
-    var svg = SVG(svgNode);
-
-    var isExpanded = this.props.isExpanded;
-    var wasExpanded = this.state.wasExpanded;
-
-    var animation = {duration: 200, ease: '<>'};
-    
-    var icon = svg.path(Icon.expand);
-    
-    if (!isExpanded && !wasExpanded) {
-      return
-    }
-    else if (isExpanded && wasExpanded) {
-      //Just draw icon (rotated up)
-      icon.rotate(180);      
-    }
-    else if (isExpanded) {
-      //Animate down to up
-      icon.animate(animation).rotate(180);
-    }
-    else {
-      //Animate up to down
-      icon.rotate(180).animate(animation).rotate(0);
-    }
-  },
 
   componentDidMount: function() {
-    this.renderIcon();
+    //Default icon points downward
+    if (!this.props.isExpanded) {
+      return;
+    }
+    //Rotate icon to upside-down position
+    this.rotateIcon();
   },
 
-  componentDidUpdate: function() {
-    this.renderIcon();
+  componentDidUpdate: function(prevProps, prevState) {
+    //If isExpanded is the same as before, don't rotate
+    if (prevProps.isExpanded === this.props.isExpanded) {
+      return;
+    }
+    //Rotate icon
+    this.rotateIcon();
   },
 
-  componentWillReceiveProps: function() {
-    //Save previous isExpanded prop in state
-    this.setState({wasExpanded: this.props.isExpanded});
+  rotateIcon: function() {
+    var svg = React.findDOMNode(this.refs.svg);
+    Velocity(svg, 'stop', true);
+    Velocity({
+      elements: svg,
+      properties: {rotateZ: this.props.isExpanded ? '180deg' : '0deg'},
+      options: Animation.expandCollapse.rotate,
+    });
   },
 
   getStyle: function() {
@@ -89,7 +69,9 @@ var ExpandCollapse = React.createClass({
       <svg ref="svg" 
            style={style.svg}
            viewBox={"0 0 " + Dimension.icon + " " + Dimension.icon}
-           {...props}/>
+           {...props}>
+          <path d={Icon.expand}/>
+      </svg>
     );
   }
 
