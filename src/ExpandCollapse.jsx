@@ -28,7 +28,7 @@ var ExpandCollapse = React.createClass({
     this.rotateIcon();
   },
 
-  componentDidUpdate: function(prevProps, prevState) {
+  componentDidUpdate: function(prevProps) {
     //If isExpanded is the same as before, don't rotate
     if (prevProps.isExpanded === this.props.isExpanded) {
       return;
