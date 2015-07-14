@@ -104,6 +104,8 @@ var File = React.createClass({
     return (
       <div style={style.component}>
           <Checkbox checkStatus={this.props.isSelected ? TRUE : FALSE} 
+                    outlineColor={Color.black}
+                    outlineOpacity={Color.blackSecondaryOpacity}
                     boxColor={Color.blue500}
                     checkColor={Color.whitePrimary}
                     style={style.checkbox}

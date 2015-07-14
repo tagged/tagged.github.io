@@ -142,6 +142,8 @@ var FileActionBar = React.createClass({
     return (
       <div style={style.root}>
           <Checkbox checkStatus={checkStatus}
+                    outlineColor={Color.black}
+                    outlineOpacity={Color.blackSecondaryOpacity}
                     boxColor={Color.white}
                     checkColor={Color.blue500}
                     style={style.checkbox}
