@@ -1,3 +1,12 @@
+var easeIn = function(x) {
+  return Math.pow(x,2);
+};
+
+var easeOut = function(x) {
+  return -(Math.pow((x-1), 2) -1);
+};
+
+
 module.exports = {
   
   snackbar: {
@@ -17,6 +26,24 @@ module.exports = {
     rotate: {
       duration: 200,
       easing: 'ease',
+    }
+  },
+  
+  checkline: {
+    animation: {
+      duration: 90,
+      ease: easeIn
+    }
+  },
+  
+  checkmark: {
+    downAnimation: {
+      duration: 30,
+      ease: easeOut
+    },
+    upAnimation: {
+      duration: 60,
+      ease: easeIn
     }
   }
   
