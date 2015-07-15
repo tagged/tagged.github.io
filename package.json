@@ -11,10 +11,10 @@
     "build": "npm run bundle:vendor && npm run build:app",
     "watch:app": "./node_modules/watch/cli.js 'npm run build:app' ./src",
     "watch": "npm run bundle:vendor && npm run watch:app",
-    "minify:vendor": "uglifyjs ./vendor.js -mc -o ./vendor.min.js",
-    "minify:app": "uglifyjs ./app.js -mc -o ./app.min.js",
+    "minify:vendor": "uglifyjs ./vendor.js -mc -o ./vendor.min.js && sed -i s/vendor.js/vendor.min.js/g index.html",
+    "minify:app": "uglifyjs ./app.js -mc -o ./app.min.js && sed -i s/app.js/app.min.js/g index.html",
     "minify": "npm run minify:vendor && npm run minify:app",
-    "clean": "rm -rf ./build && rm -f ./app.js && rm -f ./vendor.js && rm -f ./app.min.js && rm -f ./vendor.min.js",
+    "clean": "rm -rf ./build && rm -f ./app.js && rm -f ./vendor.js && rm -f ./app.min.js && rm -f ./vendor.min.js && sed -i s/app.min.js/app.js/g index.html && sed -i s/vendor.min.js/vendor.js/g index.html",
     "test": "jest"
   },
   "dependencies": {
