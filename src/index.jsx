@@ -8,19 +8,14 @@ var Search = require('./Search');
 var Cloud = require('./Cloud');
 var Tagger = require('./Tagger');
 var Fileview = require('./Fileview');
+var AppBar = require('./AppBar');
 var Snackbar = require('./Snackbar');
-
-var MaterialIcon = require('./MaterialIcon');
-var ActionBar = require('./ActionBar');
-var Logo = require('./Logo');
 
 var R = require('./res/index');
 var Animation = R.animation;
 var Color = R.color;
 var Dimension = R.dimension;
-var Icon = R.icon;
 var Typography = R.typography;
-var Value = R.value;
 
 var Util = require('./util/util');
 
@@ -338,6 +333,21 @@ var App = React.createClass({
         }
       })
     }, this.setBrowserState);
+  },
+
+  goHome: function() {
+    //Go to base/home path on Cloud page
+    //Clear selected cloud files
+    this.setState({
+      cloud: Update(this.state.cloud, {
+        path: {$set: this.state.cloud.path.slice(0, 1)},
+        files: {
+          selected: {$set: Immutable.Set()}
+        }
+      })
+    }, function() {
+      this.navigate(Page.CLOUD);
+    });
   },
 
   handleCloudTagClick: function(tag) {
@@ -1049,35 +1059,6 @@ var App = React.createClass({
         paddingBottom: Dimension.heightAppBarMobile,
         height: '100%'
       },
-      appBar: {
-        backgroundColor: Color.blue500,
-        paddingTop: Dimension.quantum,
-        paddingBottom: Dimension.quantum,
-        paddingRight: Dimension.quantum,
-      },
-      logo: {
-        float: 'left',
-        marginLeft: Dimension.marginMobile,
-        marginTop: (Dimension.heightActionBar - Dimension.logoHeight) / 2,
-        //cursor: 'pointer',
-        //put logo above action bar, 
-        //to show pointer-cursor
-        //position: 'relative',
-        //zIndex: 1,
-      },
-      logoIcon: {
-        svg: {
-          float: 'left',
-        }
-      },
-      logoText: {
-        float: 'left',
-        fontSize: Typography.fontSizeLarge,
-        lineHeight: Typography.lineHeightLarge,
-        fontFamily: Typography.logoFontFamily,
-        color: Color.whitePrimary,
-        marginLeft: Dimension.space,
-      }
     };
   },
 
@@ -1085,39 +1066,15 @@ var App = React.createClass({
     var style = this.getStyle();
     var page = this.getPage();
 
-    var iconProps = {
-      search: {
-        d: Icon.search,
-        fill: this.state.page === Page.SEARCH ? Color.white : Color.black,
-        fillOpacity: this.state.page === Page.SEARCH ? Color.whitePrimaryOpacity : Color.blackSecondaryOpacity,
-        onClick: this.navigate.bind(this, Page.SEARCH)
-      },
-      cloud: {
-        d: Icon.cloud,
-        fill: this.state.page === Page.CLOUD ? Color.white : Color.black,
-        fillOpacity: this.state.page === Page.CLOUD ? Color.whitePrimaryOpacity : Color.blackSecondaryOpacity,
-        onClick: this.navigate.bind(this, Page.CLOUD)
-      }
-    };
-
     var appBar = null;
     if (this.state.page === Page.SEARCH || this.state.page === Page.CLOUD) {
       appBar = (
-        <div style={style.appBar}>
-            <div style={style.logo}>
-                <Logo cloudColor={Color.whitePrimary} 
-                      tagColor={Color.blue500}
-                      style={style.logoIcon}/>
-                <div style={style.logoText}>{Value.appName}</div>
-            </div>
-            <ActionBar>
-                <MaterialIcon action="Search" {...iconProps.search}/>
-                <MaterialIcon action="Cloud" {...iconProps.cloud}/>
-            </ActionBar>
-        </div>
+        <AppBar page={this.state.page} 
+                onNavigate={this.navigate} 
+                onGoHome={this.goHome}/>
       );
     }
-
+    
     var snackbar = null;
     if(this.state.snackbar.visible) {
       snackbar = (

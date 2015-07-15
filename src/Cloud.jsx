@@ -7,6 +7,7 @@ var FileActionBar = require('./FileActionBar');
 
 var R = require('./res/index');
 var Dimension = R.dimension;
+var Page = R.constant.page;
 var Providers = R.providers;
 var Shadow = R.shadow;
 var Util = require('./util/util');
@@ -157,7 +158,7 @@ var Cloud = React.createClass({
     }
 
     return (
-      <div style={style.cloud} 
+      <div style={style.cloud}
            onDrop={this.handleFileDrop}
            onDragOver={this.handleFileDragOver}>
           <Path path={this.props.path} 

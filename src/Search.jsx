@@ -7,6 +7,7 @@ var FileActionBar = require('./FileActionBar');
 var R = require('./res/index');
 var Color = R.color;
 var Dimension = R.dimension;
+var Page = R.constant.page;
 var Shadow = R.shadow;
 var Util = require('./util/util');
 var Immutable = require('immutable');
