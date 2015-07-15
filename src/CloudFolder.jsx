@@ -30,6 +30,7 @@ var CloudFolder = React.createClass({
         float: 'left',
         marginTop: Dimension.quantum,
         marginRight: Dimension.quantum,
+        cursor: 'pointer',
       },
       rightIcon: {
         clearance: {
