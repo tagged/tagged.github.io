@@ -14,7 +14,7 @@
     "minify:vendor": "uglifyjs ./vendor.js -mc -o ./vendor.min.js",
     "minify:app": "uglifyjs ./app.js -mc -o ./app.min.js",
     "minify": "npm run minify:vendor && npm run minify:app",
-    "clean": "rm -rf ./build && rm -f ./app.js && rm -f ./vendor.js",
+    "clean": "rm -rf ./build && rm -f ./app.js && rm -f ./vendor.js && rm -f ./app.min.js && rm -f ./vendor.min.js",
     "test": "jest"
   },
   "dependencies": {
