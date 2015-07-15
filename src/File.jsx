@@ -49,11 +49,11 @@ var File = React.createClass({
       checkbox: {
         clearance: {
           float: 'left',
-          marginRight: Dimension.quantum
         }
       },
       fileInfo: {
         marginRight: Dimension.touchTarget + Dimension.quantum,
+        paddingLeft: Dimension.quantum,
         overflow: 'hidden',//clear checkbox
       },
       filename: {
