@@ -126,11 +126,16 @@ var Checkbox = React.createClass({
   },
   
   animateCheckmark: function(prevProps) {
+    //If checkStatus hasn't changed, don't animate or stop previous animation
+    if (prevProps.checkStatus === this.props.checkStatus) {
+      return;
+    }
+    
     var polyline = React.findDOMNode(this.refs.polyline);
     Velocity(polyline, 'stop', true);
 
     //Animate checkline
-    if (this.props.checkStatus === INDETERMINATE && prevProps.checkStatus !== INDETERMINATE) {
+    if (this.props.checkStatus === INDETERMINATE) {
       Velocity({
         elements: polyline,
         properties: {
@@ -154,7 +159,7 @@ var Checkbox = React.createClass({
     }
     
     //Animate checkmark
-    else if (this.props.checkStatus === TRUE && prevProps.checkStatus !== TRUE) {
+    else if (this.props.checkStatus === TRUE) {
       Velocity({
         elements: polyline,
         properties: {
