@@ -34,9 +34,14 @@ var Folder = React.createClass({
           float: 'right'
         }
       },
-      text: {
+      folderNameWrapper: {
+        overflow: 'hidden',//clear left icon
+      },
+      folderName: {
         root: {
-          cursor: 'pointer'
+          float: 'left',
+          cursor: 'pointer',
+          whiteSpace: 'normal',
         }
       }
     };
@@ -60,10 +65,16 @@ var Folder = React.createClass({
     }
     
     return (
-      <div style={style.folder} onClick={this.props.onClick}>
-          <MaterialIcon d={Icon.folder} style={style.leftIcon}/>
+      <div style={style.folder}>
+          <MaterialIcon d={Icon.folder}
+                        onClick={this.props.onClick}
+                        style={style.leftIcon}/>
           {menuOpener}
-          <TextSingle text={this.props.name} style={style.text}/>
+          <div style={style.folderNameWrapper}>
+              <TextSingle text={this.props.name}
+                          onClick={this.props.onClick}
+                          style={style.folderName}/>
+          </div>
       </div>
     );
   }
