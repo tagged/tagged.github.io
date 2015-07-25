@@ -138,15 +138,6 @@ var _files = [
     contents: [
       {
         isFolder: false,
-        path: ['Google Drive','Sunshine & Whiskey.mp3'],
-        modified: '2015 Jan 8',
-        size: '5.22 MB',
-        type: 'FILE',
-        link: '//drive.google.com',
-        tags: ['country','music'],
-      },
-      {
-        isFolder: false,
         path: ['Google Drive','Char siu'],
         modified: '2015 Feb 24',
         size: '515 B',
@@ -188,39 +179,28 @@ var _files = [
         contents: [
           {
             isFolder: false,
-            path: ['Google Drive', 'Photos','horses.jpg'],
+            path: ['Google Drive', 'Photos','sunset.jpg'],
             modified: '2011 May 11',
             size: '152 kB',
             type: 'JPG',
             link: '//drive.google.com',
-            tags: ['horse','outdoor','animal']
-          },
+            tags: []
+          }
+        ]
+      },
+      //Google Drive/Music
+      {
+        isFolder: true,
+        path: ['Google Drive','Music'],
+        contents: [
           {
             isFolder: false,
-            path: ['Google Drive', 'Photos','farm.jpg'],
-            modified: '2011 May 12',
-            size: '202 kB',
-            type: 'JPG',
+            path: ['Google Drive', 'Music','Zac Brown Band - Loving You Easy.mp3'],
+            modified: '2015 Jul 20',
+            size: '5.18 MB',
+            type: 'MP3',
             link: '//drive.google.com',
-            tags: ['horse','chicken','farm','outdoor','animal']
-          },
-          {
-            isFolder: false,
-            path: ['Google Drive', 'Photos','waimea-1.png'],
-            modified: '2012 Jun 30',
-            size: '411 kB',
-            type: 'PNG',
-            link: '//drive.google.com',
-            tags: ['underwater','turtle','animal']
-          },
-          {
-            isFolder: false,
-            path: ['Google Drive', 'Photos','waimea-2.png'],
-            modified: '2012 Jun 30',
-            size: '396 kB',
-            type: 'PNG',
-            link: '//drive.google.com',
-            tags: ['underwater','dolphin','animal']
+            tags: []
           }
         ]
       }

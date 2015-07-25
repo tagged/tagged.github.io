@@ -49,12 +49,20 @@ var Folder = React.createClass({
   render: function() {
     var style = this.getStyle();
 
+    var menuOpener = null;
+    //Disable menu for now
+    if (false) {
+      menuOpener = (
+        <MaterialIcon d={Icon.moreVert} 
+                      onClick={this.openMenu}
+                      style={style.rightIcon}/>
+      );
+    }
+    
     return (
       <div style={style.folder} onClick={this.props.onClick}>
           <MaterialIcon d={Icon.folder} style={style.leftIcon}/>
-          <MaterialIcon d={Icon.moreVert} 
-                        onClick={this.openMenu}
-                        style={style.rightIcon}/>
+          {menuOpener}
           <TextSingle text={this.props.name} style={style.text}/>
       </div>
     );
