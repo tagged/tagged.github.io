@@ -23,6 +23,8 @@ var Menu = React.createClass({
   getStyle: function() {
     return {
       menu: {
+        position: 'relative',
+        zIndex: 99,
         paddingTop: Dimension.space,
         paddingBottom: Dimension.space,
         borderRadius: Dimension.borderRadius,
@@ -31,12 +33,22 @@ var Menu = React.createClass({
       },
       item: {
         cursor: 'pointer'
+      },
+      invisible: {
+        position: 'fixed',
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
+        zIndex: 98,
       }
     };
   },
 
   render: function() {
-    var style = Util.merge(this.getStyle(), this.props.style);
+    var {onMenuHide, hoverColor, style, ...props} = this.props;
+
+    style = Util.merge(this.getStyle(), style);
 
     var childNodes = React.Children.map(this.props.children, function(child, childIndex) {
       return (
@@ -50,18 +62,13 @@ var Menu = React.createClass({
     }, this);
 
     return (
-      <div style={style.menu}>
-          {childNodes}
+      <div>
+          <div style={style.invisible} onMouseDown={onMenuHide}/>
+          <div style={style.menu} {...props}>
+              {childNodes}
+          </div>
       </div>
     );
-  },
-
-  componentDidMount: function() {
-    document.addEventListener("mousedown", this.props.onMenuHide);
-  },
-
-  componentWillUnmount: function() {
-    document.removeEventListener("mousedown", this.props.onMenuHide);
   },
 
   handleMouseEnter: function(childIndex) {

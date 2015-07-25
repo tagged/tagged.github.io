@@ -38,11 +38,13 @@ var TextSingle = React.createClass({
   },
 
   render: function() {
-    var style = Util.merge(this.getStyle(), this.props.style);
+    var {text, style, ...props} = this.props;
+    
+    style = Util.merge(this.getStyle(), style);
 
     return (
-      <div style={style.root}>
-          {this.props.text}
+      <div style={style.root} {...props}>
+          {text}
       </div>
     );
   }
