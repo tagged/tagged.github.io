@@ -95,7 +95,6 @@ var Cloud = React.createClass({
         var account = this.props.accounts[provider.name];
         var onClick;
         if (account === null) {
-          account = "Sign in";
           onClick = function() {
             window.open(provider.login, '_blank');
           };
@@ -106,6 +105,7 @@ var Cloud = React.createClass({
         return (
           <CloudFolder account={account}
                        provider={provider.name}
+                       login={provider.login}
                        onClick={onClick}
                        key={provider.name}/>
         )
