@@ -555,12 +555,13 @@ var App = React.createClass({
   },
 
   closeTagger: function() {
-    //Collapse header, clear files, clear value
+    //Clear files, clear value, clear tags selected, collapse header
     this.setState({
       tagger: Update(this.state.tagger, {
         files: {$set: Immutable.Set()},
         isShowingFiles: {$set: false},
         value: {$set: ""},
+        tagsSelected: {$set: Immutable.Set()}
       })
     });
     this.navigate(this.state.tagger.basePage);
@@ -686,7 +687,7 @@ var App = React.createClass({
   },
 
   closeFileview: function() {
-    //clear value
+    //Clear file, clear value, clear tags selected
     this.setState({
       fileview: Update(this.state.fileview, {
         file: {$set: ""},
