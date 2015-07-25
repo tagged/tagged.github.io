@@ -43,10 +43,12 @@ var TextDouble = React.createClass({
   },
 
   render: function() {
-    var style = Util.merge(this.getStyle(), this.props.style);
+    var {text, style, ...props} = this.props;
+    
+    style = Util.merge(this.getStyle(), style);
 
     return (
-      <div style={style.root}>
+      <div style={style.root} {...props}>
           <div style={style.first}>
               {this.props.text[0]}
           </div>

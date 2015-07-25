@@ -49,9 +49,13 @@ var CloudFolder = React.createClass({
           marginTop: Dimension.quantum
         }
       },
-      text: {
+      folderNameWrapper: {
+        overflow: 'hidden',//clear left icon
+      },
+      folderName: {
         root: {
-          cursor: 'pointer'
+          float: 'left',
+          cursor: 'pointer',
         }
       },
       menu: {
@@ -114,12 +118,16 @@ var CloudFolder = React.createClass({
     }
 
     return (
-      <div style={style.folder}
-           onClick={this.props.onClick}>
-          <ImageIcon {...Image[this.props.provider]} style={style.leftIcon}/>
+      <div style={style.folder}>
+          <ImageIcon {...Image[this.props.provider]}
+                     onClick={this.props.onClick}
+                     style={style.leftIcon}/>
           {menuOpener}
-          <TextDouble text={[this.props.provider, this.props.account || "Sign in"]} 
-                      style={style.text}/>
+          <div style={style.folderNameWrapper}>
+              <TextDouble text={[this.props.provider, this.props.account || "Sign in"]}
+                          onClick={this.props.onClick}
+                          style={style.folderName}/>
+          </div>
           {menu}
       </div>
     );
