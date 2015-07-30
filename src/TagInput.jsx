@@ -31,7 +31,7 @@ var TagInput = React.createClass({
   },
 
   getStyle: function() {
-    var verticalPadding = (Dimension.heightTag - Typography.lineHeight * Typography.fontSize) / 2;
+    var verticalPadding = (Dimension.heightTag - Typography.lineHeightSmall * Typography.fontSizeSmall) / 2;
     
     return {
       component: {
@@ -39,7 +39,7 @@ var TagInput = React.createClass({
         position: 'relative',
         marginRight: Dimension.space,
         marginBottom: Dimension.space,
-        fontSize: Typography.fontSize,
+        fontSize: Typography.fontSizeSmall,
         fontWeight: Typography.fontWeightRegular
       },
       input: {
@@ -52,7 +52,7 @@ var TagInput = React.createClass({
         paddingLeft: Dimension.space,
         paddingRight: Dimension.space,
         font: 'inherit',
-        lineHeight: Typography.lineHeight,
+        lineHeight: Typography.lineHeightSmall,
         paddingTop: verticalPadding - Dimension.borderWidth,
         paddingBottom: verticalPadding - Dimension.borderWidth,
         color: Color.blackPrimary,

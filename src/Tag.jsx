@@ -27,8 +27,8 @@ var Tag = React.createClass({
       tag: {
         display: 'inline-block',
         verticalAlign: 'top',
-        fontSize: Typography.fontSize,
-        lineHeight: Typography.lineHeight,
+        fontSize: Typography.fontSizeSmall,
+        lineHeight: Typography.lineHeightSmall,
         paddingTop: verticalPadding,
         paddingBottom: verticalPadding,
         paddingLeft: Dimension.space,
