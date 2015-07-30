@@ -1,6 +1,7 @@
 var React = require('react');
 var Tags = require('./Tags');
 var Subheader = require('./Subheader');
+var TextSingle = require('./TextSingle');
 var File = require('./File');
 var FileActionBar = require('./FileActionBar');
 
@@ -9,6 +10,7 @@ var Color = R.color;
 var Dimension = R.dimension;
 var Page = R.constant.page;
 var Shadow = R.shadow;
+var Typography = R.typography;
 var Util = require('./util/util');
 var Immutable = require('immutable');
 var FileStore = require('./res/FileStore');
@@ -46,10 +48,16 @@ var Search = React.createClass({
         paddingBottom: Dimension.heightActionBar + Dimension.space + Dimension.quantum
       },
       header: {
-        paddingTop: 3 * Dimension.space,
+        paddingTop: Dimension.space,
         paddingBottom: Dimension.space,
         paddingLeft: Dimension.marginMobile,
         paddingRight: Dimension.marginMobile,
+      },
+      title: {
+        root: {
+          color: Color.blackSecondary,
+          fontWeight: Typography.fontWeightMedium,
+        }
       },
       suggestions: {
         tags: {
@@ -202,6 +210,7 @@ var Search = React.createClass({
     return (
       <div style={style.search}>
           <div style={style.header}>
+              <TextSingle text="Search" style={style.title}/>
               <Tags ref="searchTags"
                     tags={searchTags}
                     onTagClick={this.props.onSearchTagDelete}
