@@ -7,15 +7,6 @@ var _files = [
     isFolder: true,
     path: ['Dropbox'],
     contents: [
-      {
-        isFolder: false,
-        path: ['Dropbox', 'Getting Started.pdf'],
-        modified: '2010 Sep 16',
-        size: '124 kB',
-        type: 'PDF',
-        link: '//www.dropbox.com/home',
-        tags: [],
-      },
       //Dropbox/Recipes
       {
         isFolder: true,
